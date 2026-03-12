@@ -12,9 +12,17 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
+                'name' => 'Fenix',
+                'email' => 'f@f.com',
+                'role' => 'owner',
+                'password' => Hash::make('12345'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
                 'name' => 'Mario',
                 'email' => 'm@m.com',
-                'role' => 'admin',
+                'role' => 'pl',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
+            $table->foreignId('vendor_contact_id')->nullable()->constrained('vendor_contacts')->onDelete('set null');
             $table->foreignId('vendor_package_id')->nullable()->constrained('vendor_packages')->onDelete('set null');
             $table->decimal('deal_price', 15, 2);
             $table->enum('status', ['reviewing', 'verified', 'rejected', 'signed'])->default('reviewing');

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendors', function (Blueprint $table) {
+        Schema::create('vendor_contacts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('vendor_categories')->onDelete('cascade');
+            $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->string('name');
-            $table->text('address')->nullable();
-            $table->string('instagram')->nullable();
+            $table->string('phone', 20);
+            $table->boolean('is_primary')->default(false);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendors');
+        Schema::dropIfExists('vendor_contacts');
     }
 };
