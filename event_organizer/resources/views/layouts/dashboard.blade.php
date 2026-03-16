@@ -26,23 +26,31 @@
             </a>
 
             @if(Auth::user()->role === 'owner')
-            <div x-data="{ open: {{ request()->routeIs('admin.users') || request()->routeIs('admin.vendors') ? 'true' : 'false' }} }">
+            <div x-data="{
+                    open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.vendors') ? 'true' : 'false' }})
+                 }"
+                 x-init="$watch('open', val => localStorage.setItem('masterDataOpen', val))">
+
                 <button @click="open = !open"
                         class="w-full flex justify-between items-center px-4 py-2.5 rounded-md font-medium transition-colors hover:bg-gray-800 hover:text-white mt-2">
                     <span>Master Data</span>
-                    <svg :class="{'rotate-180': open}" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <svg :class="{'rotate-180': open}" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
 
                 <div x-show="open" x-collapse class="pl-4 mt-1 space-y-1">
-                    <a href="{{ route('admin.users') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('admin.users') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">User</a>
-                    <a href="{{ route('admin.vendors') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('admin.vendors') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
+                    <a href="{{ route('owner.users') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.users') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">User</a>
+                    <a href="{{ route('owner.vendors') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
                 </div>
             </div>
             @endif
 
             @if(in_array(Auth::user()->role, ['owner', 'pl']))
-            <a href="{{ route('pl.events') }}"
-               class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ request()->routeIs('pl.events') ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
+            @php
+                $eventRoute = Auth::user()->role === 'owner' ? route('owner.events.index') : route('pl.events.index');
+                $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index');
+            @endphp
+            <a href="{{ $eventRoute }}"
+               class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ $isEventActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
                 Event Arrangement
             </a>
             @endif
