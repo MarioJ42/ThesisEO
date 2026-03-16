@@ -87,31 +87,25 @@
         const tableContainer = document.getElementById('table-container');
 
         function fetchUpdatedData() {
-            // Bangun URL dengan parameter pencarian dan per_page
             const url = new URL(window.location.href);
             url.searchParams.set('search', searchInput.value);
             url.searchParams.set('per_page', perPageSelect.value);
 
-            // Fetch data secara asinkronus (Live Search)
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(response => response.text())
                 .then(html => {
                     const doc = new DOMParser().parseFromString(html, 'text/html');
-                    // Perbarui hanya container tabel
                     tableContainer.innerHTML = doc.getElementById('table-container').innerHTML;
-                    // Update URL di browser tanpa reload
                     window.history.pushState({}, '', url);
                 });
         }
 
-        // Debounce pencarian agar tidak terlalu sering fetch
         let timeout = null;
         searchInput.addEventListener('input', function() {
             clearTimeout(timeout);
             timeout = setTimeout(fetchUpdatedData, 300);
         });
 
-        // Fetch data saat jumlah entri diubah
         perPageSelect.addEventListener('change', fetchUpdatedData);
     });
 </script>
