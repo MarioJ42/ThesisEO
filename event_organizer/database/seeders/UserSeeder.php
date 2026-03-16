@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Fenix',
                 'email' => 'f@f.com',
+                'phone' => '081234567890',
                 'role' => 'owner',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
@@ -22,6 +23,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Mario',
                 'email' => 'm@m.com',
+                'phone' => '081234567890',
                 'role' => 'pl',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
@@ -30,6 +32,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Kezia',
                 'email' => 'k@k.com',
+                'phone' => '081234567890',
                 'role' => 'klien',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
@@ -38,6 +41,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Sharon',
                 'email' => 's@s.com',
+                'phone' => '081234567890',
                 'role' => 'crew_rsvp',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
@@ -46,6 +50,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Vegas',
                 'email' => 'v@v.com',
+                'phone' => '081234567890',
                 'role' => 'crew_eo',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),

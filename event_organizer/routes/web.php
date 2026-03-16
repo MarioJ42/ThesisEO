@@ -16,18 +16,24 @@ Route::get('/vendor', function () {
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'owner') abort(403);
+        if (Auth::user()->role !== 'owner') {
+            return redirect('/');
+        }
         return view('owner.dashboard');
     })->name('owner.dashboard');
 
     Route::get('/users', [OwnerController::class, 'users'])->name('owner.users');
+    Route::post('/users', [OwnerController::class, 'storeUser'])->name('owner.users.store');
+    Route::put('/users/{user}', [OwnerController::class, 'updateUser'])->name('owner.users.update');
     Route::get('/vendors', [OwnerController::class, 'vendors'])->name('owner.vendors');
     Route::get('/events', [EventController::class, 'index'])->name('owner.events.index');
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::get('/dashboard', function () {
-        if (!in_array(Auth::user()->role, ['owner', 'pl'])) abort(403);
+        if (Auth::user()->role !== 'pl') {
+            return redirect('/');
+        }
         return view('pl.dashboard');
     })->name('pl.dashboard');
 
