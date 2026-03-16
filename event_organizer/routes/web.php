@@ -26,6 +26,8 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::post('/users', [OwnerController::class, 'storeUser'])->name('owner.users.store');
     Route::put('/users/{user}', [OwnerController::class, 'updateUser'])->name('owner.users.update');
     Route::get('/vendors', [OwnerController::class, 'vendors'])->name('owner.vendors');
+    Route::post('/vendors', [OwnerController::class, 'storeVendor'])->name('owner.vendors.store');
+    Route::put('/vendors/{vendor}', [OwnerController::class, 'updateVendor'])->name('owner.vendors.update');
     Route::get('/events', [EventController::class, 'index'])->name('owner.events.index');
 });
 

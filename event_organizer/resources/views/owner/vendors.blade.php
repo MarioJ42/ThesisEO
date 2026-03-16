@@ -21,7 +21,7 @@
                 </button>
             </div>
             <div>
-                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search name or category..." class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by name or category..." class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
             </div>
         </div>
 
@@ -32,7 +32,6 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Vendor Name</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">PIC</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Contact Person</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Action</th>
@@ -42,9 +41,16 @@
                         @forelse($vendors as $vendor)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-sm text-gray-700 font-medium">{{ $vendor->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $vendor->categories->pluck('name')->join(', ') ?: '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $vendor->contacts->first()->name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $vendor->contacts->first()->phone ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ $vendor->categories->pluck('name')->join(', ') ?: '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($vendor->contacts->isNotEmpty())
+                                    {{ $vendor->contacts->first()->name }} ({{ $vendor->contacts->first()->phone }})
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-sm text-center">
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-700">Active</span>
                             </td>
@@ -54,7 +60,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">Data vendor tidak ditemukan.</td>
+                            <td colspan="5" class="px-6 py-4 text-sm text-center text-gray-500">Data vendor tidak ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -81,25 +87,31 @@
         const tableContainer = document.getElementById('table-container');
 
         function fetchUpdatedData() {
+            // Bangun URL dengan parameter pencarian dan per_page
             const url = new URL(window.location.href);
             url.searchParams.set('search', searchInput.value);
             url.searchParams.set('per_page', perPageSelect.value);
 
+            // Fetch data secara asinkronus (Live Search)
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(response => response.text())
                 .then(html => {
                     const doc = new DOMParser().parseFromString(html, 'text/html');
+                    // Perbarui hanya container tabel
                     tableContainer.innerHTML = doc.getElementById('table-container').innerHTML;
+                    // Update URL di browser tanpa reload
                     window.history.pushState({}, '', url);
                 });
         }
 
+        // Debounce pencarian agar tidak terlalu sering fetch
         let timeout = null;
         searchInput.addEventListener('input', function() {
             clearTimeout(timeout);
             timeout = setTimeout(fetchUpdatedData, 300);
         });
 
+        // Fetch data saat jumlah entri diubah
         perPageSelect.addEventListener('change', fetchUpdatedData);
     });
 </script>

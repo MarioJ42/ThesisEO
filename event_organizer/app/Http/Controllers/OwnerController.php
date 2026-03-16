@@ -82,8 +82,11 @@ class OwnerController extends Controller
 
         $vendors = Vendor::with(['categories', 'contacts'])
             ->when($search, function ($query, $search) {
+                // Kita bungkus dalam 'where' closure agar kondisi 'or' tidak mengganggu query utama
                 return $query->where(function ($q) use ($search) {
+                    // Cari berdasarkan Nama Vendor
                     $q->where('name', 'like', "%{$search}%")
+                        // ATAU cari ke dalam tabel categories
                         ->orWhereHas('categories', function ($qCat) use ($search) {
                             $qCat->where('name', 'like', "%{$search}%");
                         });
@@ -93,5 +96,60 @@ class OwnerController extends Controller
             ->appends(request()->query());
 
         return view('owner.vendors', compact('vendors'));
+    }
+
+    public function storeVendor(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'categories' => 'required|string', // Format: MUA, Venue, Catering
+            'pic_name' => 'required|string|max:255',
+            'pic_phone' => 'required|string|max:20',
+        ]);
+
+        // 1. Simpan Vendor
+        $vendor = Vendor::create(['name' => $request->name]);
+
+        // 2. Simpan Categories (Pisahkan koma menjadi array)
+        $categories = array_map('trim', explode(',', $request->categories));
+        foreach ($categories as $cat) {
+            $vendor->categories()->create(['name' => $cat]);
+        }
+
+        // 3. Simpan Contact
+        $vendor->contacts()->create([
+            'name' => $request->pic_name,
+            'phone' => $request->pic_phone,
+        ]);
+
+        return redirect()->route('owner.vendors')->with('success', 'Vendor successfully added!');
+    }
+
+    public function updateVendor(Request $request, Vendor $vendor)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'categories' => 'required|string',
+            'pic_name' => 'required|string|max:255',
+            'pic_phone' => 'required|string|max:20',
+        ]);
+
+        // 1. Update Nama Vendor
+        $vendor->update(['name' => $request->name]);
+
+        // 2. Update Categories (Hapus lama, isi baru)
+        $vendor->categories()->delete();
+        $categories = array_map('trim', explode(',', $request->categories));
+        foreach ($categories as $cat) {
+            $vendor->categories()->create(['name' => $cat]);
+        }
+
+        // 3. Update Contact (Update baris pertama)
+        $vendor->contacts()->first()->update([
+            'name' => $request->pic_name,
+            'phone' => $request->pic_phone,
+        ]);
+
+        return redirect()->route('owner.vendors')->with('success', 'Vendor successfully updated!');
     }
 }
