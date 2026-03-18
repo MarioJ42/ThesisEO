@@ -4,13 +4,15 @@
 <div class="max-w-7xl mx-auto" x-data="{
     isModalOpen: false,
     isEditModalOpen: false,
-    editForm: { id: '', name: '', categories: [], is_active: '1' },
+    editForm: { id: '', name: '', categories: [], is_active: '1', address: '', instagram: '' },
 
-    openEditModal(id, name, categoryIds, is_active) {
+    openEditModal(id, name, categoryIds, is_active, address, instagram) {
         this.editForm.id = id;
         this.editForm.name = name;
         this.editForm.categories = categoryIds.map(String);
         this.editForm.is_active = is_active.toString();
+        this.editForm.address = address || '';
+        this.editForm.instagram = instagram || '';
         this.isEditModalOpen = true;
     }
 }">
@@ -24,7 +26,7 @@
 
     @if ($errors->any())
     <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-        <ul class="list-disc list-inside">
+        <ul class="list-disc list-inside text-sm">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -79,7 +81,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button @click="openEditModal({{ $vendor->id }}, '{{ addslashes($vendor->name) }}', {{ $catIds }}, {{ $vendor->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
+                                    <button @click="openEditModal({{ $vendor->id }}, '{{ addslashes($vendor->name) }}', {{ $catIds }}, {{ $vendor->is_active ? '1' : '0' }}, '{{ addslashes($vendor->address) }}', '{{ addslashes($vendor->instagram) }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
 
                                     <a href="{{ route('owner.vendors.manage', $vendor->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Manage</a>
                                 </div>
@@ -106,8 +108,8 @@
         </div>
     </div>
 
-    <div x-show="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="display: none;" x-cloak>
-        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl" @click.away="isModalOpen = false">
+    <div x-show="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
+        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl my-8" @click.away="isModalOpen = false">
             <div class="flex justify-between items-center p-4 border-b">
                 <h3 class="text-xl font-semibold text-gray-900">Add New Vendor</h3>
                 <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
@@ -117,7 +119,7 @@
 
             <form action="{{ route('owner.vendors.store') }}" method="POST">
                 @csrf
-                <div class="p-6 space-y-4">
+                <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Vendor Name <span class="text-red-500">*</span></label>
                         <input type="text" name="name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -134,6 +136,19 @@
                             @endforeach
                         </div>
                     </div>
+
+                    <div class="pt-2 border-t border-gray-200">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram</label>
+                        <div class="flex mb-4">
+                            <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+                                @
+                            </span>
+                            <input type="text" name="instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5">
+                        </div>
+
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
+                        <textarea name="address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+                    </div>
                     <p class="text-xs text-gray-500 italic mt-2">* Contacts, Portfolios, and Packages can be added later via the "Manage" button.</p>
                 </div>
 
@@ -145,8 +160,8 @@
         </div>
     </div>
 
-    <div x-show="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="display: none;" x-cloak>
-        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl" @click.away="isEditModalOpen = false">
+    <div x-show="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
+        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl my-8" @click.away="isEditModalOpen = false">
             <div class="flex justify-between items-center p-4 border-b">
                 <h3 class="text-xl font-semibold text-gray-900">Quick Edit Vendor</h3>
                 <button @click="isEditModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
@@ -157,7 +172,7 @@
             <form :action="'{{ url('/owner/vendors') }}/' + editForm.id" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="p-6 space-y-4">
+                <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Vendor Name <span class="text-red-500">*</span></label>
                         <input type="text" name="name" x-model="editForm.name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -173,6 +188,19 @@
                             </label>
                             @endforeach
                         </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-200">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram</label>
+                        <div class="flex mb-4">
+                            <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+                                @
+                            </span>
+                            <input type="text" name="instagram" x-model="editForm.instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5">
+                        </div>
+
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
+                        <textarea name="address" x-model="editForm.address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
                     </div>
 
                     <div class="pt-2 border-t border-gray-200">

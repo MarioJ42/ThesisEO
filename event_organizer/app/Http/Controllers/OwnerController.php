@@ -103,10 +103,14 @@ class OwnerController extends Controller
             'name' => 'required|string|max:255|unique:vendors,name',
             'categories' => 'required|array',
             'categories.*' => 'exists:vendor_categories,id',
+            'address' => 'nullable|string',
+            'instagram' => 'nullable|string|max:255',
         ]);
 
         $vendor = Vendor::create([
             'name' => $request->name,
+            'address' => $request->address,
+            'instagram' => $request->instagram,
             'is_active' => true
         ]);
 
@@ -122,10 +126,14 @@ class OwnerController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'exists:vendor_categories,id',
             'is_active' => 'required|boolean',
+            'address' => 'nullable|string',
+            'instagram' => 'nullable|string|max:255',
         ]);
 
         $vendor->update([
             'name' => $request->name,
+            'address' => $request->address,
+            'instagram' => $request->instagram,
             'is_active' => filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN),
         ]);
 
@@ -239,5 +247,49 @@ class OwnerController extends Controller
         return redirect()->back()
             ->with('success', 'Package successfully deleted!')
             ->with('active_tab', 'packages');
+    }
+
+
+    public function storeVendorPortfolio(Request $request, Vendor $vendor)
+    {
+        if ($vendor->portfolios()->count() >= 10) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Maximum limit of 10 portfolio photos reached for this vendor.'])
+                ->with('active_tab', 'portfolios');
+        }
+
+        $request->validate([
+            'images' => 'required|array|max:5',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $remainingSlots = 10 - $vendor->portfolios()->count();
+        $imagesToProcess = array_slice($request->file('images'), 0, $remainingSlots);
+
+        foreach ($imagesToProcess as $image) {
+            $path = $image->store('portfolios', 'public');
+
+            $vendor->portfolios()->create([
+                'title' => pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME),
+                'image_path' => $path,
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', count($imagesToProcess) . ' Photo(s) successfully uploaded!')
+            ->with('active_tab', 'portfolios');
+    }
+
+    public function destroyVendorPortfolio(\App\Models\VendorPortfolio $portfolio)
+    {
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($portfolio->image_path)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($portfolio->image_path);
+        }
+
+        $portfolio->delete();
+
+        return redirect()->back()
+            ->with('success', 'Photo successfully deleted!')
+            ->with('active_tab', 'portfolios');
     }
 }

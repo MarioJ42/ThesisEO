@@ -28,7 +28,9 @@
         this.packageForm.max_price = max_price;
         this.packageForm.details = details;
         this.isEditPackageModalOpen = true;
-    }
+    },
+
+    isPortfolioModalOpen: false
 }">
 
     <div class="flex items-center justify-between mb-6">
@@ -80,7 +82,7 @@
         </nav>
     </div>
 
-   <div class="bg-white rounded-b-lg shadow-sm border border-t-0 border-gray-200 p-6">
+    <div class="bg-white rounded-b-lg shadow-sm border border-t-0 border-gray-200 p-6">
 
         <div x-show="activeTab === 'contacts'" x-cloak>
             <div class="flex justify-between items-center mb-4">
@@ -178,11 +180,32 @@
 
         <div x-show="activeTab === 'portfolios'" x-cloak>
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Portfolios</h3>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">+ Upload Photo</button>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Portfolios</h3>
+                    <p class="text-sm text-gray-500">Maximum 10 photos. Max 2MB per photo (JPG, PNG).</p>
+                </div>
+                <button @click="isPortfolioModalOpen = true" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">+ Upload Photo</button>
             </div>
-            <div class="border-2 border-dashed border-gray-200 rounded-lg p-10 text-center text-gray-500">
-                Fitur Portfolios sedang dalam pengembangan...
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                @forelse($vendor->portfolios as $portfolio)
+                <div class="relative group aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                    <img src="{{ asset('storage/' . $portfolio->image_path) }}" alt="{{ $portfolio->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <form id="delete-portfolio-form-{{ $portfolio->id }}" action="{{ route('owner.vendors.portfolios.destroy', $portfolio->id) }}" method="POST">
+                            @csrf @method('DELETE')
+                            <button type="button" onclick="confirmDeletePortfolio('{{ $portfolio->id }}')" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div class="col-span-full border-2 border-dashed border-gray-200 rounded-lg p-10 text-center text-gray-500">
+                    There are no portfolio photos yet. Please click the "+ Upload Photo" button.
+                </div>
+                @endforelse
             </div>
         </div>
 
@@ -292,7 +315,7 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                        <input type="text" name="name" placeholder="e.g. Paket Full Band" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
                     <div class="flex gap-4">
                         <div class="w-1/2">
@@ -306,7 +329,7 @@
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Specifications / Details</label>
-                        <textarea name="details" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"></textarea>
+                        <textarea name="details" rows="4" placeholder="e.g. 2 singer, 1 drum, 1 bass..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end p-4 border-t gap-2">
@@ -354,6 +377,30 @@
             </form>
         </div>
     </div>
+
+    <div x-show="isPortfolioModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" x-cloak>
+        <div class="relative w-full max-w-md bg-white rounded-lg shadow-xl" @click.away="isPortfolioModalOpen = false">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">Upload Photos</h3>
+                <button @click="isPortfolioModalOpen = false" class="text-gray-400 hover:text-gray-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form action="{{ route('owner.vendors.portfolios.store', $vendor->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="p-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Select Images (Max 5 at once) <span class="text-red-500">*</span></label>
+                    <input type="file" name="images[]" multiple accept=".jpg,.jpeg,.png" required class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2.5">
+                    <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, PNG. Max size: 2MB per file.</p>
+                </div>
+                <div class="flex justify-end p-4 border-t gap-2">
+                    <button type="button" @click="isPortfolioModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -394,6 +441,26 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('delete-package-form-' + packageId).submit();
+            }
+        });
+    }
+
+    function confirmDeletePortfolio(portfolioId) {
+        Swal.fire({
+            title: 'Delete Photo?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            scrollbarPadding: false,
+            heightAuto: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-portfolio-form-' + portfolioId).submit();
             }
         });
     }
