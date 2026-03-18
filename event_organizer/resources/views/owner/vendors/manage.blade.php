@@ -315,7 +315,7 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" placeholder="e.g. Paket Full Band" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                        <input type="text" name="name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
                     <div class="flex gap-4">
                         <div class="w-1/2">
@@ -329,7 +329,7 @@
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Specifications / Details</label>
-                        <textarea name="details" rows="4" placeholder="e.g. 2 singer, 1 drum, 1 bass..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"></textarea>
+                        <textarea name="details" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end p-4 border-t gap-2">
