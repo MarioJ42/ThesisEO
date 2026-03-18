@@ -80,7 +80,7 @@
         </nav>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-sm border border-t-0 border-gray-200 p-6 min-h-[400px]">
+   <div class="bg-white rounded-b-lg shadow-sm border border-t-0 border-gray-200 p-6">
 
         <div x-show="activeTab === 'contacts'" x-cloak>
             <div class="flex justify-between items-center mb-4">
