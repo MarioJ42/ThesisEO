@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VendorContact extends Model
+class VendorPackage extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'vendor_id',
         'name',
-        'phone',
-        'is_primary',
-        'is_active',
+        'min_price',
+        'max_price',
+        'details',
     ];
 
     public function vendor()

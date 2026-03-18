@@ -80,7 +80,7 @@ class OwnerController extends Controller
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
 
-        $vendors = Vendor::with(['categories', 'contacts'])
+        $vendors = Vendor::with('categories')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -92,29 +92,25 @@ class OwnerController extends Controller
             ->paginate($perPage)
             ->appends(request()->query());
 
-        return view('owner.vendors', compact('vendors'));
+        $masterCategories = \App\Models\VendorCategory::orderBy('name', 'asc')->get();
+
+        return view('owner.vendors', compact('vendors', 'masterCategories'));
     }
 
     public function storeVendor(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'categories' => 'required|string',
-            'pic_name' => 'required|string|max:255',
-            'pic_phone' => 'required|string|max:20',
+            'name' => 'required|string|max:255|unique:vendors,name',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:vendor_categories,id',
         ]);
 
-        $vendor = Vendor::create(['name' => $request->name]);
-
-        $categories = array_map('trim', explode(',', $request->categories));
-        foreach ($categories as $cat) {
-            $vendor->categories()->create(['name' => $cat]);
-        }
-
-        $vendor->contacts()->create([
-            'name' => $request->pic_name,
-            'phone' => $request->pic_phone,
+        $vendor = Vendor::create([
+            'name' => $request->name,
+            'is_active' => true
         ]);
+
+        $vendor->categories()->attach($request->categories);
 
         return redirect()->route('owner.vendors')->with('success', 'Vendor successfully added!');
     }
@@ -122,25 +118,126 @@ class OwnerController extends Controller
     public function updateVendor(Request $request, Vendor $vendor)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'categories' => 'required|string',
-            'pic_name' => 'required|string|max:255',
-            'pic_phone' => 'required|string|max:20',
+            'name' => 'required|string|max:255|unique:vendors,name,' . $vendor->id,
+            'categories' => 'required|array',
+            'categories.*' => 'exists:vendor_categories,id',
+            'is_active' => 'required|boolean',
         ]);
 
-        $vendor->update(['name' => $request->name]);
-
-        $vendor->categories()->delete();
-        $categories = array_map('trim', explode(',', $request->categories));
-        foreach ($categories as $cat) {
-            $vendor->categories()->create(['name' => $cat]);
-        }
-
-        $vendor->contacts()->first()->update([
-            'name' => $request->pic_name,
-            'phone' => $request->pic_phone,
+        $vendor->update([
+            'name' => $request->name,
+            'is_active' => filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN),
         ]);
+
+        $vendor->categories()->sync($request->categories);
 
         return redirect()->route('owner.vendors')->with('success', 'Vendor successfully updated!');
+    }
+
+    public function manageVendor(Vendor $vendor)
+    {
+        $vendor->load(['categories', 'contacts', 'packages', 'portfolios']);
+
+        return view('owner.vendors.manage', compact('vendor'));
+    }
+
+    public function storeVendorContact(Request $request, Vendor $vendor)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'is_primary' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        if ($request->is_primary) {
+            $vendor->contacts()->update(['is_primary' => false]);
+        }
+
+        $vendor->contacts()->create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'is_primary' => $request->boolean('is_primary'),
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'PIC Contact successfully added!')
+            ->with('active_tab', 'contacts');
+    }
+
+    public function updateVendorContact(Request $request, \App\Models\VendorContact $contact)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'is_primary' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        if ($request->is_primary) {
+            $contact->vendor->contacts()->where('id', '!=', $contact->id)->update(['is_primary' => false]);
+        }
+
+        $contact->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'is_primary' => $request->boolean('is_primary'),
+            'is_active' => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'PIC Contact successfully updated!')
+            ->with('active_tab', 'contacts');
+    }
+
+    public function destroyVendorContact(\App\Models\VendorContact $contact)
+    {
+        $contact->delete();
+        return redirect()->back()
+            ->with('success', 'PIC Contact successfully deleted!')
+            ->with('active_tab', 'contacts');
+    }
+
+
+    public function storeVendorPackage(Request $request, Vendor $vendor)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'min_price' => 'required|numeric|min:0',
+            'max_price' => 'required|numeric|gte:min_price',
+            'details' => 'nullable|string',
+        ]);
+
+        $vendor->packages()->create($request->only('name', 'min_price', 'max_price', 'details'));
+
+        return redirect()->back()
+            ->with('success', 'Package successfully added!')
+            ->with('active_tab', 'packages');
+    }
+
+    public function updateVendorPackage(Request $request, \App\Models\VendorPackage $package)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'min_price' => 'required|numeric|min:0',
+            'max_price' => 'required|numeric|gte:min_price',
+            'details' => 'nullable|string',
+        ]);
+
+        $package->update($request->only('name', 'min_price', 'max_price', 'details'));
+
+        return redirect()->back()
+            ->with('success', 'Package successfully updated!')
+            ->with('active_tab', 'packages');
+    }
+
+    public function destroyVendorPackage(\App\Models\VendorPackage $package)
+    {
+        $package->delete();
+
+        return redirect()->back()
+            ->with('success', 'Package successfully deleted!')
+            ->with('active_tab', 'packages');
     }
 }

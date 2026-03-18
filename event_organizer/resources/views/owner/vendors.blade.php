@@ -1,8 +1,36 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto" x-data="{
+    isModalOpen: false,
+    isEditModalOpen: false,
+    editForm: { id: '', name: '', categories: [], is_active: '1' },
+
+    openEditModal(id, name, categoryIds, is_active) {
+        this.editForm.id = id;
+        this.editForm.name = name;
+        this.editForm.categories = categoryIds.map(String);
+        this.editForm.is_active = is_active.toString();
+        this.isEditModalOpen = true;
+    }
+}">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Master Vendor</h2>
+
+    @if(session('success'))
+    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline">{{ session('success') }}</span>
+    </div>
+    @endif
+
+    @if ($errors->any())
+    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 w-full">
@@ -13,10 +41,9 @@
                         <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
                         <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                         <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                     </select>
                 </div>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
+                <button @click="isModalOpen = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
                     Add New Vendor
                 </button>
             </div>
@@ -32,35 +59,35 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Vendor Name</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Contact Person</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($vendors as $vendor)
+                        @php
+                            $catString = $vendor->categories->pluck('name')->join(', ');
+                            $catIds = $vendor->categories->pluck('id')->toJson();
+                        @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-sm text-gray-700 font-medium">{{ $vendor->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ $vendor->categories->pluck('name')->join(', ') ?: '-' }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                @if($vendor->contacts->isNotEmpty())
-                                    {{ $vendor->contacts->first()->name }} ({{ $vendor->contacts->first()->phone }})
-                                @else
-                                    -
-                                @endif
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $catString ?: '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-center">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $vendor->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ $vendor->is_active ? 'Active' : 'Inactive' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-700">Active</span>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-center">
-                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-colors">Edit</button>
+                                <div class="flex justify-center gap-2">
+                                    <button @click="openEditModal({{ $vendor->id }}, '{{ addslashes($vendor->name) }}', {{ $catIds }}, {{ $vendor->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
+
+                                    <a href="{{ route('owner.vendors.manage', $vendor->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Manage</a>
+                                </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-sm text-center text-gray-500">Data vendor tidak ditemukan.</td>
+                            <td colspan="4" class="px-6 py-4 text-sm text-center text-gray-500">Data vendor tidak ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -76,6 +103,92 @@
                     <a href="{{ $vendors->nextPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ !$vendors->hasMorePages() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Next</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div x-show="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="display: none;" x-cloak>
+        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl" @click.away="isModalOpen = false">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-semibold text-gray-900">Add New Vendor</h3>
+                <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form action="{{ route('owner.vendors.store') }}" method="POST">
+                @csrf
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Vendor Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Categories <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                            @foreach($masterCategories as $cat)
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="categories[]" value="{{ $cat->id }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500 focus:border-blue-500 h-4 w-4">
+                                <span class="ml-2 text-sm text-gray-700 truncate">{{ $cat->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 italic mt-2">* Contacts, Portfolios, and Packages can be added later via the "Manage" button.</p>
+                </div>
+
+                <div class="flex justify-end p-4 border-t gap-2">
+                    <button type="button" @click="isModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save Vendor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="display: none;" x-cloak>
+        <div class="relative w-full max-w-lg bg-white rounded-lg shadow-xl" @click.away="isEditModalOpen = false">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-semibold text-gray-900">Quick Edit Vendor</h3>
+                <button @click="isEditModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form :action="'{{ url('/owner/vendors') }}/' + editForm.id" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Vendor Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" x-model="editForm.name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Categories <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                            @foreach($masterCategories as $cat)
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="categories[]" value="{{ $cat->id }}" x-model="editForm.categories" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500 focus:border-blue-500 h-4 w-4">
+                                <span class="ml-2 text-sm text-gray-700 truncate">{{ $cat->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-200">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Vendor Status</label>
+                        <select name="is_active" x-model="editForm.is_active" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="1">Active (Available for Events)</option>
+                            <option value="0">Inactive (Hidden/Suspended)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end p-4 border-t gap-2">
+                    <button type="button" @click="isEditModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update Vendor</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

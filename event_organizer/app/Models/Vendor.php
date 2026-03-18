@@ -11,6 +11,13 @@ class Vendor extends Model
 
     protected $guarded = ['id'];
 
+    protected $fillable = [
+        'name',
+        'address',
+        'instagram',
+        'is_active',
+    ];
+
     public function categories()
     {
         return $this->belongsToMany(VendorCategory::class, 'category_vendor', 'vendor_id', 'category_id');
@@ -22,9 +29,19 @@ class Vendor extends Model
             ->withPivot('vendor_contact_id', 'vendor_package_id', 'deal_price', 'status')
             ->withTimestamps();
     }
-    
+
     public function contacts()
     {
-        return $this->hasMany(VendorContact::class, 'vendor_id');
+        return $this->hasMany(VendorContact::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(VendorPackage::class);
+    }
+
+    public function portfolios()
+    {
+        return $this->hasMany(VendorPortfolio::class);
     }
 }

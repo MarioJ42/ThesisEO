@@ -39,8 +39,8 @@ class UserSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => 'Sharon',
-                'email' => 's@s.com',
+                'name' => 'Clarin',
+                'email' => 'c@c.com',
                 'phone' => '081234567890',
                 'role' => 'crew_rsvp',
                 'password' => Hash::make('12345'),
