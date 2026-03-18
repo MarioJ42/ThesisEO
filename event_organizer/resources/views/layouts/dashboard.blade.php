@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +8,7 @@
     <title>{{ config('app.name', 'Fenix EO') }} - Admin Portal</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="font-sans antialiased bg-gray-50 flex h-screen overflow-hidden">
 
     <aside class="w-64 bg-gray-900 text-gray-300 flex flex-col shadow-xl">
@@ -21,49 +23,57 @@
                 $isDashboardActive = request()->routeIs('owner.dashboard') || request()->routeIs('pl.dashboard');
             @endphp
             <a href="{{ $dashboardRoute }}"
-               class="block px-4 py-2.5 rounded-md transition-colors {{ $isDashboardActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
+                class="block px-4 py-2.5 rounded-md transition-colors {{ $isDashboardActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
                 Dashboard
             </a>
 
-            @if(Auth::user()->role === 'owner')
-            <div x-data="{
+            @if (Auth::user()->role === 'owner')
+                <div x-data="{
                     open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.vendors') ? 'true' : 'false' }})
-                 }"
-                 x-init="$watch('open', val => localStorage.setItem('masterDataOpen', val))">
+                }" x-init="$watch('open', val => localStorage.setItem('masterDataOpen', val))">
 
-                <button @click="open = !open"
+                    <button @click="open = !open"
                         class="w-full flex justify-between items-center px-4 py-2.5 rounded-md font-medium transition-colors hover:bg-gray-800 hover:text-white mt-2">
-                    <span>Master Data</span>
-                    <svg :class="{'rotate-180': open}" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
+                        <span>Master Data</span>
+                        <svg :class="{ 'rotate-180': open }" class="w-4 h-4 transition-transform duration-200"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
 
-                <div x-show="open" x-collapse class="pl-4 mt-1 space-y-1">
-                    <a href="{{ route('owner.users') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.users') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">User</a>
-                    <a href="{{ route('owner.vendors') }}" class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
+                    <div x-show="open" x-collapse class="pl-4 mt-1 space-y-1">
+                        <a href="{{ route('owner.users') }}"
+                            class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.users') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">User</a>
+                        <a href="{{ route('owner.vendors') }}"
+                            class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
+                    </div>
                 </div>
-            </div>
             @endif
 
-            @if(in_array(Auth::user()->role, ['owner', 'pl']))
-            @php
-                $eventRoute = Auth::user()->role === 'owner' ? route('owner.events.index') : route('pl.events.index');
-                $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index');
-            @endphp
-            <a href="{{ $eventRoute }}"
-               class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ $isEventActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
-                Event Arrangement
-            </a>
+            @if (in_array(Auth::user()->role, ['owner', 'pl']))
+                @php
+                    $eventRoute =
+                        Auth::user()->role === 'owner' ? route('owner.events.index') : route('pl.events.index');
+                    $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index');
+                @endphp
+                <a href="{{ $eventRoute }}"
+                    class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ $isEventActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
+                    Event Arrangement
+                </a>
             @endif
 
         </nav>
 
         <div class="p-4 border-t border-gray-800">
-            <form method="POST" action="{{ route('logout') }}">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
-                <button type="submit" class="w-full text-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-md transition-colors">
-                    Logout
-                </button>
             </form>
+
+            <button type="button" onclick="confirmLogout()"
+                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-center transition-colors">
+                Logout
+            </button>
         </div>
     </aside>
 
@@ -79,5 +89,30 @@
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Ready to Leave?',
+                text: "Are you sure you want to logout from your account?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, logout!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                scrollbarPadding: false,
+                heightAuto: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form').submit();
+                }
+            });
+        }
+    </script>
+
 </body>
+
 </html>
