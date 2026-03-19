@@ -29,8 +29,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/vendors', [OwnerController::class, 'vendors'])->name('owner.vendors');
     Route::post('/vendors', [OwnerController::class, 'storeVendor'])->name('owner.vendors.store');
     Route::put('/vendors/{vendor}', [OwnerController::class, 'updateVendor'])->name('owner.vendors.update');
-    Route::get('/events', [EventController::class, 'index'])->name('owner.events.index');
-    
+
     Route::get('/vendors/{vendor}/manage', [OwnerController::class, 'manageVendor'])->name('owner.vendors.manage');
 
     Route::post('/vendors/{vendor}/contacts', [OwnerController::class, 'storeVendorContact'])->name('owner.vendors.contacts.store');
@@ -43,7 +42,11 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
 
     Route::post('/vendors/{vendor}/portfolios', [OwnerController::class, 'storeVendorPortfolio'])->name('owner.vendors.portfolios.store');
     Route::delete('/vendors/portfolios/{portfolio}', [OwnerController::class, 'destroyVendorPortfolio'])->name('owner.vendors.portfolios.destroy');
-    });
+
+    Route::get('/events', [EventController::class, 'index'])->name('owner.events.index');
+    Route::post('/events', [EventController::class, 'store'])->name('owner.events.store');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('owner.events.update');
+});
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::get('/dashboard', function () {
@@ -54,10 +57,13 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     })->name('pl.dashboard');
 
     Route::get('/events', [EventController::class, 'index'])->name('pl.events.index');
+    Route::post('/events', [EventController::class, 'store'])->name('pl.events.store');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('pl.events.update');
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('client.events.index');
+    Route::post('/events', [EventController::class, 'store'])->name('client.events.store');
 });
 
 Route::middleware('auth')->group(function () {

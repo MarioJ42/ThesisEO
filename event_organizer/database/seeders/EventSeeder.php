@@ -10,18 +10,17 @@ class EventSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Masukkan data ke tabel events
         $events = [
             [
                 'id' => 1,
-                'client_id' => 3, // Kezia
-                'pl_id' => 2, // Mario
+                'client_id' => 3,
+                'pl_id' => 2,
                 'package_id' => 1,
-                'title' => 'Kezia & Sharon',
+                'title' => 'Kezia & Clarin',
                 'event_date' => Carbon::now()->addMonths(3)->toDateString(),
                 'venue' => 'Pakuwon Imperial Ballroom',
                 'total_price' => 190000000,
-                'status' => 'planning', // Sesuai enum
+                'status' => 'planning',
                 'created_at' => now(),
                 'updated_at' => now()
             ]
@@ -29,7 +28,6 @@ class EventSeeder extends Seeder
 
         DB::table('events')->insert($events);
 
-        // 2. Masukkan data ke tabel pivot event_vendor
         $eventVendor = [
             [
                 'event_id' => 1,
@@ -37,7 +35,7 @@ class EventSeeder extends Seeder
                 'vendor_contact_id' => 1,
                 'vendor_package_id' => 1,
                 'deal_price' => 25000000,
-                'status' => 'verified', // Sesuai enum
+                'status' => 'verified',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -47,7 +45,7 @@ class EventSeeder extends Seeder
                 'vendor_contact_id' => 2,
                 'vendor_package_id' => 2,
                 'deal_price' => 150000000,
-                'status' => 'signed', // Sesuai enum
+                'status' => 'signed',
                 'created_at' => now(),
                 'updated_at' => now()
             ]

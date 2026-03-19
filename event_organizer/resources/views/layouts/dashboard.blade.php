@@ -57,7 +57,7 @@
                         Auth::user()->role === 'owner' ? route('owner.events.index') : route('pl.events.index');
                     $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index');
                 @endphp
-                <a href="{{ $eventRoute }}"
+                <a href="{{ route(Auth::user()->role . '.events.index') }}"
                     class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ $isEventActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
                     Event Arrangement
                 </a>

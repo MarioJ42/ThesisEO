@@ -16,7 +16,12 @@
         this.isEditModalOpen = true;
     }
 }">
-    <h2 class="text-2xl font-bold text-gray-900 mb-6">Master Vendor</h2>
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Master Vendor</h2>
+        <button @click="isModalOpen = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
+            Add New Vendor
+        </button>
+    </div>
 
     @if(session('success'))
     <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -36,18 +41,13 @@
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 w-full">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center text-sm text-gray-600">
-                    <span class="mr-2">Show entries:</span>
-                    <select id="perPageSelect" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8 shadow-sm">
-                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                    </select>
-                </div>
-                <button @click="isModalOpen = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
-                    Add New Vendor
-                </button>
+            <div class="flex items-center text-sm text-gray-600">
+                <span class="mr-2">Show entries:</span>
+                <select id="perPageSelect" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8 shadow-sm">
+                    <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                </select>
             </div>
             <div>
                 <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by name or category..." class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
@@ -138,16 +138,16 @@
                     </div>
 
                     <div class="pt-2 border-t border-gray-200">
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram Username</label>
                         <div class="flex mb-4">
                             <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
                                 @
                             </span>
-                            <input type="text" name="instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5">
+                            <input type="text" name="instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5" placeholder="username_ig">
                         </div>
 
                         <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
-                        <textarea name="address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+                        <textarea name="address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Vendor address (Optional)"></textarea>
                     </div>
                     <p class="text-xs text-gray-500 italic mt-2">* Contacts, Portfolios, and Packages can be added later via the "Manage" button.</p>
                 </div>
@@ -191,16 +191,16 @@
                     </div>
 
                     <div class="pt-2 border-t border-gray-200">
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Instagram Username</label>
                         <div class="flex mb-4">
                             <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
                                 @
                             </span>
-                            <input type="text" name="instagram" x-model="editForm.instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5">
+                            <input type="text" name="instagram" x-model="editForm.instagram" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5" placeholder="username_ig">
                         </div>
 
                         <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
-                        <textarea name="address" x-model="editForm.address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+                        <textarea name="address" x-model="editForm.address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Vendor address (Optional)"></textarea>
                     </div>
 
                     <div class="pt-2 border-t border-gray-200">
