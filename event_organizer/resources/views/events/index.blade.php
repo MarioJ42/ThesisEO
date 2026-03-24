@@ -6,13 +6,14 @@
     activeTab: 'all',
 
     isEditModalOpen: false,
-    editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '' },
-    openEditModal(id, title, pl_id, package_name, event_date) {
+    editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '', status: '' },
+    openEditModal(id, title, pl_id, package_name, event_date, status) {
         this.editForm.id = id;
         this.editForm.title = title;
         this.editForm.pl_id = pl_id || '';
         this.editForm.package_name = package_name;
         this.editForm.event_date = event_date;
+        this.editForm.status = status;
         this.isEditModalOpen = true;
     }
 }">
@@ -110,7 +111,7 @@
                                     <span class="text-gray-500 italic">Custom</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $event->event_date->format('d M Y') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700 font-medium">
                                 @if($event->pl)
                                     {{ $event->pl->name }}
@@ -130,8 +131,8 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button @click="openEditModal({{ $event->id }}, '{{ addslashes($event->title) }}', '{{ $event->pl_id }}', '{{ $event->package ? addslashes($event->package->name) : 'Custom' }}', '{{ $event->event_date->format('d M Y') }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
-                                    <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Manage</button>
+                                    <button @click="openEditModal({{ $event->id }}, '{{ addslashes($event->title) }}', '{{ $event->pl_id }}', '{{ $event->package ? addslashes($event->package->name) : 'Custom' }}', '{{ \Carbon\Carbon::parse($event->event_date)->format('Y-m-d') }}', '{{ $event->status }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
+                                    <a href="{{ route($user->role . '.events.manage', $event->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Manage</a>
                                 </div>
                             </td>
                         </tr>
@@ -179,7 +180,7 @@
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Event Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="title" placeholder="e.g. Wedding of Kezia & Clarin" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <input type="text" name="title" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Event Date <span class="text-red-500">*</span></label>
@@ -235,13 +236,35 @@
 
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Assign Project Leader</label>
-                        <select name="pl_id" x-model="editForm.pl_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            <option value="">-- Unassigned (Draft) --</option>
+                        <select name="pl_id" x-model="editForm.pl_id" @change="if(editForm.status === 'draft' && editForm.pl_id) editForm.status = 'planning'" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <template x-if="!editForm.pl_id">
+                                <option value="">-- Unassigned (Draft) --</option>
+                            </template>
                             @foreach($projectLeaders as $pl)
                                 <option value="{{ $pl->id }}">{{ $pl->name }} ({{ strtoupper($pl->role) }})</option>
                             @endforeach
                         </select>
-                        <p class="mt-2 text-xs text-gray-500">Assigning a PL to a drafted event will automatically change its status to <b>Planning</b>.</p>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-200">
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Event Status</label>
+                        <select name="status" x-model="editForm.status" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <template x-if="editForm.status === 'draft'">
+                                <option value="draft">Draft (Waiting for PL)</option>
+                            </template>
+                            <template x-if="editForm.status !== 'draft'">
+                                <option value="planning">Planning</option>
+                            </template>
+                            <template x-if="editForm.status !== 'draft'">
+                                <option value="ongoing">Ongoing</option>
+                            </template>
+                            <template x-if="editForm.status !== 'draft'">
+                                <option value="completed">Completed</option>
+                            </template>
+                            <template x-if="editForm.status !== 'draft'">
+                                <option value="canceled">Canceled</option>
+                            </template>
+                        </select>
                     </div>
                 </div>
                 <div class="flex justify-end p-4 border-t gap-2">

@@ -29,7 +29,6 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/vendors', [OwnerController::class, 'vendors'])->name('owner.vendors');
     Route::post('/vendors', [OwnerController::class, 'storeVendor'])->name('owner.vendors.store');
     Route::put('/vendors/{vendor}', [OwnerController::class, 'updateVendor'])->name('owner.vendors.update');
-
     Route::get('/vendors/{vendor}/manage', [OwnerController::class, 'manageVendor'])->name('owner.vendors.manage');
 
     Route::post('/vendors/{vendor}/contacts', [OwnerController::class, 'storeVendorContact'])->name('owner.vendors.contacts.store');
@@ -46,6 +45,12 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('owner.events.index');
     Route::post('/events', [EventController::class, 'store'])->name('owner.events.store');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('owner.events.update');
+
+    Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('owner.events.manage');
+    Route::post('/events/{event}/slots/custom', [EventController::class, 'addCustomSlot'])->name('owner.events.slots.custom');
+    Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('owner.events.slots.assign');
+    Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('owner.events.slots.remove');
+    Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('owner.events.slots.status');
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
@@ -59,6 +64,12 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('pl.events.index');
     Route::post('/events', [EventController::class, 'store'])->name('pl.events.store');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('pl.events.update');
+
+    Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('pl.events.manage');
+    Route::post('/events/{event}/slots/custom', [EventController::class, 'addCustomSlot'])->name('pl.events.slots.custom');
+    Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('pl.events.slots.assign');
+    Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('pl.events.slots.remove');
+    Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('pl.events.slots.status');
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {

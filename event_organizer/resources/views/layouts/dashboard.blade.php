@@ -7,6 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Fenix EO') }} - Admin Portal</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 
 <body class="font-sans antialiased bg-gray-50 flex h-screen overflow-hidden">
@@ -29,7 +32,7 @@
 
             @if (Auth::user()->role === 'owner')
                 <div x-data="{
-                    open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.vendors') ? 'true' : 'false' }})
+                    open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.vendors') || request()->routeIs('owner.vendors.manage') ? 'true' : 'false' }})
                 }" x-init="$watch('open', val => localStorage.setItem('masterDataOpen', val))">
 
                     <button @click="open = !open"
@@ -42,20 +45,18 @@
                         </svg>
                     </button>
 
-                    <div x-show="open" x-collapse class="pl-4 mt-1 space-y-1">
+                    <div x-show="open" x-collapse class="pl-4 mt-1 space-y-1" x-cloak>
                         <a href="{{ route('owner.users') }}"
                             class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.users') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">User</a>
                         <a href="{{ route('owner.vendors') }}"
-                            class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
+                            class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') || request()->routeIs('owner.vendors.manage') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
                     </div>
                 </div>
             @endif
 
             @if (in_array(Auth::user()->role, ['owner', 'pl']))
                 @php
-                    $eventRoute =
-                        Auth::user()->role === 'owner' ? route('owner.events.index') : route('pl.events.index');
-                    $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index');
+                    $isEventActive = request()->routeIs('owner.events.index') || request()->routeIs('pl.events.index') || request()->routeIs('owner.events.manage') || request()->routeIs('pl.events.manage');
                 @endphp
                 <a href="{{ route(Auth::user()->role . '.events.index') }}"
                     class="block px-4 py-2.5 mt-2 rounded-md transition-colors {{ $isEventActive ? 'bg-gray-950 text-white font-bold' : 'hover:bg-gray-800 hover:text-white font-medium' }}">
