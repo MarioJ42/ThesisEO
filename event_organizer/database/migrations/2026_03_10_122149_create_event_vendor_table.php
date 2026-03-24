@@ -11,24 +11,16 @@ return new class extends Migration
         Schema::create('event_vendor', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-
-            // Relasi Slot
             $table->foreignId('vendor_category_id')->constrained('vendor_categories')->onDelete('cascade');
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->onDelete('set null');
-
-            // Kolom yang sempat hilang (dikembalikan)
             $table->foreignId('vendor_contact_id')->nullable()->constrained('vendor_contacts')->onDelete('set null');
             $table->foreignId('vendor_package_id')->nullable()->constrained('vendor_packages')->onDelete('set null');
-
-            // Detail Slot Event
             $table->enum('session', ['morning', 'evening', 'all_day'])->default('all_day');
             $table->string('role_detail');
             $table->boolean('is_included')->default(false);
-
             $table->decimal('deal_price', 15, 2)->default(0);
             $table->integer('meal_crew')->default(0);
-
-            $table->enum('status', ['unassigned', 'reviewing', 'verified', 'rejected', 'signed'])->default('unassigned');
+            $table->enum('status', ['unassigned', 'reviewing', 'verified', 'rejected'])->default('unassigned');
             $table->timestamps();
         });
     }

@@ -1,6 +1,10 @@
 @extends('layouts.dashboard')
 
 @section('content')
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
 <div class="max-w-7xl mx-auto" x-data="{ activeTab: localStorage.getItem('manageEventTab') || 'overview' }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
 
     <div class="flex items-center justify-between mb-6">
@@ -37,7 +41,7 @@
         </nav>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-sm border border-gray-200 border-t-0 p-6 min-h-[400px]">
+    <div class="bg-white rounded-b-lg shadow-sm border border-gray-200 border-t-0 p-6">
 
         <div x-show="activeTab === 'overview'" x-cloak>
             <h3 class="text-lg font-bold text-gray-900 mb-4">Verified Vendor</h3>
@@ -57,7 +61,7 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-bold text-gray-800 uppercase">{{ $slot->category_name }}</td>
                             <td class="px-6 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
-                            <td class="px-6 py-4 text-sm text-blue-600">{{ $slot->role_detail }}</td>
+                            <td class="px-6 py-4 text-sm text-blue-600">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_phone ?? 'N/A' }}</td>
                         </tr>
@@ -127,7 +131,7 @@
                                     {{ $slot->category_name }}
                                     @if($slot->is_included) <span class="ml-1 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Included</span> @endif
                                 </td>
-                                <td class="px-4 py-4 text-sm text-blue-700">{{ $slot->role_detail }}</td>
+                                <td class="px-4 py-4 text-sm text-blue-700">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
                                 <td class="px-4 py-4 text-sm">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full
                                         @if($slot->status == 'unassigned') bg-gray-100 text-gray-600
@@ -198,7 +202,9 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-4 text-sm font-bold text-gray-800 uppercase">
                                 {{ $slot->category_name }}
-                                <div class="text-[11px] font-normal text-blue-600 mt-0.5 capitalize">{{ $slot->role_detail }}</div>
+                                @if($slot->role_detail && $slot->role_detail !== '-')
+                                    <div class="text-[11px] font-normal text-blue-600 mt-0.5 capitalize">{{ $slot->role_detail }}</div>
+                                @endif
                             </td>
                             <td class="px-4 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
                             <td class="px-4 py-4 text-sm">

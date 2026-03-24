@@ -97,7 +97,7 @@ class EventController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'New Event Arrangement created & Vendor Slots generated!');
+        return redirect()->back()->with('success', 'New Event Arrangement created');
     }
 
     public function update(Request $request, Event $event)
@@ -233,7 +233,7 @@ class EventController extends Controller
     public function updateSlotStatus(Request $request, Event $event, $slotId)
     {
         $request->validate([
-            'status' => 'required|in:unassigned,reviewing,verified,rejected,signed'
+            'status' => 'required|in:unassigned,reviewing,verified,rejected'
         ]);
 
         DB::table('event_vendor')

@@ -1,10 +1,12 @@
 @extends('layouts.dashboard')
 
 @section('content')
+<style>
+    [x-cloak] { display: none !important; }
+</style>
 <div class="max-w-7xl mx-auto" x-data="{
     isModalOpen: false,
     activeTab: 'all',
-
     isEditModalOpen: false,
     editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '', status: '' },
     openEditModal(id, title, pl_id, package_name, event_date, status) {
@@ -71,7 +73,7 @@
                 </select>
             </div>
             <div>
-                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by Event Name or Project Leader..." class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by Event Name or PL" class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
             </div>
         </div>
 
@@ -94,7 +96,7 @@
                         @php
                             $rowCategory = 'unassigned';
                             if ($event->pl_id) {
-                                $rowCategory = ($event->pl->role === 'owner') ? 'mine' : 'pl';
+                                $rowCategory = ($event->pl_id === $user->id) ? 'mine' : 'pl';
                             }
                         @endphp
 
@@ -146,8 +148,25 @@
             </div>
 
             <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+                @php
+                    $catCounts = ['mine' => 0, 'pl' => 0, 'unassigned' => 0];
+                    foreach($events as $e) {
+                        if (!$e->pl_id) {
+                            $catCounts['unassigned']++;
+                        } else {
+                            if ($e->pl_id === $user->id) {
+                                $catCounts['mine']++;
+                            } else {
+                                $catCounts['pl']++;
+                            }
+                        }
+                    }
+                @endphp
                 <div class="text-sm text-gray-600">
-                    Showing {{ $events->firstItem() ?? 0 }} to {{ $events->lastItem() ?? 0 }} of {{ $events->total() }} entries
+                    <span x-show="activeTab === 'all'">Showing {{ $events->firstItem() ?? 0 }} to {{ $events->lastItem() ?? 0 }} of {{ $events->total() }} entries</span>
+                    <span x-show="activeTab === 'mine'" x-cloak>Showing {{ $catCounts['mine'] > 0 ? 1 : 0 }} to {{ $catCounts['mine'] }} of {{ $catCounts['mine'] }} entries</span>
+                    <span x-show="activeTab === 'pl'" x-cloak>Showing {{ $catCounts['pl'] > 0 ? 1 : 0 }} to {{ $catCounts['pl'] }} of {{ $catCounts['pl'] }} entries</span>
+                    <span x-show="activeTab === 'unassigned'" x-cloak>Showing {{ $catCounts['unassigned'] > 0 ? 1 : 0 }} to {{ $catCounts['unassigned'] }} of {{ $catCounts['unassigned'] }} entries</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <a href="{{ $events->previousPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ $events->onFirstPage() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Previous</a>
