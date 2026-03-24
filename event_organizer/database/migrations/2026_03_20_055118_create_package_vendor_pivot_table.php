@@ -6,25 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('wedding_package_details', function (Blueprint $table) {
+        Schema::create('package_vendor_pivot', function (Blueprint $table) {
             $table->id();
             $table->foreignId('package_id')->constrained('wedding_packages')->onDelete('cascade');
             $table->foreignId('vendor_category_id')->constrained('vendor_categories')->onDelete('cascade');
-            $table->text('description')->nullable();
+            $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('wedding_package_details');
+        Schema::dropIfExists('package_vendor_pivot');
     }
 };

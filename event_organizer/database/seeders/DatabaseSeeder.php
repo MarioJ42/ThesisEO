@@ -11,10 +11,17 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             VendorCategorySeeder::class,
-            WeddingPackageSeeder::class,
             VendorSeeder::class,
             VendorContactSeeder::class,
             VendorPackageSeeder::class,
+            WeddingPackageSeeder::class,
+
+            // Masukkan seeder template baru
+            PackageTemplateSeeder::class,
+
+            // Seeder pivot opsional vendor per paket
+            PackageVendorPivotSeeder::class,
+
             EventSeeder::class,
         ]);
     }

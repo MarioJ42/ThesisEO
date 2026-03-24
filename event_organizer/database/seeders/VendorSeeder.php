@@ -27,6 +27,14 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 3,
+                'name' => 'JW Marriott Surabaya',
+                'address' => 'Jl. Embong Malang No.85-89, Kedungdoro, Kec. Tegalsari, Surabaya, Jawa Timur 60261',
+                'instagram' => 'jwmarriottsby',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         DB::table('vendors')->insert($vendors);
@@ -38,6 +46,8 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 1, 'category_id' => 12],
             ['vendor_id' => 2, 'category_id' => 23],
             ['vendor_id' => 2, 'category_id' => 21],
+            ['vendor_id' => 3, 'category_id' => 23],
+            ['vendor_id' => 3, 'category_id' => 1],
         ];
 
         DB::table('category_vendor')->insert($categoryVendor);

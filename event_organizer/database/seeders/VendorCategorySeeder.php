@@ -16,7 +16,6 @@ class VendorCategorySeeder extends Seeder
             ['name' => 'Suit', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Videographer', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Photographer', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Decoration', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Keepsake', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'WCC', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Hair Styling', 'created_at' => now(), 'updated_at' => now()],
