@@ -29,7 +29,6 @@ class EventController extends Controller
         if ($user->role === 'pl') {
             $query->where('pl_id', $user->id);
             $events = $query->paginate($perPage)->appends(request()->query());
-
             $myEvents = $events;
             $plEvents = collect();
             $unassignedEvents = collect();
@@ -227,7 +226,17 @@ class EventController extends Controller
                 'status' => 'unassigned'
             ]);
 
-        return redirect()->back()->with('success', 'Vendor removed from slot.');
+        return redirect()->back()->with('error', 'Vendor removed from slot.');
+    }
+
+    public function destroySlot(Event $event, $slotId)
+    {
+        DB::table('event_vendor')
+            ->where('id', $slotId)
+            ->where('event_id', $event->id)
+            ->delete();
+
+        return redirect()->back()->with('error', 'Vendor slot deleted successfully!');
     }
 
     public function updateSlotStatus(Request $request, Event $event, $slotId)
@@ -245,9 +254,9 @@ class EventController extends Controller
             ]);
 
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Status and meal crew updated successfully.']);
+            return response()->json(['success' => true, 'message' => "Vendor's status updated"]);
         }
 
-        return redirect()->back()->with('success', 'Slot status and meal crew updated.');
+        return redirect()->back()->with('success', "Vendor's status updated");
     }
 }

@@ -23,6 +23,12 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <span class="block sm:inline">{{ session('error') }}</span>
+    </div>
+    @endif
+
     <div class="bg-white rounded-t-lg shadow-sm border-b border-gray-200">
         <nav class="flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
             <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
@@ -121,7 +127,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note</th>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Status</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-1/3">Assign Vendor</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-1/3">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -146,10 +152,12 @@
                                     @if($slot->vendor_id)
                                         <div class="flex items-center justify-between bg-white border border-gray-200 p-2 rounded-lg">
                                             <span class="font-bold text-gray-800">{{ $slot->vendor_name }}</span>
-                                            <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
-                                                @csrf @method('PUT')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-bold px-2">Remove</button>
-                                            </form>
+                                            <div class="flex items-center divide-x divide-gray-300">
+                                                <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
+                                                    @csrf @method('PUT')
+                                                    <button type="submit" class="text-orange-500 hover:text-orange-700 text-xs font-bold px-2">Unassign</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     @else
                                         @php
@@ -160,16 +168,24 @@
                                                 $availableVendors = $availableVendors->whereIn('id', $allowedIds);
                                             }
                                         @endphp
-                                        <form action="{{ route($user->role . '.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="flex gap-2">
-                                            @csrf @method('PUT')
-                                            <select name="vendor_id" required class="w-full border-gray-300 text-sm rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500">
-                                                <option value="" disabled selected>Select Vendor</option>
-                                                @foreach($availableVendors as $v)
-                                                    <option value="{{ $v->id }}">{{ $v->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-xs font-bold">Assign</button>
-                                        </form>
+                                        <div class="flex gap-2 items-stretch w-full h-[36px]">
+                                            <form action="{{ route($user->role . '.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="flex gap-2 flex-grow h-full">
+                                                @csrf @method('PUT')
+                                                <select name="vendor_id" required class="w-full border-gray-300 text-sm rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full">
+                                                    <option value="" disabled selected>Select Vendor</option>
+                                                    @foreach($availableVendors as $v)
+                                                        <option value="{{ $v->id }}">{{ $v->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-bold w-20 h-full flex items-center justify-center flex-shrink-0 transition-colors">Assign</button>
+                                            </form>
+                                            @if($slot->status === 'unassigned')
+                                            <button type="button" onclick="confirmDelete(this)" data-form-id="delete-slot-{{ $slot->id }}" class="bg-red-500 hover:bg-red-600 text-white rounded-md text-xs font-bold w-20 h-full flex items-center justify-center transition-colors">Delete</button>
+                                            <form id="delete-slot-{{ $slot->id }}" action="{{ route($user->role . '.events.slots.destroy', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="hidden">
+                                                @csrf @method('DELETE')
+                                            </form>
+                                            @endif
+                                        </div>
                                     @endif
                                 </td>
                             </tr>
@@ -242,4 +258,24 @@
 
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(button) {
+        const formId = button.getAttribute('data-form-id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to delete this slot?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit();
+            }
+        });
+    }
+</script>
 @endsection

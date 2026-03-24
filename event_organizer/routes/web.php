@@ -50,6 +50,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::post('/events/{event}/slots/custom', [EventController::class, 'addCustomSlot'])->name('owner.events.slots.custom');
     Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('owner.events.slots.assign');
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('owner.events.slots.remove');
+    Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('owner.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('owner.events.slots.status');
 });
 
@@ -69,6 +70,7 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::post('/events/{event}/slots/custom', [EventController::class, 'addCustomSlot'])->name('pl.events.slots.custom');
     Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('pl.events.slots.assign');
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('pl.events.slots.remove');
+    Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('pl.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('pl.events.slots.status');
 });
 
