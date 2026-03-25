@@ -83,6 +83,7 @@
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">PIC</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Meal Crew</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -93,9 +94,10 @@
                             <td class="px-6 py-4 text-sm text-blue-600">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_phone ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->meal_crew ?? 0 }}</td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No vendors verified yet.</td></tr>
+                        <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No vendors verified yet.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
