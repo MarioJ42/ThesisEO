@@ -157,6 +157,12 @@ class EventController extends Controller
                 ->groupBy('vendor_category_id');
         }
 
+        $assignedVendorIds = $slots->whereNotNull('vendor_id')->pluck('vendor_id')->unique();
+        $vendorContacts = DB::table('vendor_contacts')
+            ->whereIn('vendor_id', $assignedVendorIds)
+            ->get()
+            ->groupBy('vendor_id');
+
         return view('events.manage', compact(
             'event',
             'user',
@@ -165,7 +171,8 @@ class EventController extends Controller
             'eveningSlots',
             'verifiedSlots',
             'categories',
-            'allowedVendors'
+            'allowedVendors',
+            'vendorContacts'
         ));
     }
 
@@ -223,7 +230,8 @@ class EventController extends Controller
             ->update([
                 'vendor_id' => null,
                 'vendor_contact_id' => null,
-                'status' => 'unassigned'
+                'status' => 'unassigned',
+                'meal_crew' => 0
             ]);
 
         return redirect()->back()->with('error', 'Vendor removed from slot.');
@@ -242,7 +250,8 @@ class EventController extends Controller
     public function updateSlotStatus(Request $request, Event $event, $slotId)
     {
         $request->validate([
-            'status' => 'required|in:unassigned,reviewing,verified,rejected'
+            'status' => 'required|in:unassigned,reviewing,verified,rejected,signed',
+            'vendor_contact_id' => 'nullable|exists:vendor_contacts,id'
         ]);
 
         DB::table('event_vendor')
@@ -250,7 +259,8 @@ class EventController extends Controller
             ->where('event_id', $event->id)
             ->update([
                 'status' => $request->status,
-                'meal_crew' => $request->meal_crew ?? 0
+                'meal_crew' => $request->meal_crew ?? 0,
+                'vendor_contact_id' => $request->vendor_contact_id
             ]);
 
         if ($request->wantsJson() || $request->ajax()) {

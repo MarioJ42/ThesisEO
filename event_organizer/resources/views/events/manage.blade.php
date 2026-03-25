@@ -4,8 +4,21 @@
 <style>
     [x-cloak] { display: none !important; }
 </style>
-
-<div class="max-w-7xl mx-auto" x-data="{ activeTab: localStorage.getItem('manageEventTab') || 'overview' }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
+<div class="max-w-7xl mx-auto" x-data="{
+    isModalOpen: false,
+    activeTab: localStorage.getItem('manageEventTab') || 'overview',
+    isEditModalOpen: false,
+    editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '', status: '' },
+    openEditModal(id, title, pl_id, package_name, event_date, status) {
+        this.editForm.id = id;
+        this.editForm.title = title;
+        this.editForm.pl_id = pl_id || '';
+        this.editForm.package_name = package_name;
+        this.editForm.event_date = event_date;
+        this.editForm.status = status;
+        this.isEditModalOpen = true;
+    }
+}" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
 
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -18,14 +31,24 @@
     </div>
 
     @if(session('success'))
-    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
         <span class="block sm:inline">{{ session('success') }}</span>
     </div>
     @endif
 
     @if(session('error'))
-    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
         <span class="block sm:inline">{{ session('error') }}</span>
+    </div>
+    @endif
+
+    @if ($errors->any())
+    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <ul class="list-disc list-inside text-sm">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
     </div>
     @endif
 
@@ -235,6 +258,18 @@
                             <td class="px-4 py-4 text-sm">
                                 <form action="{{ route($user->role . '.events.slots.status', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="flex justify-center items-center gap-2">
                                     @csrf @method('PUT')
+
+                                    <select name="vendor_contact_id" class="w-36 bg-white border border-gray-300 text-gray-900 text-xs rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">-- Select PIC --</option>
+                                        @if(isset($vendorContacts[$slot->vendor_id]))
+                                            @foreach($vendorContacts[$slot->vendor_id] as $contact)
+                                                <option value="{{ $contact->id }}" {{ $slot->vendor_contact_id == $contact->id ? 'selected' : '' }}>
+                                                    {{ $contact->name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+
                                     <div class="flex items-center">
                                         <input type="number" name="meal_crew" value="{{ $slot->meal_crew ?? 0 }}" min="0" class="w-12 text-center text-xs border-gray-300 rounded-l-md p-1.5 focus:ring-blue-500 focus:border-blue-500">
                                         <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1.5 border border-l-0 border-gray-300 rounded-r-md">Pax</span>
@@ -244,7 +279,7 @@
                                         <option value="verified" {{ in_array($slot->status, ['verified', 'signed']) ? 'selected' : '' }}>Verified</option>
                                         <option value="rejected" {{ $slot->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
                                     </select>
-                                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1.5 rounded-md text-xs font-bold transition-colors">Save</button>
+                                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">Save</button>
                                 </form>
                             </td>
                         </tr>
