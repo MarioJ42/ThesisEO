@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             PackageTemplateSeeder::class,
             PackageVendorPivotSeeder::class,
             EventSeeder::class,
+            EoPortfolioSeeder::class,
         ]);
     }
 }

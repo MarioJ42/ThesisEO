@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OwnerController;
+use App\Models\EoPortfolio;
 
 Route::get('/', function () {
-    return view('home');
+    $portfolios = EoPortfolio::latest()->get();
+    return view('home', compact('portfolios'));
 })->name('home');
 
 Route::get('/vendor', function () {
