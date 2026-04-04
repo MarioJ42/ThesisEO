@@ -50,7 +50,7 @@
                 </select>
             </div>
             <div>
-                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by name or category..." class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                <input type="text" id="searchInput" value="{{ request('search') }}" placeholder="Search by name or category" class="border-gray-300 rounded-md text-sm px-4 py-2 w-full sm:w-64 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
             </div>
         </div>
 

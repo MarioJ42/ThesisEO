@@ -52,6 +52,9 @@ class VendorCategorySeeder extends Seeder
             ['name' => 'Digital Guest Book', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Souvenir', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Photobooth', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Baloon & Dove', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Flower Shower', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Misua & Angco Tea', 'created_at' => now(), 'updated_at' => now()],
         ];
 
         DB::table('vendor_categories')->insert($categories);
