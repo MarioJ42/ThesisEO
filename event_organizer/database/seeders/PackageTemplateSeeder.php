@@ -10,6 +10,12 @@ class PackageTemplateSeeder extends Seeder
     public function run(): void
     {
         $templates = [
+            //Holy Matrimony Wedding Package
+
+
+
+
+            //Full Day Wedding Package
             //Morning Procession
             ['package_id' => 3, 'vendor_category_id' => 1, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
             ['package_id' => 3, 'vendor_category_id' => 6, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],

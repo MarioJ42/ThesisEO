@@ -28,6 +28,10 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::post('/users', [OwnerController::class, 'storeUser'])->name('owner.users.store');
     Route::put('/users/{user}', [OwnerController::class, 'updateUser'])->name('owner.users.update');
 
+    Route::get('/clients', [OwnerController::class, 'clients'])->name('owner.clients');
+    Route::post('/clients', [OwnerController::class, 'storeClient'])->name('owner.clients.store');
+    Route::put('/clients/{user}', [OwnerController::class, 'updateClient'])->name('owner.clients.update');
+
     Route::get('/vendors', [OwnerController::class, 'vendors'])->name('owner.vendors');
     Route::post('/vendors', [OwnerController::class, 'storeVendor'])->name('owner.vendors.store');
     Route::put('/vendors/{vendor}', [OwnerController::class, 'updateVendor'])->name('owner.vendors.update');

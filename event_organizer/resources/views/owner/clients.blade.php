@@ -8,35 +8,18 @@
     newPhoneNumber: '',
 
     isEditModalOpen: false,
-    editForm: { id: '', name: '', email: '', role: '', is_active: '1' },
-    editPassword: '',
-    editConfirmPassword: '',
-    editPhoneNumber: '',
+    editForm: { id: '', is_active: '1' },
 
-    openEditModal(id, name, email, phone, role, is_active) {
+    openEditModal(id, is_active) {
         this.editForm.id = id;
-        this.editForm.name = name;
-        this.editForm.email = email;
-        this.editForm.role = role;
         this.editForm.is_active = is_active.toString();
-        this.editPassword = '';
-        this.editConfirmPassword = '';
-
-        if (phone.startsWith('0')) {
-            this.editPhoneNumber = phone.substring(1);
-        } else if (phone.startsWith('+62')) {
-            this.editPhoneNumber = phone.substring(3);
-        } else {
-            this.editPhoneNumber = phone;
-        }
-
         this.isEditModalOpen = true;
     }
 }">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">Master User</h2>
+        <h2 class="text-2xl font-bold text-gray-900">Master Client</h2>
         <button @click="isModalOpen = true; newPassword = ''; confirmPassword = ''; newPhoneNumber = '';" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
-            Add New Account
+            Add New Client
         </button>
     </div>
 
@@ -85,28 +68,28 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @forelse($users as $user)
+                        @forelse($clients as $client)
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-sm text-gray-700 font-medium">{{ $user->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $user->email }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $user->phone }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700 font-medium">{{ $client->name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $client->email }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $client->phone }}</td>
                             <td class="px-6 py-4 text-sm text-center">
-                                <span class="uppercase text-xs font-semibold text-gray-600">{{ $user->role }}</span>
+                                <span class="uppercase text-xs font-semibold text-gray-600">{{ $client->role }}</span>
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $client->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ $client->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
-                                <button @click="openEditModal({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ addslashes($user->phone) }}', '{{ $user->role }}', {{ $user->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
-                                    Edit
+                                <button @click="openEditModal({{ $client->id }}, {{ $client->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
+                                    Edit Status
                                 </button>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">Data user tidak ditemukan.</td>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">Data client tidak ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -115,11 +98,11 @@
 
             <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
                 <div class="text-sm text-gray-600">
-                    Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} entries
+                    Showing {{ $clients->firstItem() ?? 0 }} to {{ $clients->lastItem() ?? 0 }} of {{ $clients->total() }} entries
                 </div>
                 <div class="flex items-center gap-1">
-                    <a href="{{ $users->previousPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ $users->onFirstPage() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Previous</a>
-                    <a href="{{ $users->nextPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ !$users->hasMorePages() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Next</a>
+                    <a href="{{ $clients->previousPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ $clients->onFirstPage() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Previous</a>
+                    <a href="{{ $clients->nextPageUrl() }}" class="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {{ !$clients->hasMorePages() ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">Next</a>
                 </div>
             </div>
         </div>
@@ -128,13 +111,13 @@
     <div x-show="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
         <div class="relative w-full max-w-md bg-white rounded-lg shadow-xl my-8" @click.away="isModalOpen = false">
             <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-semibold text-gray-900">Add New User</h3>
+                <h3 class="text-xl font-semibold text-gray-900">Add New Client</h3>
                 <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <form action="{{ route('owner.users.store') }}" method="POST">
+            <form action="{{ route('owner.clients.store') }}" method="POST">
                 @csrf
                 <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
                     <div>
@@ -155,15 +138,6 @@
                             <input type="tel" x-model="newPhoneNumber" required placeholder="81234567890" class="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Role</label>
-                        <select name="role" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            <option value="owner">Owner</option>
-                            <option value="pl">Project Leader (PL)</option>
-                            <option value="crew_rsvp">Crew RSVP</option>
-                            <option value="crew_eo">Crew EO</option>
-                        </select>
-                    </div>
                     <div class="flex gap-4">
                         <div class="w-1/2">
                             <label class="block mb-2 text-sm font-medium text-gray-900">Password</label>
@@ -182,7 +156,7 @@
                             :disabled="newPassword === '' || newPassword !== confirmPassword"
                             :class="(newPassword !== '' && newPassword === confirmPassword) ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                             class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
-                        Save Account
+                        Save Client
                     </button>
                 </div>
             </form>
@@ -192,86 +166,34 @@
     <div x-show="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
         <div class="relative w-full max-w-md bg-white rounded-lg shadow-xl my-8" @click.away="isEditModalOpen = false">
             <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-semibold text-gray-900">Edit User Account</h3>
+                <h3 class="text-xl font-semibold text-gray-900">Edit Client Status</h3>
                 <button @click="isEditModalOpen = false" class="text-gray-400 hover:text-gray-900 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <form :action="'{{ url('/owner/users') }}/' + editForm.id" method="POST">
+            <form :action="'{{ url('/owner/clients') }}/' + editForm.id" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-
-                    <template x-if="{{ Auth::id() }} == editForm.id">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Full Name</label>
-                                <input type="text" name="name" x-model="editForm.name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            </div>
-                            <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Email Address</label>
-                                <input type="email" name="email" x-model="editForm.email" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            </div>
-                            <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Phone Number</label>
-                                <div class="flex">
-                                    <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-lg">
-                                        🇮🇩 +62
-                                    </span>
-                                    <input type="hidden" name="phone" :value="'+62' + editPhoneNumber.replace(/^0+/, '')">
-                                    <input type="tel" x-model="editPhoneNumber" required class="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-none rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Role</label>
-                                <select name="role" x-model="editForm.role" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    <option value="owner">Owner</option>
-                                    <option value="pl">Project Leader (PL)</option>
-                                    <option value="crew_rsvp">Crew RSVP</option>
-                                    <option value="crew_eo">Crew EO</option>
-                                </select>
-                            </div>
-                            <div class="pt-2 border-t border-gray-200">
-                                <p class="text-xs text-gray-500 mb-3">Leave password fields empty if you don't want to change it.</p>
-                                <div class="flex gap-4">
-                                    <div class="w-1/2">
-                                        <label class="block mb-2 text-sm font-medium text-gray-900">New Password</label>
-                                        <input type="password" name="password" x-model="editPassword" minlength="8" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    </div>
-                                    <div class="w-1/2">
-                                        <label class="block mb-2 text-sm font-medium text-gray-900">Confirm Password</label>
-                                        <input type="password" name="password_confirmation" x-model="editConfirmPassword" minlength="8" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    </div>
-                                </div>
-                            </div>
+                <div class="p-6 space-y-4">
+                    <div class="space-y-4">
+                        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
+                            You can only change the <b>Account Status</b> for client users.
                         </div>
-                    </template>
-
-                    <template x-if="{{ Auth::id() }} != editForm.id">
-                        <div class="space-y-4">
-                            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
-                                You can only change the <b>Account Status</b> for other users.
-                            </div>
-                            <div>
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Account Status</label>
-                                <select name="is_active" x-model="editForm.is_active" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Account Status</label>
+                            <select name="is_active" x-model="editForm.is_active" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
                         </div>
-                    </template>
-
+                    </div>
                 </div>
 
                 <div class="flex justify-end p-4 border-t gap-2">
                     <button type="button" @click="isEditModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit"
-                            :disabled="editPassword !== editConfirmPassword"
-                            :class="(editPassword === editConfirmPassword) ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
-                            class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
-                        Update Account
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                        Update Status
                     </button>
                 </div>
             </form>

@@ -14,9 +14,10 @@ class OwnerController extends Controller
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
 
-        $users = User::when($search, function ($query, $search) {
-            return $query->where('name', 'like', "%{$search}%");
-        })->paginate($perPage)->appends(request()->query());
+        $users = User::where('role', '!=', 'klien')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })->paginate($perPage)->appends(request()->query());
 
         return view('owner.users', compact('users'));
     }
@@ -28,7 +29,7 @@ class OwnerController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:owner,pl,klien,crew_rsvp,crew_eo',
+            'role' => 'required|in:owner,pl,crew_rsvp,crew_eo',
         ]);
 
         User::create([
@@ -50,7 +51,7 @@ class OwnerController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
                 'phone' => 'required|string|max:20',
-                'role' => 'required|in:owner,pl,klien,crew_rsvp,crew_eo',
+                'role' => 'required|in:owner,pl,crew_rsvp,crew_eo',
                 'password' => 'nullable|string|min:8|confirmed',
             ]);
 
@@ -75,12 +76,59 @@ class OwnerController extends Controller
         return redirect()->route('owner.users')->with('success', 'User account successfully updated!');
     }
 
+    public function clients(Request $request)
+    {
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
+        $clients = User::where('role', 'klien')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })->paginate($perPage)->appends(request()->query());
+
+        return view('owner.clients', compact('clients'));
+    }
+
+    public function storeClient(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|max:20',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => 'klien',
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('owner.clients')->with('success', 'Client account successfully added!');
+    }
+
+    public function updateClient(Request $request, User $user)
+    {
+        $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        $user->is_active = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+        $user->save();
+
+        return redirect()->route('owner.clients')->with('success', 'Client account successfully updated!');
+    }
+
     public function vendors(Request $request)
     {
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
 
         $vendors = Vendor::with('categories')
+            ->whereNotIn('name', ['Fenix EO', 'Pribadi'])
             ->when($search, function ($query, $search) {
                 return $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -89,6 +137,7 @@ class OwnerController extends Controller
                         });
                 });
             })
+            ->orderBy('name', 'asc')
             ->paginate($perPage)
             ->appends(request()->query());
 
@@ -207,7 +256,6 @@ class OwnerController extends Controller
             ->with('active_tab', 'contacts');
     }
 
-
     public function storeVendorPackage(Request $request, Vendor $vendor)
     {
         $request->validate([
@@ -248,7 +296,6 @@ class OwnerController extends Controller
             ->with('success', 'Package successfully deleted!')
             ->with('active_tab', 'packages');
     }
-
 
     public function storeVendorPortfolio(Request $request, Vendor $vendor)
     {

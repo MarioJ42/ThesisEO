@@ -116,7 +116,7 @@ class VendorSeeder extends Seeder
             ],
             [
                 'id' => 14,
-                'name' => 'XO Palace Ballroom',
+                'name' => 'XO Palace',
                 'address' => 'Jl. Raya Kupang Indah No.15, Dukuh Kupang, Kec. Dukuhpakis, Surabaya, Jawa Timur 60225',
                 'instagram' => '@pavilionatjw',
                 'created_at' => now(),
@@ -140,15 +140,15 @@ class VendorSeeder extends Seeder
             ],
             [
                 'id' => 17,
-                'name' => 'Novotel Samator Ballroom',
-                'address' => 'Jl. Raya Kedung Baruk No.26-28, Kedung Baruk, Kec. Rungkut, Surabaya, Jawa Timur 60298',
-                'instagram' => '@novotel_samator',
+                'name' => 'Depot Bu Tin',
+                'address' => 'Jl. Dharmahusada Utara No.34, Gubeng, Surabaya, Jawa Timur 60285',
+                'instagram' => '@butin_surabaya',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'id' => 18,
-                'name' => 'Possa',
+                'name' => 'Possa Wedding',
                 'address' => 'Surabaya',
                 'instagram' => '@possawedding',
                 'created_at' => now(),
@@ -332,7 +332,7 @@ class VendorSeeder extends Seeder
             ],
             [
                 'id' => 41,
-                'name' => 'Biehin Tailor',
+                'name' => 'Bie Hin Tailor',
                 'address' => 'Jl. Pahlawan No.79, Alun-alun Contong, Kec. Bubutan, Surabaya, Jawa Timur 60174',
                 'instagram' => '@biehintailor',
                 'created_at' => now(),
@@ -466,6 +466,110 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 58,
+                'name' => 'Novotel Samator East Surabaya Hotel',
+                'address' => 'Jl. Raya Kedung Baruk No.26-28, Kedung Baruk, Kec. Rungkut, Surabaya, Jawa Timur 60298',
+                'instagram' => '@novotel_samator',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 59,
+                'name' => 'Depplight',
+                'address' => 'Surabaya',
+                'instagram' => '@depp.light',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 60,
+                'name' => 'Bethany Church Nginden',
+                'address' => 'Jalan Nginden Intan Timur I No.29, Nginden Jangkungan, Kec. Sukolilo, Surabaya, Jawa Timur 60118',
+                'instagram' => '@successfulbethanyfamilies',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 61,
+                'name' => 'Evergreen Cake',
+                'address' => 'Surabaya',
+                'instagram' => '@evergreencakesurabaya',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 62,
+                'name' => 'Glow Effect',
+                'address' => 'Surabaya',
+                'instagram' => '@gloweffect',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 63,
+                'name' => 'Manifest',
+                'address' => 'Surabaya',
+                'instagram' => '@manifestmusic_entertainment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 64,
+                'name' => 'Ann Pagar Ayu',
+                'address' => 'Surabaya',
+                'instagram' => '@ann_pagarayu',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 65,
+                'name' => 'Trikarta',
+                'address' => 'Surabaya',
+                'instagram' => '@trikarta',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 66,
+                'name' => 'Sempurna Invitations',
+                'address' => 'Grand City Surabaya, Jl. Wali kota Mustajab No.1, Ketabang, Kec. Genteng, Surabaya, Jawa Timur 60272',
+                'instagram' => '@sempurnainvitations',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 67,
+                'name' => 'Calief Invitation',
+                'address' => 'Surabaya',
+                'instagram' => '-',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 68,
+                'name' => 'Si Manten',
+                'address' => 'Surabaya',
+                'instagram' => '@simanten',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 69,
+                'name' => 'Stefany Hyperstage Visual',
+                'address' => 'Surabaya',
+                'instagram' => '-',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 70,
+                'name' => 'Nasi Campur Tambak Bayan',
+                'address' => 'Jl. Tambak Bayan No.21, Alun-alun Contong, Kec. Bubutan, Surabaya, Jawa Timur 60174',
+                'instagram' => '-',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         DB::table('vendors')->insert($vendors);
@@ -519,8 +623,12 @@ class VendorSeeder extends Seeder
             //Pavilion (JW Marriott Surabaya)
             ['vendor_id' => 13, 'category_id' => 22], //Venue
 
-            //XO Palace Ballroom
+            //XO Palace
             ['vendor_id' => 14, 'category_id' => 22], //Venue
+            ['vendor_id' => 14, 'category_id' => 23], //Sound
+            ['vendor_id' => 14, 'category_id' => 26], //LED
+            ['vendor_id' => 14, 'category_id' => 27], //LCD
+            ['vendor_id' => 14, 'category_id' => 46], //Pyramid Fountain & Toast
 
             //Santika Premiere Ballroom
             ['vendor_id' => 15, 'category_id' => 22], //Venue
@@ -528,10 +636,10 @@ class VendorSeeder extends Seeder
             //Morazen Ballroom
             ['vendor_id' => 16, 'category_id' => 22], //Venue
 
-            //Novotel Samator Ballroom
-            ['vendor_id' => 17, 'category_id' => 22], //Venue
+            //Depot Bu Tin
+            ['vendor_id' => 17, 'category_id' => 20], //Meal Crew
 
-            //Possa
+            //Possa Wedding
             ['vendor_id' => 18, 'category_id' => 6], //Photographer
             ['vendor_id' => 18, 'category_id' => 5], //Videographer
 
@@ -637,6 +745,7 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 37, 'category_id' => 9], //Hair Styling
             ['vendor_id' => 37, 'category_id' => 10], //Headpiece
             ['vendor_id' => 37, 'category_id' => 11], //Robe & Veil
+            ['vendor_id' => 37, 'category_id' => 18], //Wedding Car
 
             //Ovan Putri
             ['vendor_id' => 38, 'category_id' => 2], //MUA
@@ -656,7 +765,7 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 40, 'category_id' => 4], //Suit
             ['vendor_id' => 40, 'category_id' => 12], //Tie
 
-            //Biehin Tailor
+            //Bie Hin Tailor
             ['vendor_id' => 41, 'category_id' => 4], //Suit
             ['vendor_id' => 41, 'category_id' => 12], //Tie
 
@@ -696,7 +805,7 @@ class VendorSeeder extends Seeder
             //Its cake
             ['vendor_id' => 53, 'category_id' => 32], //Wedding Cake
 
-            //Clarity
+            //Clarity Production
             ['vendor_id' => 54, 'category_id' => 42], //Photobooth
 
             //Tini Booth
@@ -713,6 +822,52 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 57, 'category_id' => 10], //Headpiece
             ['vendor_id' => 57, 'category_id' => 12], //Tie
             ['vendor_id' => 57, 'category_id' => 16], //Ring Box
+
+            //Novotel Samator East Surabaya
+            ['vendor_id' => 58, 'category_id' => 1], //Hotel
+            ['vendor_id' => 58, 'category_id' => 22], //Venue
+            ['vendor_id' => 58, 'category_id' => 26], //LED
+            ['vendor_id' => 58, 'category_id' => 27], //LCD
+            ['vendor_id' => 58, 'category_id' => 20], //Meal Crew
+            ['vendor_id' => 58, 'category_id' => 13], //Room Decoraition
+
+            //Depplight
+            ['vendor_id' => 59, 'category_id' => 7], //Keepsake
+
+            //Bethany Church Nginden
+            ['vendor_id' => 60, 'category_id' => 19], //Church
+            ['vendor_id' => 60, 'category_id' => 31], //Church Decoration
+
+            //Evergreen Cake
+            ['vendor_id' => 61, 'category_id' => 32], //Wedding Cake
+
+            //Glow Effect
+            ['vendor_id' => 62, 'category_id' => 38], //Effect
+            ['vendor_id' => 62, 'category_id' => 24], //Lighting
+
+            //Manifest
+            ['vendor_id' => 63, 'category_id' => 33], //Band
+
+            //Ann Pagar Ayu
+            ['vendor_id' => 64, 'category_id' => 37], //Usherettes
+
+            //Trikarta
+            ['vendor_id' => 65, 'category_id' => 41], //Souvenir
+
+            //Sempurna Invitations
+            ['vendor_id' => 66, 'category_id' => 39], //Invitation
+
+            //Calief Invitation
+            ['vendor_id' => 67, 'category_id' => 39], //Invitation
+
+            //Si Manten
+            ['vendor_id' => 68, 'category_id' => 40], //Digital Guest Book
+
+            //Stefany Hyperstage Visual
+            ['vendor_id' => 69, 'category_id' => 29], //Animation
+
+            //Nasi Campur Tambak Bayan
+            ['vendor_id' => 70, 'category_id' => 21], //Guest Lunch
         ];
 
         DB::table('category_vendor')->insert($categoryVendor);

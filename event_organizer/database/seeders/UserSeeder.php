@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Fenix',
                 'email' => 'f@f.com',
-                'phone' => '081234567890',
+                'phone' => '+6281234567890',
                 'role' => 'owner',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
@@ -23,8 +23,17 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Mario',
                 'email' => 'm@m.com',
-                'phone' => '081234567890',
+                'phone' => '+6281234567890',
                 'role' => 'pl',
+                'password' => Hash::make('12345'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Jessica Christy',
+                'email' => 'j@j.com',
+                'phone' => '081234567890',
+                'role' => 'klien',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()
@@ -33,7 +42,7 @@ class UserSeeder extends Seeder
                 'name' => 'Kezia',
                 'email' => 'k@k.com',
                 'phone' => '081234567890',
-                'role' => 'klien',
+                'role' => 'crew_rsvp',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()
@@ -41,15 +50,6 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Clarin',
                 'email' => 'c@c.com',
-                'phone' => '081234567890',
-                'role' => 'crew_rsvp',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'name' => 'Vegas',
-                'email' => 'v@v.com',
                 'phone' => '081234567890',
                 'role' => 'crew_eo',
                 'password' => Hash::make('12345'),
