@@ -9,52 +9,141 @@ class PackageTemplateSeeder extends Seeder
 {
     public function run(): void
     {
-        $templates = [
-            //Holy Matrimony Wedding Package
+        $templates = [];
 
-
-
-
-            //Full Day Wedding Package
-            //Morning Procession
-            ['package_id' => 3, 'vendor_category_id' => 1, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 6, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 5, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 14, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 15, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 7, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 16, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 19, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 31, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 2, 'session' => 'morning', 'role_detail' => "Bride", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 9, 'session' => 'morning', 'role_detail' => "Bride", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 11, 'session' => 'morning', 'role_detail' => "Bride", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 3, 'session' => 'morning', 'role_detail' => "Bride", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 10, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 2, 'session' => 'morning', 'role_detail' => "Groom", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 9, 'session' => 'morning', 'role_detail' => "Groom", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 12, 'session' => 'morning', 'role_detail' => "Groom", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 18, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 21, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 20, 'session' => 'morning', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-
-            // Reception
-            ['package_id' => 3, 'vendor_category_id' => 22, 'session' => 'evening', 'role_detail' => '-', 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 30, 'session' => 'evening', 'role_detail' => '-', 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 6, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 5, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 23, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 24, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 38, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 32, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 28, 'session' => 'evening', 'role_detail' => "-", 'is_included' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 33, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 41, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 39, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 42, 'session' => 'evening', 'role_detail' => "-", 'is_included' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['package_id' => 3, 'vendor_category_id' => 20, 'session' => 'evening', 'role_detail' => "-", 'is_included' => false, 'created_at' => now(), 'updated_at' => now()],
+        //Morning Procession
+        $morningCategories = [
+            1,  // Hotel
+            2,  // MUA
+            3,  // Gown
+            4,  // Suit
+            9,  // Hair Styling
+            5,  // Videographer
+            6,  // Photographer
+            11, // Robe & Veil
+            12, // Tie
+            20, // Meal Crew
+            21, // Guest Lunch
+            10, // Headpiece
+            14, // Hand Bouquet
+            15, // Corsage
+            7,  // Keepsake
+            16, // Ring Box
+            18, // Wedding Car
+            31, // Church Decoration
         ];
 
+        //Reception
+        $receptionCategories = [
+            22, // Venue
+            23, // Sound
+            24, // Lighting
+            28, // MC
+            30, // Venue Decoration
+            32, // Wedding Cake
+            33, // Band
+            38, // Effect
+            39, // Invitation
+            41, // Souvenir
+            42, // Photobooth
+            5,  // Videographer
+            6,  // Photographer
+            20, // Meal Crew
+        ];
+
+        // PACKAGE 1: Holy Matrimony (Hanya Morning Procession)
+        foreach ($morningCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 1,
+                'vendor_category_id' => $categoryId,
+                'session' => 'morning',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // PACKAGE 2: Half Day Wedding (Morning Procession + Reception)
+        foreach ($morningCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 2,
+                'vendor_category_id' => $categoryId,
+                'session' => 'morning',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        foreach ($receptionCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 2,
+                'vendor_category_id' => $categoryId,
+                'session' => 'evening',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // PACKAGE 3: Full Day Wedding (Morning Procession + Reception)
+        foreach ($morningCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 3,
+                'vendor_category_id' => $categoryId,
+                'session' => 'morning',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        foreach ($receptionCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 3,
+                'vendor_category_id' => $categoryId,
+                'session' => 'evening',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        // PACKAGE 4: Dreamy Full Day Wedding (Morning + Reception + Usherettes)
+        foreach ($morningCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 4,
+                'vendor_category_id' => $categoryId,
+                'session' => 'morning',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        foreach ($receptionCategories as $categoryId) {
+            $templates[] = [
+                'package_id' => 4,
+                'vendor_category_id' => $categoryId,
+                'session' => 'evening',
+                'role_detail' => '-',
+                'is_included' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        $templates[] = [
+            'package_id' => 4,
+            'vendor_category_id' => 37,
+            'session' => 'evening',
+            'role_detail' => '-',
+            'is_included' => false,
+            'created_at' => now(),
+            'updated_at' => now()
+        ];
         DB::table('package_templates')->insert($templates);
     }
 }
