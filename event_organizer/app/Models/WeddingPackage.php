@@ -9,11 +9,21 @@ class WeddingPackage extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'name',
+        'base_price',
+        'is_active'
+    ];
 
-    // Relasi One-to-Many: Satu paket wedding bisa digunakan di banyak event
-    public function events()
+    public function templates()
     {
-        return $this->hasMany(Event::class, 'package_id');
+        return $this->hasMany(PackageTemplate::class, 'package_id');
+    }
+
+    public function vendors()
+    {
+        return $this->belongsToMany(Vendor::class, 'package_vendor_pivot', 'package_id', 'vendor_id')
+            ->withPivot('vendor_category_id')
+            ->withTimestamps();
     }
 }

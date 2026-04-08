@@ -32,7 +32,7 @@
 
             @if (Auth::user()->role === 'owner')
                 <div x-data="{
-                    open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.clients') || request()->routeIs('owner.vendors') || request()->routeIs('owner.vendors.manage') ? 'true' : 'false' }})
+                    open: localStorage.getItem('masterDataOpen') === 'true' || (localStorage.getItem('masterDataOpen') === null && {{ request()->routeIs('owner.users') || request()->routeIs('owner.clients') || request()->routeIs('owner.vendors') || request()->routeIs('owner.vendors.manage') || request()->routeIs('owner.wedding_packages') ? 'true' : 'false' }})
                 }" x-init="$watch('open', val => localStorage.setItem('masterDataOpen', val))">
 
                     <button @click="open = !open"
@@ -52,6 +52,8 @@
                             class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.clients') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Clients</a>
                         <a href="{{ route('owner.vendors') }}"
                             class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.vendors') || request()->routeIs('owner.vendors.manage') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Vendor</a>
+                        <a href="{{ route('owner.wedding_packages') }}"
+                            class="block px-4 py-2 rounded-md transition-colors {{ request()->routeIs('owner.wedding_packages') ? 'bg-gray-950 text-white font-bold' : 'text-sm hover:bg-gray-800 hover:text-white' }}">Event Package</a>
                     </div>
                 </div>
             @endif

@@ -11,7 +11,7 @@ class PackageTemplateSeeder extends Seeder
     {
         $templates = [];
 
-        //Morning Procession
+        // Master List Categories Sesi Morning
         $morningCategories = [
             1,  // Hotel
             2,  // MUA
@@ -33,7 +33,7 @@ class PackageTemplateSeeder extends Seeder
             31, // Church Decoration
         ];
 
-        //Reception
+        // Master List Categories Sesi Reception (Evening)
         $receptionCategories = [
             22, // Venue
             23, // Sound
@@ -51,6 +51,11 @@ class PackageTemplateSeeder extends Seeder
             20, // Meal Crew
         ];
 
+        // Kategori yang memiliki vendor = Included (True)
+        $includedMorning = [2, 3, 4, 5, 6, 10, 11, 12]; // MUA, Gown, Suit, Video, Photo, Headpiece, Robe & Veil, Tie
+        $includedEveningBase = [5, 6, 28, 30, 32, 33]; // Video, Photo, MC, Venue Decor, Cake, Band
+        $includedEveningPkg4 = [5, 6, 28, 30, 32, 33, 42]; // Base + Photobooth
+
         // PACKAGE 1: Holy Matrimony (Hanya Morning Procession)
         foreach ($morningCategories as $categoryId) {
             $templates[] = [
@@ -58,7 +63,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedMorning),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -71,7 +76,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedMorning),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -82,7 +87,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'evening',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedEveningBase),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -95,7 +100,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedMorning),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -106,7 +111,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'evening',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedEveningBase),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -119,7 +124,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedMorning),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -130,7 +135,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'evening',
                 'role_detail' => '-',
-                'is_included' => false,
+                'is_included' => in_array($categoryId, $includedEveningPkg4),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -140,10 +145,11 @@ class PackageTemplateSeeder extends Seeder
             'vendor_category_id' => 37,
             'session' => 'evening',
             'role_detail' => '-',
-            'is_included' => false,
+            'is_included' => true,
             'created_at' => now(),
             'updated_at' => now()
         ];
+
         DB::table('package_templates')->insert($templates);
     }
 }

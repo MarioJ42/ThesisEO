@@ -339,4 +339,120 @@ class OwnerController extends Controller
             ->with('success', 'Photo successfully deleted!')
             ->with('active_tab', 'portfolios');
     }
+
+    public function weddingPackages(Request $request)
+    {
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
+        $packages = \App\Models\WeddingPackage::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%");
+        })
+            ->orderBy('base_price', 'asc')
+            ->paginate($perPage)
+            ->appends(request()->query());
+
+        return view('owner.wedding_packages', compact('packages'));
+    }
+
+    public function storeWeddingPackage(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'base_price' => 'required|numeric|min:0',
+        ]);
+
+        \App\Models\WeddingPackage::create([
+            'name' => $request->name,
+            'base_price' => $request->base_price,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('owner.wedding_packages')->with('success', 'Event Package successfully added!');
+    }
+
+    public function updateWeddingPackage(Request $request, \App\Models\WeddingPackage $package)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'base_price' => 'required|numeric|min:0',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $package->update([
+            'name' => $request->name,
+            'base_price' => $request->base_price,
+            'is_active' => filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN),
+        ]);
+
+        return redirect()->route('owner.wedding_packages')->with('success', 'Event Package successfully updated!');
+    }
+
+    public function manageWeddingPackage(\App\Models\WeddingPackage $package)
+    {
+        $package->load(['templates.category', 'vendors']);
+        $masterCategories = \App\Models\VendorCategory::orderBy('name')->get();
+        $masterVendors = \App\Models\Vendor::where('is_active', true)->orderBy('name')->get();
+
+        return view('owner.wedding_packages.manage', compact('package', 'masterCategories', 'masterVendors'));
+    }
+
+    public function storePackageTemplate(Request $request, \App\Models\WeddingPackage $package)
+    {
+        $request->validate([
+            'vendor_category_id' => 'required|exists:vendor_categories,id',
+            'session' => 'required|string',
+        ]);
+
+        $package->templates()->create([
+            'vendor_category_id' => $request->vendor_category_id,
+            'session' => $request->session,
+            'role_detail' => '-',
+            'is_included' => false,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Category successfully added to template!')
+            ->with('active_tab', 'template');
+    }
+
+    public function destroyPackageTemplate(\App\Models\WeddingPackage $package, \App\Models\PackageTemplate $template)
+    {
+        $package->vendors()->wherePivot('vendor_category_id', $template->vendor_category_id)->detach();
+
+        $template->delete();
+
+        return redirect()->back()
+            ->with('success', 'Category successfully removed from template!')
+            ->with('active_tab', 'template');
+    }
+
+    public function assignVendorToTemplate(Request $request, \App\Models\WeddingPackage $package, \App\Models\PackageTemplate $template)
+    {
+        $request->validate([
+            'is_included' => 'required|boolean',
+            'vendors' => 'nullable|array',
+            'vendors.*' => 'exists:vendors,id',
+        ]);
+
+        $template->update([
+            'is_included' => filter_var($request->is_included, FILTER_VALIDATE_BOOLEAN)
+        ]);
+
+        $package->vendors()->wherePivot('vendor_category_id', $template->vendor_category_id)->detach();
+
+        if ($request->has('vendors') && is_array($request->vendors)) {
+            foreach ($request->vendors as $vendorId) {
+                $package->vendors()->attach($vendorId, [
+                    'vendor_category_id' => $template->vendor_category_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', 'Vendor assignment successfully updated!')
+            ->with('active_tab', 'assignment');
+    }
 }

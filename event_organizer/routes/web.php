@@ -58,6 +58,14 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('owner.events.slots.remove');
     Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('owner.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('owner.events.slots.status');
+
+    Route::get('/event-packages', [OwnerController::class, 'weddingPackages'])->name('owner.wedding_packages');
+    Route::post('/event-packages', [OwnerController::class, 'storeWeddingPackage'])->name('owner.wedding_packages.store');
+    Route::put('/event-packages/{package}', [OwnerController::class, 'updateWeddingPackage'])->name('owner.wedding_packages.update');
+    Route::get('/event-packages/{package}/manage', [OwnerController::class, 'manageWeddingPackage'])->name('owner.wedding_packages.manage');
+    Route::post('/event-packages/{package}/template', [OwnerController::class, 'storePackageTemplate'])->name('owner.wedding_packages.template.store');
+    Route::delete('/event-packages/{package}/template/{template}', [OwnerController::class, 'destroyPackageTemplate'])->name('owner.wedding_packages.template.destroy');
+    Route::put('/event-packages/{package}/template/{template}/assign', [OwnerController::class, 'assignVendorToTemplate'])->name('owner.wedding_packages.template.assign');
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
