@@ -10,8 +10,6 @@ class PackageTemplateSeeder extends Seeder
     public function run(): void
     {
         $templates = [];
-
-        // Master List Categories Sesi Morning
         $morningCategories = [
             1,  // Hotel
             2,  // MUA
@@ -33,7 +31,6 @@ class PackageTemplateSeeder extends Seeder
             31, // Church Decoration
         ];
 
-        // Master List Categories Sesi Reception (Evening)
         $receptionCategories = [
             22, // Venue
             23, // Sound
@@ -51,10 +48,9 @@ class PackageTemplateSeeder extends Seeder
             20, // Meal Crew
         ];
 
-        // Kategori yang memiliki vendor = Included (True)
-        $includedMorning = [2, 3, 4, 5, 6, 10, 11, 12]; // MUA, Gown, Suit, Video, Photo, Headpiece, Robe & Veil, Tie
-        $includedEveningBase = [5, 6, 28, 30, 32, 33]; // Video, Photo, MC, Venue Decor, Cake, Band
-        $includedEveningPkg4 = [5, 6, 28, 30, 32, 33, 42]; // Base + Photobooth
+        $includedMorning = [2, 3, 4, 5, 6, 10, 11, 12];
+        $includedEveningBase = [5, 6, 28, 30, 32, 33];
+        $includedEveningPkg4 = [5, 6, 28, 30, 32, 33, 42];
 
         // PACKAGE 1: Holy Matrimony (Hanya Morning Procession)
         foreach ($morningCategories as $categoryId) {

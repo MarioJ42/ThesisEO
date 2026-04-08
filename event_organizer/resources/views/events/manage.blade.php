@@ -73,35 +73,51 @@
     <div class="bg-white rounded-b-lg shadow-sm border border-gray-200 border-t-0 p-6">
 
         <div x-show="activeTab === 'overview'" x-cloak>
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Verified Vendor</h3>
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full w-full whitespace-nowrap">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor's Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">PIC</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Meal Crew</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($verifiedSlots as $slot)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-bold text-gray-800 uppercase">{{ $slot->category_name }}</td>
-                            <td class="px-6 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
-                            <td class="px-6 py-4 text-sm text-blue-600">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->contact_phone ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $slot->meal_crew ?? 0 }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No vendors verified yet.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-6">Verified Vendor</h3>
+
+            @foreach(['morning' => 'Morning Session', 'evening' => 'Reception'] as $sessionKey => $sessionTitle)
+                @php $sessionVerifiedSlots = $verifiedSlots->where('session', $sessionKey); @endphp
+                @if($sessionVerifiedSlots->count() > 0)
+                <div class="mb-8">
+                    <h4 class="font-bold text-gray-800 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-200">{{ $sessionTitle }}</h4>
+                    <div class="overflow-x-auto border border-gray-200 rounded-b-lg border-t-0">
+                        <table class="min-w-full w-full whitespace-nowrap">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor's Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">PIC</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
+                                    <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Meal Crew</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach($sessionVerifiedSlots as $slot)
+                                <tr class="hover:bg-blue-50/30 transition-colors">
+                                    <td class="px-4 py-4 text-sm font-bold text-gray-800 uppercase">
+                                        {{ $slot->category_name }}
+                                        @if($slot->is_included)
+                                            <span class="ml-2 text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold tracking-wider">INCLUDED</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
+                                    <td class="px-4 py-4 text-sm text-blue-700">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">{{ $slot->contact_name ?? 'N/A' }}</td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">{{ $slot->contact_phone ?? 'N/A' }}</td>
+                                    <td class="px-4 py-4 text-sm text-center text-gray-700">{{ $slot->meal_crew ?? 0 }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endif
+            @endforeach
+
+            @if($verifiedSlots->count() === 0)
+                <div class="px-6 py-8 text-center text-gray-500 border border-gray-200 rounded-lg bg-gray-50">No vendors verified yet.</div>
+            @endif
         </div>
 
         <div x-show="activeTab === 'planning'" x-cloak>
@@ -160,7 +176,9 @@
                             <tr class="hover:bg-blue-50/30">
                                 <td class="px-4 py-4 text-sm font-bold text-gray-800 uppercase">
                                     {{ $slot->category_name }}
-                                    @if($slot->is_included) <span class="ml-1 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Included</span> @endif
+                                    @if($slot->is_included)
+                                        <span class="ml-2 text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold tracking-wider">INCLUDED</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-4 text-sm text-blue-700">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
                                 <td class="px-4 py-4 text-sm">
@@ -243,6 +261,9 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-4 text-sm font-bold text-gray-800 uppercase">
                                 {{ $slot->category_name }}
+                                @if($slot->is_included)
+                                    <span class="ml-2 text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold tracking-wider">INCLUDED</span>
+                                @endif
                                 @if($slot->role_detail && $slot->role_detail !== '-')
                                     <div class="text-[11px] font-normal text-blue-600 mt-0.5 capitalize">{{ $slot->role_detail }}</div>
                                 @endif
