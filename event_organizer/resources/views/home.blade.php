@@ -123,7 +123,7 @@
                     </button>
                     @endif
 
-                    <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pt-4 no-scrollbar items-stretch">
+                    <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pt-4 no-scrollbar">
                         @foreach($packages as $package)
                             @if($package->name === 'Full Day Wedding')
                                 <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border-2 border-gray-900 rounded-2xl p-8 shadow-lg bg-gray-900 text-white transform md:-translate-y-4 cursor-pointer relative overflow-hidden group flex flex-col">
@@ -135,7 +135,7 @@
                                     <div class="mb-6">
                                         <span class="text-3xl font-extrabold">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
                                     </div>
-                                    <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-grow">
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-300">
                                         <li class="flex items-center">
                                             <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
                                         </li>
@@ -152,7 +152,7 @@
                                             <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
                                         </li>
                                     </ul>
-                                    <button class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors mt-auto">Plan This Event</button>
+                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors mt-auto">Plan This Event</button>
                                 </div>
                             @else
                                 <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer relative overflow-hidden flex flex-col">
@@ -173,7 +173,7 @@
                                         <span class="text-3xl font-extrabold text-gray-900">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
                                     </div>
 
-                                    <ul class="space-y-3 mb-8 text-sm text-gray-600 flex-grow">
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-600">
                                         @if($package->name === 'Holy Matrimony')
                                             <li class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
@@ -234,7 +234,7 @@
                                             </li>
                                         @endif
                                     </ul>
-                                    <button class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900 mt-auto">Plan This Event</button>
+                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900 mt-auto">Plan This Event</button>
                                 </div>
                             @endif
                         @endforeach
@@ -360,6 +360,32 @@
             </div>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function promptLogin() {
+            Swal.fire({
+                title: 'Do you already have an account?',
+                text: 'You need an account to plan an event.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Log In',
+                cancelButtonText: 'No, I need one',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}";
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Contact Us',
+                        text: 'To create a new event and get an account, please contact Michael H via WhatsApp at +6285855788100.',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
