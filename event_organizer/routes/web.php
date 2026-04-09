@@ -6,10 +6,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OwnerController;
 use App\Models\EoPortfolio;
+use App\Models\WeddingPackage;
 
 Route::get('/', function () {
     $portfolios = EoPortfolio::latest()->get();
-    return view('home', compact('portfolios'));
+    $packages = WeddingPackage::where('is_active', true)->orderBy('base_price', 'asc')->get();
+    return view('home', compact('portfolios', 'packages'));
 })->name('home');
 
 Route::get('/vendor', function () {

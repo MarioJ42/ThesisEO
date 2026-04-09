@@ -12,6 +12,13 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
@@ -95,133 +102,145 @@
             </div>
         </section>
 
-        <section id="packages" class="py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="packages" class="py-24 bg-white overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Signature Packages</h2>
-                    <p class="text-gray-500">Choose a package that fits your needs, or contact us to build a custom
-                        arrangement tailored just for you.</p>
+                    <p class="text-gray-500">Choose a package that fits your needs, or contact us to build a custom arrangement tailored just for you.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div
-                        class="border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Intimate Elegance</h3>
-                        <p class="text-gray-500 text-sm mb-6 h-10">Perfect for private gatherings and close-knit
-                            celebrations.</p>
-                        <div class="mb-6">
-                            <span class="text-3xl font-extrabold text-gray-900">Rp 50M</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Up to 100 Guests
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Essential Vendor Management
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> On-the-day Coordination
-                            </li>
-                        </ul>
-                        <button
-                            class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900">Plan
-                            This Event</button>
-                    </div>
+                <div x-data="{
+                    scrollNext() { this.$refs.slider.scrollBy({ left: 350, behavior: 'smooth' }); },
+                    scrollPrev() { this.$refs.slider.scrollBy({ left: -350, behavior: 'smooth' }); }
+                }" class="relative">
 
-                    <div
-                        class="border-2 border-gray-900 rounded-2xl p-8 shadow-lg bg-gray-900 text-white transform md:-translate-y-4 cursor-pointer relative overflow-hidden">
-                        <div
-                            class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
-                            Most Popular
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Grand Celebration</h3>
-                        <p class="text-gray-400 text-sm mb-6 h-10">Comprehensive planning for your unforgettable grand
-                            wedding.</p>
-                        <div class="mb-6">
-                            <span class="text-3xl font-extrabold">Rp 150M</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-300">
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Up to 500 Guests
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Full Vendor Sourcing & Management
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Complete Concept & Styling
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Dedicated Project Leader
-                            </li>
-                        </ul>
-                        <button
-                            class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors">Plan
-                            This Event</button>
-                    </div>
+                    @if(count($packages) > 3)
+                    <button @click="scrollPrev()" class="hidden md:flex absolute top-1/2 -left-4 -translate-y-1/2 z-10 w-12 h-12 bg-white border border-gray-200 rounded-full items-center justify-center shadow-lg hover:bg-gray-50 text-gray-800 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button @click="scrollNext()" class="hidden md:flex absolute top-1/2 -right-4 -translate-y-1/2 z-10 w-12 h-12 bg-white border border-gray-200 rounded-full items-center justify-center shadow-lg hover:bg-gray-50 text-gray-800 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                    @endif
 
-                    <div
-                        class="border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Bespoke Luxury</h3>
-                        <p class="text-gray-500 text-sm mb-6 h-10">The ultimate custom experience with no limits.</p>
-                        <div class="mb-6">
-                            <span class="text-3xl font-extrabold text-gray-900">Custom</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-gray-600">
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Unlimited Guests
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> Premium Vendor Selection
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg> VVIP Treatment & Logistics
-                            </li>
-                        </ul>
-                        <button
-                            class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900">Contact
-                            to Plan</button>
+                    <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pt-4 no-scrollbar items-stretch">
+                        @foreach($packages as $package)
+                            @if($package->name === 'Full Day Wedding')
+                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border-2 border-gray-900 rounded-2xl p-8 shadow-lg bg-gray-900 text-white transform md:-translate-y-4 cursor-pointer relative overflow-hidden group flex flex-col">
+                                    <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
+                                        Most Popular
+                                    </div>
+                                    <h3 class="text-xl font-bold mb-2">{{ $package->name }}</h3>
+                                    <p class="text-gray-400 text-sm mb-6 h-10">Comprehensive planning for your unforgettable grand wedding.</p>
+                                    <div class="mb-6">
+                                        <span class="text-3xl font-extrabold">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
+                                    </div>
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-grow">
+                                        <li class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
+                                        </li>
+                                        <li class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tea Pai Properties
+                                        </li>
+                                        <li class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 50 Balloons & Dove
+                                        </li>
+                                        <li class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Meeting
+                                        </li>
+                                        <li class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
+                                        </li>
+                                    </ul>
+                                    <button class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors mt-auto">Plan This Event</button>
+                                </div>
+                            @else
+                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer relative overflow-hidden flex flex-col">
+                                    @if($package->name === 'Dreamy Full Day Wedding')
+                                    <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
+                                        DREAM WEDDING
+                                    </div>
+                                    @endif
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $package->name }}</h3>
+
+                                    @if($package->name === 'Dreamy Full Day Wedding')
+                                        <p class="text-gray-500 text-sm mb-6 h-10">Comprehensive planning for your unforgettable magical grand wedding.</p>
+                                    @else
+                                        <p class="text-gray-500 text-sm mb-6 h-10">Tailored arrangement for your special day.</p>
+                                    @endif
+
+                                    <div class="mb-6">
+                                        <span class="text-3xl font-extrabold text-gray-900">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
+                                    </div>
+
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-600 flex-grow">
+                                        @if($package->name === 'Holy Matrimony')
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Meeting
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
+                                            </li>
+                                        @elseif($package->name === 'Half Day Wedding')
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tea Pai Properties
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Meeting
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
+                                            </li>
+                                        @elseif($package->name === 'Dreamy Full Day Wedding')
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tea Pai Properties
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 50 Balloons & Dove
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 Wedding Hand Bouquet
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 Corsage For Groom
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 10 Corsages For Family
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Meeting
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
+                                            </li>
+                                        @else
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Essential Vendor Management
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> On-the-day Coordination
+                                            </li>
+                                            <li class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Customized Planning
+                                            </li>
+                                        @endif
+                                    </ul>
+                                    <button class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900 mt-auto">Plan This Event</button>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
+
             </div>
         </section>
 
