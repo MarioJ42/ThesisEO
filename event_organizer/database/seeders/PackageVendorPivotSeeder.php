@@ -184,6 +184,9 @@ class PackageVendorPivotSeeder extends Seeder
             // Glimpse Music
             ['package_id' => 3, 'vendor_category_id' => 33, 'vendor_id' => 50, 'created_at' => now(), 'updated_at' => now()],
 
+            // Fenix EO
+            ['package_id' => 3, 'vendor_category_id' => 43, 'vendor_id' => 1, 'created_at' => now(), 'updated_at' => now()],
+
 
             // PACKAGE 4: DREAMY FULL DAY (package_id = 4)
 
@@ -255,6 +258,9 @@ class PackageVendorPivotSeeder extends Seeder
 
             // Athalia Usherettes
             ['package_id' => 4, 'vendor_category_id' => 37, 'vendor_id' => 56, 'created_at' => now(), 'updated_at' => now()],
+
+            // Fenix EO
+            ['package_id' => 4, 'vendor_category_id' => 43, 'vendor_id' => 1, 'created_at' => now(), 'updated_at' => now()],
         ];
 
         DB::table('package_vendor_pivot')->insert($packageVendors);

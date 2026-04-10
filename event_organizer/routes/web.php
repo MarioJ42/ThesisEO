@@ -9,9 +9,7 @@ use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
 
-// Landing Page Route
 Route::get('/', function () {
-    // Redirect non-clients to their respective dashboards
     if (Auth::check()) {
         if (Auth::user()->role === 'owner') {
             return redirect()->route('owner.dashboard');
@@ -23,7 +21,6 @@ Route::get('/', function () {
     $portfolios = EoPortfolio::latest()->get();
     $packages = WeddingPackage::where('is_active', true)->orderBy('base_price', 'asc')->get();
 
-    // Return view with headers to prevent browser caching for the back button
     return response()
         ->view('home', compact('portfolios', 'packages'))
         ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
@@ -31,9 +28,7 @@ Route::get('/', function () {
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->name('home');
 
-// Vendor Page Route
 Route::get('/vendor', function () {
-    // Redirect non-clients to their respective dashboards
     if (Auth::check()) {
         if (Auth::user()->role === 'owner') {
             return redirect()->route('owner.dashboard');
@@ -46,7 +41,6 @@ Route::get('/vendor', function () {
         $query->orderBy('name', 'asc')->with('packages');
     }])->orderBy('name', 'asc')->get();
 
-    // Return view with headers to prevent browser caching for the back button
     return response()
         ->view('vendor', compact('categories'))
         ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')

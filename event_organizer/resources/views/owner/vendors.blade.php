@@ -149,7 +149,6 @@
                         <label class="block mb-2 text-sm font-medium text-gray-900">Address</label>
                         <textarea name="address" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Vendor address (Optional)"></textarea>
                     </div>
-                    <p class="text-xs text-gray-500 italic mt-2">* Contacts, Portfolios, and Packages can be added later via the "Manage" button.</p>
                 </div>
 
                 <div class="flex justify-end p-4 border-t gap-2">

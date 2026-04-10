@@ -29,6 +29,7 @@ class PackageTemplateSeeder extends Seeder
             16, // Ring Box
             18, // Wedding Car
             31, // Church Decoration
+            43, // Baloon & Dove
         ];
 
         $receptionCategories = [
@@ -49,6 +50,7 @@ class PackageTemplateSeeder extends Seeder
         ];
 
         $includedMorning = [2, 3, 4, 5, 6, 10, 11, 12];
+        $includedMorningPkg34 = [2, 3, 4, 5, 6, 10, 11, 12, 43];
         $includedEveningBase = [5, 6, 28, 30, 32, 33];
         $includedEveningPkg4 = [5, 6, 28, 30, 32, 33, 42];
 
@@ -96,7 +98,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => in_array($categoryId, $includedMorning),
+                'is_included' => in_array($categoryId, $includedMorningPkg34),
                 'created_at' => now(),
                 'updated_at' => now()
             ];
@@ -120,7 +122,7 @@ class PackageTemplateSeeder extends Seeder
                 'vendor_category_id' => $categoryId,
                 'session' => 'morning',
                 'role_detail' => '-',
-                'is_included' => in_array($categoryId, $includedMorning),
+                'is_included' => in_array($categoryId, $includedMorningPkg34),
                 'created_at' => now(),
                 'updated_at' => now()
             ];

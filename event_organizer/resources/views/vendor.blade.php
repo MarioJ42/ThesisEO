@@ -32,7 +32,8 @@
         class="fixed w-full z-50 top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{ route('home') }}'">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer"
+                    onclick="window.location.href='{{ route('home') }}'">
                     <img src="/images/logo-fenix.png" alt="Fenix Logo" class="w-24 h-24 object-contain">
                 </div>
 
@@ -51,18 +52,23 @@
                                 class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors focus:outline-none">
                                 <span>Hi, {{ Auth::user()->name }}</span>
 
-                                <svg :class="{'rotate-90': open}" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                <svg :class="{ 'rotate-90': open }" class="w-4 h-4 transition-transform duration-200"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                    </path>
                                 </svg>
                             </button>
 
-                            <div x-show="open"
-                                x-transition.opacity.duration.200ms
+                            <div x-show="open" x-transition.opacity.duration.200ms
                                 class="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 flex flex-col"
                                 style="display: none;">
 
-                                <a href="{{ route('profile.edit') }}" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors flex items-center gap-3">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                <a href="{{ route('profile.edit') }}"
+                                    class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors flex items-center gap-3">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
                                     Profile
                                 </a>
 
@@ -70,8 +76,13 @@
 
                                 <form method="POST" action="{{ route('logout') }}" class="m-0 block">
                                     @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    <button type="submit"
+                                        class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                            </path>
+                                        </svg>
                                         Log Out
                                     </button>
                                 </form>
@@ -156,7 +167,7 @@
                     <div class="mb-6">
                         <h3 class="font-bold text-gray-900 mb-3 text-lg">Search</h3>
                         <div class="relative">
-                            <input type="text" x-model="searchQuery" placeholder="Find vendo."
+                            <input type="text" x-model="searchQuery" placeholder="Find vendor"
                                 class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm text-gray-700 placeholder-gray-400">
                             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -234,10 +245,10 @@
                                                 @php
                                                     $packages = $vendor->packages ?? collect();
                                                     $minPrice = $packages->isNotEmpty()
-                                                        ? $packages->min('price')
+                                                        ? $packages->min('min_price')
                                                         : null;
                                                     $maxPrice = $packages->isNotEmpty()
-                                                        ? $packages->max('price')
+                                                        ? $packages->max('max_price')
                                                         : null;
                                                 @endphp
 

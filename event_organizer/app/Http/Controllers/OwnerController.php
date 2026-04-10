@@ -390,11 +390,40 @@ class OwnerController extends Controller
 
     public function manageWeddingPackage(\App\Models\WeddingPackage $package)
     {
-        $package->load(['templates.category', 'vendors']);
+        $package->load(['templates.category', 'vendors.packages']);
         $masterCategories = \App\Models\VendorCategory::orderBy('name')->get();
         $masterVendors = \App\Models\Vendor::where('is_active', true)->orderBy('name')->get();
 
-        return view('owner.wedding_packages.manage', compact('package', 'masterCategories', 'masterVendors'));
+        $minCost = 0;
+        $maxCost = 0;
+
+        foreach ($package->templates->where('is_included', true) as $template) {
+            $assignedVendors = $package->vendors->where('pivot.vendor_category_id', $template->vendor_category_id);
+
+            if ($assignedVendors->isNotEmpty()) {
+                $categoryMin = null;
+                $categoryMax = 0;
+
+                foreach ($assignedVendors as $vendor) {
+                    if ($vendor->packages->isNotEmpty()) {
+                        $vMin = $vendor->packages->min('min_price');
+                        $vMax = $vendor->packages->max('max_price');
+
+                        if (is_null($categoryMin) || $vMin < $categoryMin) {
+                            $categoryMin = $vMin;
+                        }
+                        if ($vMax > $categoryMax) {
+                            $categoryMax = $vMax;
+                        }
+                    }
+                }
+
+                $minCost += $categoryMin ?? 0;
+                $maxCost += $categoryMax;
+            }
+        }
+
+        return view('owner.wedding_packages.manage', compact('package', 'masterCategories', 'masterVendors', 'minCost', 'maxCost'));
     }
 
     public function storePackageTemplate(Request $request, \App\Models\WeddingPackage $package)
