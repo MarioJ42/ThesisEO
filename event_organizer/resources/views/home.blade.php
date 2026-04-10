@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fenix Event Organizer</title>
+    <link rel="icon" href="/images/logo-fenix.png" type="image/png">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -126,7 +128,7 @@
                     <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pt-4 no-scrollbar">
                         @foreach($packages as $package)
                             @if($package->name === 'Full Day Wedding')
-                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border-2 border-gray-900 rounded-2xl p-8 shadow-lg bg-gray-900 text-white transform md:-translate-y-4 cursor-pointer relative overflow-hidden group flex flex-col">
+                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border-2 border-gray-900 rounded-2xl p-8 shadow-lg bg-gray-900 text-white transform md:-translate-y-4 cursor-pointer relative overflow-hidden group">
                                     <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                                         Most Popular
                                     </div>
@@ -152,10 +154,10 @@
                                             <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Vendor Coordinating
                                         </li>
                                     </ul>
-                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors mt-auto">Plan This Event</button>
+                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-md transition-colors">Plan This Event</button>
                                 </div>
                             @else
-                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer relative overflow-hidden flex flex-col">
+                                <div class="snap-center shrink-0 w-full md:w-[calc(33.333%-1.33rem)] border border-gray-100 rounded-2xl p-8 hover:shadow-xl transition-shadow duration-300 bg-white group cursor-pointer relative overflow-hidden">
                                     @if($package->name === 'Dreamy Full Day Wedding')
                                     <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                                         DREAM WEDDING
@@ -234,7 +236,7 @@
                                             </li>
                                         @endif
                                     </ul>
-                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900 mt-auto">Plan This Event</button>
+                                    <button type="button" onclick="promptLogin()" class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-900 hover:text-white text-gray-900 font-semibold rounded-md transition-colors border border-gray-200 group-hover:border-gray-900">Plan This Event</button>
                                 </div>
                             @endif
                         @endforeach
