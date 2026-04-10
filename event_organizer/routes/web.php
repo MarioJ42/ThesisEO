@@ -7,6 +7,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\OwnerController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
+use App\Models\VendorCategory;
 
 Route::get('/', function () {
     $portfolios = EoPortfolio::latest()->get();
@@ -15,7 +16,12 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/vendor', function () {
-    return view('vendor');
+    $categories = VendorCategory::with(['vendors' => function ($query) {
+        $query->orderBy('name', 'asc')
+            ->with('packages');
+    }])->orderBy('name', 'asc')->get();
+
+    return view('vendor', compact('categories'));
 })->name('vendor');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
