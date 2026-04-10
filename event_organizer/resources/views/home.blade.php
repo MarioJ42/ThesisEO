@@ -30,22 +30,58 @@
         class="fixed w-full z-50 top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{ route('home') }}'">
                     <img src="/images/logo-fenix.png" alt="Fenix Logo" class="w-24 h-24 object-contain">
                 </div>
 
                 <div class="hidden md:flex space-x-8">
                     <a href="{{ route('home') }}"
-                        class="text-gray-900 font-medium text-sm border-b-2 border-gray-900 px-1 py-2">Home</a>
+                        class="{{ request()->routeIs('home') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-900' }} font-medium text-sm transition-colors px-1 py-2">Home</a>
                     <a href="{{ route('vendor') }}"
-                        class="text-gray-500 hover:text-gray-900 font-medium text-sm transition-colors px-1 py-2">Vendor</a>
+                        class="{{ request()->routeIs('vendor') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-900' }} font-medium text-sm transition-colors px-1 py-2">Vendor</a>
                 </div>
 
-                <div class="flex items-center">
-                    <a href="{{ route('login') }}"
-                        class="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-md text-sm font-semibold tracking-wide transition-all shadow-sm">
-                        LOG IN
-                    </a>
+                <div class="flex items-center gap-4">
+                    @auth
+                        <div x-data="{ open: false }" class="relative">
+
+                            <button @click="open = !open" @click.outside="open = false"
+                                class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors focus:outline-none">
+                                <span>Hi, {{ Auth::user()->name }}</span>
+
+                                <svg :class="{'rotate-90': open}" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+
+                            <div x-show="open"
+                                x-transition.opacity.duration.200ms
+                                class="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 flex flex-col"
+                                style="display: none;">
+
+                                <a href="{{ route('profile.edit') }}" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors flex items-center gap-3">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    Profile
+                                </a>
+
+                                <div class="h-px bg-gray-100 my-1"></div>
+
+                                <form method="POST" action="{{ route('logout') }}" class="m-0 block">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                        Log Out
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-md text-sm font-semibold tracking-wide transition-all shadow-sm">
+                            LOG IN
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -137,7 +173,7 @@
                                     <div class="mb-6">
                                         <span class="text-3xl font-extrabold">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
                                     </div>
-                                    <ul class="space-y-3 mb-8 text-sm text-gray-300">
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-300 min-h-[280px]">
                                         <li class="flex items-center">
                                             <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set
                                         </li>
@@ -175,7 +211,7 @@
                                         <span class="text-3xl font-extrabold text-gray-900">Rp {{ number_format($package->base_price, 0, ',', '.') }}</span>
                                     </div>
 
-                                    <ul class="space-y-3 mb-8 text-sm text-gray-600">
+                                    <ul class="space-y-3 mb-8 text-sm text-gray-600 min-h-[280px]">
                                         @if($package->name === 'Holy Matrimony')
                                             <li class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Morning Session Set

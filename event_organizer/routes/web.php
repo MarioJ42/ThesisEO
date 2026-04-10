@@ -9,19 +9,49 @@ use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
 
+// Landing Page Route
 Route::get('/', function () {
+    // Redirect non-clients to their respective dashboards
+    if (Auth::check()) {
+        if (Auth::user()->role === 'owner') {
+            return redirect()->route('owner.dashboard');
+        } elseif (Auth::user()->role === 'pl') {
+            return redirect()->route('pl.dashboard');
+        }
+    }
+
     $portfolios = EoPortfolio::latest()->get();
     $packages = WeddingPackage::where('is_active', true)->orderBy('base_price', 'asc')->get();
-    return view('home', compact('portfolios', 'packages'));
+
+    // Return view with headers to prevent browser caching for the back button
+    return response()
+        ->view('home', compact('portfolios', 'packages'))
+        ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->name('home');
 
+// Vendor Page Route
 Route::get('/vendor', function () {
+    // Redirect non-clients to their respective dashboards
+    if (Auth::check()) {
+        if (Auth::user()->role === 'owner') {
+            return redirect()->route('owner.dashboard');
+        } elseif (Auth::user()->role === 'pl') {
+            return redirect()->route('pl.dashboard');
+        }
+    }
+
     $categories = VendorCategory::with(['vendors' => function ($query) {
-        $query->orderBy('name', 'asc')
-            ->with('packages');
+        $query->orderBy('name', 'asc')->with('packages');
     }])->orderBy('name', 'asc')->get();
 
-    return view('vendor', compact('categories'));
+    // Return view with headers to prevent browser caching for the back button
+    return response()
+        ->view('vendor', compact('categories'))
+        ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->name('vendor');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
