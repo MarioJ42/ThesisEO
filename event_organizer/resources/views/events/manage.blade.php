@@ -101,7 +101,14 @@
                                             <span class="ml-2 text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold tracking-wider">INCLUDED</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
+                                    <td class="px-4 py-4 text-sm font-bold text-gray-800">
+                                        {{ $slot->vendor_name }}
+                                        @if($slot->vendor_package_id)
+                                            <div class="text-[11px] font-normal text-gray-500 mt-0.5">{{ $slot->package_name }}</div>
+                                        @else
+                                            <div class="text-[11px] italic font-normal text-red-500 mt-0.5">No Package Selected</div>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-4 text-sm text-blue-700">{{ $slot->role_detail !== '-' ? $slot->role_detail : '' }}</td>
                                     <td class="px-4 py-4 text-sm text-gray-700">{{ $slot->contact_name ?? 'N/A' }}</td>
                                     <td class="px-4 py-4 text-sm text-gray-700">{{ $slot->contact_phone ?? 'N/A' }}</td>
@@ -192,15 +199,75 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-4 text-sm">
-                                    @if($slot->vendor_id)
-                                        <div class="flex items-center justify-between bg-white border border-gray-200 p-2 rounded-lg">
-                                            <span class="font-bold text-gray-800">{{ $slot->vendor_name }}</span>
+                                    @if($slot->vendor_id && $slot->vendor_package_id)
+                                        <div class="flex items-center justify-between bg-white border border-green-200 p-2 rounded-lg" x-data="{ editPrice: false }">
+                                            <div class="flex flex-col w-full pr-4">
+                                                <span class="font-bold text-gray-800">{{ $slot->vendor_name }}</span>
+                                                @php
+                                                    $selectedPkg = collect($vendorPackages[$slot->vendor_id] ?? [])->firstWhere('id', $slot->vendor_package_id);
+                                                    $baseCost = ($slot->is_included && isset($baseCosts[$slot->vendor_category_id])) ? $baseCosts[$slot->vendor_category_id] : 0;
+                                                    
+                                                    $currentDealPrice = $slot->deal_price > 0 ? $slot->deal_price : ($selectedPkg->price ?? 0);
+                                                    $upgradeFee = max(0, $currentDealPrice - $baseCost);
+                                                @endphp
+                                                <span class="text-[11px] text-gray-600">{{ $selectedPkg->name ?? 'Package Selected' }}</span>
+                                                
+                                                <div x-show="!editPrice" class="flex items-center gap-2 mt-0.5">
+                                                    @if($upgradeFee > 0)
+                                                        <span class="text-[10px] font-bold text-red-500">Upgrade +Rp {{ number_format($upgradeFee, 0, ',', '.') }}</span>
+                                                    @else
+                                                        <span class="text-[10px] font-bold text-green-600">Standard (No Add. Fee)</span>
+                                                    @endif
+                                                    <span class="text-[10px] text-gray-500 border-l border-gray-300 pl-2">Deal: Rp {{ number_format($currentDealPrice, 0, ',', '.') }}</span>
+                                                    <button @click="editPrice = true" class="text-blue-500 hover:text-blue-700 ml-1" title="Edit Deal Price">
+                                                        <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                    </button>
+                                                </div>
+
+                                                <form x-show="editPrice" action="{{ route($user->role . '.events.slots.price', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="flex items-center gap-2 mt-1" x-cloak>
+                                                    @csrf @method('PUT')
+                                                    <div class="relative w-full max-w-[150px]">
+                                                        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">Rp</span>
+                                                        <input type="number" name="deal_price" value="{{ round($currentDealPrice) }}" required min="0" class="w-full pl-6 pr-2 py-1 border border-gray-300 rounded text-[10px] focus:ring-blue-500 focus:border-blue-500 font-semibold">
+                                                    </div>
+                                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold px-2 py-1 transition-colors">Save</button>
+                                                    <button type="button" @click="editPrice = false" class="text-gray-500 hover:text-gray-700 text-[10px] px-1 font-semibold">Cancel</button>
+                                                </form>
+                                            </div>
                                             <div class="flex items-center divide-x divide-gray-300">
                                                 <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
                                                     @csrf @method('PUT')
                                                     <button type="submit" class="text-orange-500 hover:text-orange-700 text-xs font-bold px-2">Unassign</button>
                                                 </form>
                                             </div>
+                                        </div>
+                                    @elseif($slot->vendor_id && !$slot->vendor_package_id)
+                                        <div class="flex flex-col gap-2 w-full">
+                                            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 p-2 rounded-lg">
+                                                <span class="font-bold text-gray-800">{{ $slot->vendor_name }}</span>
+                                                <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
+                                                    @csrf @method('PUT')
+                                                    <button type="submit" class="text-orange-500 hover:text-orange-700 text-[10px] font-bold px-1">Change Vendor</button>
+                                                </form>
+                                            </div>
+                                            <form action="{{ route($user->role . '.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="flex gap-2 w-full h-[36px]">
+                                                @csrf @method('PUT')
+                                                @php
+                                                    $packages = collect($vendorPackages[$slot->vendor_id] ?? [])->where('vendor_category_id', $slot->vendor_category_id);
+                                                    $baseCost = ($slot->is_included && isset($baseCosts[$slot->vendor_category_id])) ? $baseCosts[$slot->vendor_category_id] : 0;
+                                                @endphp
+                                                <select name="vendor_package_id" required class="w-full border-gray-300 text-xs rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full">
+                                                    <option value="" disabled selected>Select Package</option>
+                                                    @foreach($packages as $pkg)
+                                                        @php
+                                                            $upgradeFee = max(0, $pkg->price - $baseCost);
+                                                            $upgradeText = $upgradeFee > 0 ? '(+Rp ' . number_format($upgradeFee, 0, ',', '.') . ')' : '(Free)';
+                                                        @endphp
+                                                        <option value="{{ $pkg->id }}">{{ $pkg->name }} {{ $upgradeText }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold px-3 h-full flex items-center justify-center flex-shrink-0 transition-colors">Save</button>
+                                            </form>
                                         </div>
                                     @else
                                         @php
@@ -269,7 +336,14 @@
                                     <div class="text-[11px] font-normal text-blue-600 mt-0.5 capitalize">{{ $slot->role_detail }}</div>
                                 @endif
                             </td>
-                            <td class="px-4 py-4 text-sm font-bold text-gray-800">{{ $slot->vendor_name }}</td>
+                            <td class="px-4 py-4 text-sm font-bold text-gray-800">
+                                {{ $slot->vendor_name }}
+                                @if($slot->vendor_package_id)
+                                    <div class="text-[11px] font-normal text-gray-500 mt-0.5">{{ $slot->package_name }}</div>
+                                @else
+                                    <div class="text-[11px] italic font-normal text-red-500 mt-0.5">No Package Selected</div>
+                                @endif
+                            </td>
                             <td class="px-4 py-4 text-sm">
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full
                                     @if($slot->status == 'reviewing') bg-yellow-100 text-yellow-800

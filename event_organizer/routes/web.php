@@ -90,6 +90,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('owner.events.slots.remove');
     Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('owner.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('owner.events.slots.status');
+    Route::put('/events/{event}/slots/{slot}/price', [EventController::class, 'updateDealPrice'])->name('owner.events.slots.price');
 
     Route::get('/event-packages', [OwnerController::class, 'weddingPackages'])->name('owner.wedding_packages');
     Route::post('/event-packages', [OwnerController::class, 'storeWeddingPackage'])->name('owner.wedding_packages.store');
@@ -119,6 +120,7 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('pl.events.slots.remove');
     Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('pl.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('pl.events.slots.status');
+    Route::put('/events/{event}/slots/{slot}/price', [EventController::class, 'updateDealPrice'])->name('pl.events.slots.price');
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {

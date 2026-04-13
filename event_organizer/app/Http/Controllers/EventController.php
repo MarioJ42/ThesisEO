@@ -132,13 +132,15 @@ class EventController extends Controller
             ->join('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
             ->leftJoin('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
             ->leftJoin('vendor_contacts', 'event_vendor.vendor_contact_id', '=', 'vendor_contacts.id')
+            ->leftJoin('vendor_packages', 'event_vendor.vendor_package_id', '=', 'vendor_packages.id')
             ->where('event_vendor.event_id', $event->id)
             ->select(
                 'event_vendor.*',
                 'vendor_categories.name as category_name',
                 'vendors.name as vendor_name',
                 'vendor_contacts.name as contact_name',
-                'vendor_contacts.phone as contact_phone'
+                'vendor_contacts.phone as contact_phone',
+                'vendor_packages.name as package_name'
             )
             ->orderBy('event_vendor.id')
             ->get();
@@ -150,15 +152,39 @@ class EventController extends Controller
         $categories = \App\Models\VendorCategory::with('vendors')->get();
 
         $allowedVendors = collect();
+        $baseCosts = [];
+
         if ($event->package_id) {
             $allowedVendors = DB::table('package_vendor_pivot')
                 ->where('package_id', $event->package_id)
                 ->get()
                 ->groupBy('vendor_category_id');
+
+            $templateCategories = DB::table('package_templates')
+                ->where('package_id', $event->package_id)
+                ->where('is_included', true)
+                ->pluck('vendor_category_id')
+                ->toArray();
+
+            foreach ($templateCategories as $catId) {
+                $allowedIds = collect($allowedVendors[$catId] ?? [])->pluck('vendor_id');
+
+                $minPrice = DB::table('vendor_packages')
+                    ->whereIn('vendor_id', $allowedIds)
+                    ->where('vendor_category_id', $catId)
+                    ->min('price');
+
+                $baseCosts[$catId] = $minPrice ?? 0;
+            }
         }
 
         $assignedVendorIds = $slots->whereNotNull('vendor_id')->pluck('vendor_id')->unique();
         $vendorContacts = DB::table('vendor_contacts')
+            ->whereIn('vendor_id', $assignedVendorIds)
+            ->get()
+            ->groupBy('vendor_id');
+
+        $vendorPackages = DB::table('vendor_packages')
             ->whereIn('vendor_id', $assignedVendorIds)
             ->get()
             ->groupBy('vendor_id');
@@ -172,7 +198,9 @@ class EventController extends Controller
             'verifiedSlots',
             'categories',
             'allowedVendors',
-            'vendorContacts'
+            'vendorContacts',
+            'vendorPackages',
+            'baseCosts'
         ));
     }
 
@@ -202,24 +230,49 @@ class EventController extends Controller
 
     public function assignVendorToSlot(Request $request, Event $event, $slotId)
     {
-        $request->validate([
-            'vendor_id' => 'required|exists:vendors,id'
-        ]);
+        if ($request->has('vendor_id')) {
+            $request->validate(['vendor_id' => 'required|exists:vendors,id']);
 
-        $contactId = DB::table('vendor_contacts')
-            ->where('vendor_id', $request->vendor_id)
-            ->value('id');
+            $contactId = DB::table('vendor_contacts')
+                ->where('vendor_id', $request->vendor_id)
+                ->where('is_primary', true)
+                ->value('id');
 
-        DB::table('event_vendor')
-            ->where('id', $slotId)
-            ->where('event_id', $event->id)
-            ->update([
-                'vendor_id' => $request->vendor_id,
-                'vendor_contact_id' => $contactId,
-                'status' => 'reviewing'
-            ]);
+            if (!$contactId) {
+                $contactId = DB::table('vendor_contacts')->where('vendor_id', $request->vendor_id)->value('id');
+            }
 
-        return redirect()->back()->with('success', 'Vendor successfully assigned to slot!');
+            DB::table('event_vendor')
+                ->where('id', $slotId)
+                ->where('event_id', $event->id)
+                ->update([
+                    'vendor_id' => $request->vendor_id,
+                    'vendor_contact_id' => $contactId,
+                    'vendor_package_id' => null,
+                    'deal_price' => 0,
+                    'status' => 'reviewing'
+                ]);
+
+            return redirect()->back()->with('success', 'Vendor selected! Please choose the package.');
+        }
+
+        if ($request->has('vendor_package_id')) {
+            $request->validate(['vendor_package_id' => 'required|exists:vendor_packages,id']);
+
+            $package = DB::table('vendor_packages')->where('id', $request->vendor_package_id)->first();
+
+            DB::table('event_vendor')
+                ->where('id', $slotId)
+                ->where('event_id', $event->id)
+                ->update([
+                    'vendor_package_id' => $package->id,
+                    'deal_price' => $package->price,
+                ]);
+
+            return redirect()->back()->with('success', 'Package successfully assigned!');
+        }
+
+        return redirect()->back()->with('error', 'Invalid request.');
     }
 
     public function removeVendorFromSlot(Event $event, $slotId)
@@ -230,7 +283,9 @@ class EventController extends Controller
             ->update([
                 'vendor_id' => null,
                 'vendor_contact_id' => null,
+                'vendor_package_id' => null,
                 'status' => 'unassigned',
+                'deal_price' => 0,
                 'meal_crew' => 0
             ]);
 
@@ -268,5 +323,21 @@ class EventController extends Controller
         }
 
         return redirect()->back()->with('success', "Vendor's status updated");
+    }
+
+    public function updateDealPrice(Request $request, Event $event, $slotId)
+    {
+        $request->validate([
+            'deal_price' => 'required|numeric|min:0',
+        ]);
+
+        DB::table('event_vendor')
+            ->where('id', $slotId)
+            ->where('event_id', $event->id)
+            ->update([
+                'deal_price' => $request->deal_price,
+            ]);
+
+        return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
     }
 }

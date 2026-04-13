@@ -10,11 +10,18 @@ class VendorPackageSeeder extends Seeder
     public function run(): void
     {
         $vendorPackages = [
+            //Possa Wedding
+            //Photographer
             ['id' => 1, 'vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Standard Photographer Wedding Day', 'price' => 15000000, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 2, 'vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Premium Photographer Wedding Day', 'price' => 18000000, 'created_at' => now(), 'updated_at' => now()],
+            //Videographer
             ['id' => 3, 'vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Standard Videographer Wedding Day', 'price' => 17000000, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 4, 'vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Premium Videographer Wedding Day', 'price' => 20000000, 'created_at' => now(), 'updated_at' => now()],
+
+            //Kama
+            //Photographer
             ['id' => 5, 'vendor_id' => 19, 'vendor_category_id' => 6, 'name' => 'Standard Photographer Wedding Day', 'price' => 19000000, 'created_at' => now(), 'updated_at' => now()],
+            //Videographer
             ['id' => 6, 'vendor_id' => 19, 'vendor_category_id' => 5, 'name' => 'Standard Videographer Wedding Day', 'price' => 21000000, 'created_at' => now(), 'updated_at' => now()],
         ];
 
