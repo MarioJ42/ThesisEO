@@ -260,12 +260,11 @@ class OwnerController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'min_price' => 'required|numeric|min:0',
-            'max_price' => 'required|numeric|gte:min_price',
+            'price' => 'required|numeric|min:0',
             'details' => 'nullable|string',
         ]);
 
-        $vendor->packages()->create($request->only('name', 'min_price', 'max_price', 'details'));
+        $vendor->packages()->create($request->only('name', 'price', 'details'));
 
         return redirect()->back()
             ->with('success', 'Package successfully added!')
@@ -276,12 +275,11 @@ class OwnerController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'min_price' => 'required|numeric|min:0',
-            'max_price' => 'required|numeric|gte:min_price',
+            'price' => 'required|numeric|min:0',
             'details' => 'nullable|string',
         ]);
 
-        $package->update($request->only('name', 'min_price', 'max_price', 'details'));
+        $package->update($request->only('name', 'price', 'details'));
 
         return redirect()->back()
             ->with('success', 'Package successfully updated!')
@@ -407,35 +405,30 @@ class OwnerController extends Controller
         $masterVendors = \App\Models\Vendor::where('is_active', true)->orderBy('name')->get();
 
         $minCost = 0;
-        $maxCost = 0;
 
         foreach ($package->templates->where('is_included', true) as $template) {
             $assignedVendors = $package->vendors->where('pivot.vendor_category_id', $template->vendor_category_id);
 
             if ($assignedVendors->isNotEmpty()) {
                 $categoryMin = null;
-                $categoryMax = 0;
 
                 foreach ($assignedVendors as $vendor) {
-                    if ($vendor->packages->isNotEmpty()) {
-                        $vMin = $vendor->packages->min('min_price');
-                        $vMax = $vendor->packages->max('max_price');
+                    $validPackages = $vendor->packages->where('vendor_category_id', $template->vendor_category_id);
+
+                    if ($validPackages->isNotEmpty()) {
+                        $vMin = $validPackages->min('price');
 
                         if (is_null($categoryMin) || $vMin < $categoryMin) {
                             $categoryMin = $vMin;
-                        }
-                        if ($vMax > $categoryMax) {
-                            $categoryMax = $vMax;
                         }
                     }
                 }
 
                 $minCost += $categoryMin ?? 0;
-                $maxCost += $categoryMax;
             }
         }
 
-        return view('owner.wedding_packages.manage', compact('package', 'masterCategories', 'masterVendors', 'minCost', 'maxCost'));
+        return view('owner.wedding_packages.manage', compact('package', 'masterCategories', 'masterVendors', 'minCost'));
     }
 
     public function storePackageTemplate(Request $request, \App\Models\WeddingPackage $package)

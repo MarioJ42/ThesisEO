@@ -11,14 +11,19 @@ class VendorPackage extends Model
 
     protected $fillable = [
         'vendor_id',
+        'vendor_category_id',
         'name',
-        'min_price',
-        'max_price',
+        'price',
         'details',
     ];
 
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(VendorCategory::class, 'vendor_category_id');
     }
 }

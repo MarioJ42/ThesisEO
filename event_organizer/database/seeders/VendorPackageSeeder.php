@@ -10,8 +10,12 @@ class VendorPackageSeeder extends Seeder
     public function run(): void
     {
         $vendorPackages = [
-            ['id' => 1, 'vendor_id' => 1, 'name' => 'Bridal All-in Package', 'min_price' => 25000000, 'max_price' => 30000000, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'vendor_id' => 2, 'name' => 'Ballroom + 500 Pax Catering', 'min_price' => 150000000, 'max_price' => 200000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 1, 'vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Standard Photographer Wedding Day', 'price' => 15000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Premium Photographer Wedding Day', 'price' => 18000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 3, 'vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Standard Videographer Wedding Day', 'price' => 17000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 4, 'vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Premium Videographer Wedding Day', 'price' => 20000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 5, 'vendor_id' => 19, 'vendor_category_id' => 6, 'name' => 'Standard Photographer Wedding Day', 'price' => 19000000, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 6, 'vendor_id' => 19, 'vendor_category_id' => 5, 'name' => 'Standard Videographer Wedding Day', 'price' => 21000000, 'created_at' => now(), 'updated_at' => now()],
         ];
 
         DB::table('vendor_packages')->insert($vendorPackages);

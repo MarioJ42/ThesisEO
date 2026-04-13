@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('vendor_packages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
+            $table->foreignId('vendor_category_id')->constrained('vendor_categories')->onDelete('cascade');
             $table->string('name');
-            $table->decimal('min_price', 15, 2)->default(0);
-            $table->decimal('max_price', 15, 2)->default(0);
+            $table->decimal('price', 15, 2)->default(0);
             $table->text('details')->nullable();
             $table->timestamps();
         });

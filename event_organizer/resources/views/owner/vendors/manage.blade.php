@@ -19,13 +19,13 @@
 
     isPackageModalOpen: false,
     isEditPackageModalOpen: false,
-    packageForm: { id: '', name: '', min_price: '', max_price: '', details: '' },
+    packageForm: { id: '', vendor_category_id: '', name: '', price: '', details: '' },
 
-    openEditPackageModal(id, name, min_price, max_price, details) {
+    openEditPackageModal(id, vendor_category_id, name, price, details) {
         this.packageForm.id = id;
+        this.packageForm.vendor_category_id = vendor_category_id.toString();
         this.packageForm.name = name;
-        this.packageForm.min_price = min_price;
-        this.packageForm.max_price = max_price;
+        this.packageForm.price = price;
         this.packageForm.details = details;
         this.isEditPackageModalOpen = true;
     },
@@ -152,9 +152,12 @@
                 @forelse($vendor->packages as $package)
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="text-md font-bold text-gray-900">{{ $package->name }}</h4>
+                        <div>
+                            <h4 class="text-md font-bold text-gray-900">{{ $package->name }}</h4>
+                            <div class="text-xs text-gray-500 mt-1 mb-2">{{ $package->category->name ?? 'Uncategorized' }}</div>
+                        </div>
                         <div class="flex gap-2">
-                            <button @click="openEditPackageModal({{ $package->id }}, '{{ addslashes($package->name) }}', '{{ $package->min_price }}', '{{ $package->max_price }}', '{{ addslashes($package->details) }}')" class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1.5 rounded transition-colors">
+                            <button @click="openEditPackageModal({{ $package->id }}, '{{ $package->vendor_category_id }}', '{{ addslashes($package->name) }}', '{{ $package->price }}', '{{ addslashes($package->details) }}')" class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1.5 rounded transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
                             <form id="delete-package-form-{{ $package->id }}" action="{{ route('owner.vendors.packages.destroy', $package->id) }}" method="POST" class="inline">
@@ -166,7 +169,7 @@
                         </div>
                     </div>
                     <div class="text-sm font-semibold text-emerald-600 mb-3">
-                        Rp {{ number_format($package->min_price, 0, ',', '.') }} - Rp {{ number_format($package->max_price, 0, ',', '.') }}
+                        Rp {{ number_format($package->price, 0, ',', '.') }}
                     </div>
                     <div class="text-sm text-gray-600 whitespace-pre-wrap">{{ $package->details ?: 'No details provided.' }}</div>
                 </div>
@@ -314,18 +317,21 @@
                 @csrf
                 <div class="p-6 space-y-4">
                     <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Package Category <span class="text-red-500">*</span></label>
+                        <select name="vendor_category_id" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                            <option value="" disabled selected>Select Category</option>
+                            @foreach($vendor->categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Name <span class="text-red-500">*</span></label>
                         <input type="text" name="name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
-                    <div class="flex gap-4">
-                        <div class="w-1/2">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">Min Price (Rp) <span class="text-red-500">*</span></label>
-                            <input type="number" name="min_price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                        </div>
-                        <div class="w-1/2">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">Max Price (Rp) <span class="text-red-500">*</span></label>
-                            <input type="number" name="max_price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                        </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Price (Rp) <span class="text-red-500">*</span></label>
+                        <input type="number" name="price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Specifications / Details</label>
@@ -352,18 +358,21 @@
                 @csrf @method('PUT')
                 <div class="p-6 space-y-4">
                     <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Package Category <span class="text-red-500">*</span></label>
+                        <select name="vendor_category_id" x-model="packageForm.vendor_category_id" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                            <option value="" disabled>Select Category</option>
+                            @foreach($vendor->categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Name <span class="text-red-500">*</span></label>
                         <input type="text" name="name" x-model="packageForm.name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
-                    <div class="flex gap-4">
-                        <div class="w-1/2">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">Min Price (Rp) <span class="text-red-500">*</span></label>
-                            <input type="number" name="min_price" x-model="packageForm.min_price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                        </div>
-                        <div class="w-1/2">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">Max Price (Rp) <span class="text-red-500">*</span></label>
-                            <input type="number" name="max_price" x-model="packageForm.max_price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                        </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Price (Rp) <span class="text-red-500">*</span></label>
+                        <input type="number" name="price" x-model="packageForm.price" required min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Specifications / Details</label>
