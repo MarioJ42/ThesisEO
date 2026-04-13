@@ -206,7 +206,8 @@
                                         @php
                                             $cat = $categories->where('id', $slot->vendor_category_id)->first();
                                             $availableVendors = $cat ? $cat->vendors : collect();
-                                            if($slot->is_included && isset($allowedVendors[$slot->vendor_category_id])) {
+
+                                            if(isset($allowedVendors[$slot->vendor_category_id]) && $allowedVendors[$slot->vendor_category_id]->isNotEmpty()) {
                                                 $allowedIds = $allowedVendors[$slot->vendor_category_id]->pluck('vendor_id')->toArray();
                                                 $availableVendors = $availableVendors->whereIn('id', $allowedIds);
                                             }

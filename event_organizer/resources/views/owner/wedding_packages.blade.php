@@ -4,51 +4,20 @@
 <div class="max-w-7xl mx-auto" x-data="{
     isModalOpen: false,
     newName: '',
-    newBasePriceRaw: '',
-    newBasePriceFormatted: '',
 
     isEditModalOpen: false,
-    editForm: { id: '', name: '', base_price: '', is_active: '1' },
-    editBasePriceFormatted: '',
+    editForm: { id: '', name: '', is_active: '1' },
 
-    formatRupiah(value) {
-        let number_string = value.toString().replace(/[^0-9]/g, '');
-        let sisa = number_string.length % 3;
-        let rupiah = number_string.substr(0, sisa);
-        let ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-        if (ribuan) {
-            let separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
-        }
-        return rupiah;
-    },
-
-    handleNewPriceInput(e) {
-        let rawValue = e.target.value.replace(/[^0-9]/g, '');
-        this.newBasePriceRaw = rawValue;
-        this.newBasePriceFormatted = this.formatRupiah(rawValue);
-    },
-
-    handleEditPriceInput(e) {
-        let rawValue = e.target.value.replace(/[^0-9]/g, '');
-        this.editForm.base_price = rawValue;
-        this.editBasePriceFormatted = this.formatRupiah(rawValue);
-    },
-
-    openEditModal(id, name, base_price, is_active) {
+    openEditModal(id, name, is_active) {
         this.editForm.id = id;
         this.editForm.name = name;
-        let cleanPrice = parseInt(base_price).toString();
-        this.editForm.base_price = cleanPrice;
-        this.editBasePriceFormatted = this.formatRupiah(cleanPrice);
         this.editForm.is_active = is_active.toString();
         this.isEditModalOpen = true;
     }
 }">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Master Event Package</h2>
-        <button @click="isModalOpen = true; newName = ''; newBasePriceRaw = ''; newBasePriceFormatted = '';" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
+        <button @click="isModalOpen = true; newName = '';" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors shadow-sm">
             Add New Package
         </button>
     </div>
@@ -90,7 +59,7 @@
                     <thead class="bg-gray-100/75">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Package Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Base Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Selling Price</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Action</th>
                         </tr>
@@ -107,7 +76,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button @click="openEditModal({{ $package->id }}, '{{ addslashes($package->name) }}', '{{ $package->base_price }}', {{ $package->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
+                                    <button @click="openEditModal({{ $package->id }}, '{{ addslashes($package->name) }}', {{ $package->is_active ? '1' : '0' }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
                                         Quick Edit
                                     </button>
                                     <a href="{{ route('owner.wedding_packages.manage', $package->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">
@@ -153,18 +122,13 @@
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Name</label>
                         <input type="text" name="name" x-model="newName" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Base Price (Rp)</label>
-                        <input type="text" x-model="newBasePriceFormatted" @input="handleNewPriceInput" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <input type="hidden" name="base_price" :value="newBasePriceRaw">
-                    </div>
                 </div>
 
                 <div class="flex justify-end p-4 border-t gap-2">
                     <button type="button" @click="isModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
                     <button type="submit"
-                            :disabled="newName === '' || newBasePriceRaw === ''"
-                            :class="(newName !== '' && newBasePriceRaw !== '') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+                            :disabled="newName === ''"
+                            :class="newName !== '' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                             class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
                         Save Package
                     </button>
@@ -191,11 +155,6 @@
                         <input type="text" name="name" x-model="editForm.name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900">Base Price (Rp)</label>
-                        <input type="text" x-model="editBasePriceFormatted" @input="handleEditPriceInput" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <input type="hidden" name="base_price" :value="editForm.base_price">
-                    </div>
-                    <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Package Status</label>
                         <select name="is_active" x-model="editForm.is_active" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             <option value="1">Active</option>
@@ -207,8 +166,8 @@
                 <div class="flex justify-end p-4 border-t gap-2">
                     <button type="button" @click="isEditModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
                     <button type="submit"
-                            :disabled="editForm.name === '' || editForm.base_price === ''"
-                            :class="(editForm.name !== '' && editForm.base_price !== '') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+                            :disabled="editForm.name === ''"
+                            :class="editForm.name !== '' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                             class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
                         Update Package
                     </button>

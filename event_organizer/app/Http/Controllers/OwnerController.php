@@ -358,13 +358,12 @@ class OwnerController extends Controller
     public function storeWeddingPackage(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'base_price' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255|unique:wedding_packages,name',
         ]);
 
         \App\Models\WeddingPackage::create([
             'name' => $request->name,
-            'base_price' => $request->base_price,
+            'base_price' => 0,
             'is_active' => true,
         ]);
 
@@ -374,18 +373,31 @@ class OwnerController extends Controller
     public function updateWeddingPackage(Request $request, \App\Models\WeddingPackage $package)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'base_price' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255|unique:wedding_packages,name,' . $package->id,
             'is_active' => 'required|boolean',
         ]);
 
         $package->update([
             'name' => $request->name,
-            'base_price' => $request->base_price,
             'is_active' => filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN),
         ]);
 
         return redirect()->route('owner.wedding_packages')->with('success', 'Event Package successfully updated!');
+    }
+
+    public function updatePackagePrice(Request $request, \App\Models\WeddingPackage $package)
+    {
+        $request->validate([
+            'base_price' => 'required|numeric|min:0',
+        ]);
+
+        $package->update([
+            'base_price' => $request->base_price,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Selling Price successfully updated!')
+            ->with('active_tab', 'assignment');
     }
 
     public function manageWeddingPackage(\App\Models\WeddingPackage $package)
@@ -459,18 +471,19 @@ class OwnerController extends Controller
     public function assignVendorToTemplate(Request $request, \App\Models\WeddingPackage $package, \App\Models\PackageTemplate $template)
     {
         $request->validate([
-            'is_included' => 'required|boolean',
             'vendors' => 'nullable|array',
             'vendors.*' => 'exists:vendors,id',
         ]);
 
+        $hasVendors = $request->has('vendors') && is_array($request->vendors) && count($request->vendors) > 0;
+
         $template->update([
-            'is_included' => filter_var($request->is_included, FILTER_VALIDATE_BOOLEAN)
+            'is_included' => $hasVendors
         ]);
 
         $package->vendors()->wherePivot('vendor_category_id', $template->vendor_category_id)->detach();
 
-        if ($request->has('vendors') && is_array($request->vendors)) {
+        if ($hasVendors) {
             foreach ($request->vendors as $vendorId) {
                 $package->vendors()->attach($vendorId, [
                     'vendor_category_id' => $template->vendor_category_id,

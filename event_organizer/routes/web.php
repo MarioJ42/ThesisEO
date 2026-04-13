@@ -98,6 +98,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::post('/event-packages/{package}/template', [OwnerController::class, 'storePackageTemplate'])->name('owner.wedding_packages.template.store');
     Route::delete('/event-packages/{package}/template/{template}', [OwnerController::class, 'destroyPackageTemplate'])->name('owner.wedding_packages.template.destroy');
     Route::put('/event-packages/{package}/template/{template}/assign', [OwnerController::class, 'assignVendorToTemplate'])->name('owner.wedding_packages.template.assign');
+    Route::put('/event-packages/{package}/price', [OwnerController::class, 'updatePackagePrice'])->name('owner.wedding_packages.price.update');
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
