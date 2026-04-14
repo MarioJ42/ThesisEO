@@ -379,9 +379,12 @@
                         </div>
                     </div>
 
-                    <div
-                        class="bg-gray-200 rounded-2xl h-[400px] flex items-center justify-center text-gray-500 font-medium">
-                        [ Google Maps Embed Placeholder ]
+                    <div class="bg-gray-200 rounded-2xl h-[400px] overflow-hidden shadow-inner">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Ruko%20Royal%20Dharmahusada,%20Surabaya&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
                     </div>
                 </div>
             </div>
@@ -390,12 +393,8 @@
     </main>
 
     <footer class="bg-gray-900 py-8 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
-            <p class="text-gray-400 text-sm">© {{ date('Y') }} Fenix Event Organizer. All rights reserved.</p>
-            <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
-                <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-                <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+            <p class="text-gray-400 text-sm text-center">© {{ date('Y') }} Fenix Event Organizer. All rights reserved.</p>
         </div>
     </footer>
 
