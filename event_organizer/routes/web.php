@@ -126,6 +126,9 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
 Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('client.events.index');
     Route::post('/events', [EventController::class, 'store'])->name('client.events.store');
+    Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('client.events.manage');
+    Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('client.events.slots.assign');
+    Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('client.events.slots.remove');
 });
 
 Route::middleware('auth')->group(function () {

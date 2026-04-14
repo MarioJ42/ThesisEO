@@ -37,8 +37,14 @@
                 <div class="hidden md:flex space-x-8">
                     <a href="{{ route('home') }}"
                         class="{{ request()->routeIs('home') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-900' }} font-medium text-sm transition-colors px-1 py-2">Home</a>
+
                     <a href="{{ route('vendor') }}"
                         class="{{ request()->routeIs('vendor') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-900' }} font-medium text-sm transition-colors px-1 py-2">Vendor</a>
+
+                    @if(Auth::check() && Auth::user()->role === 'klien')
+                        <a href="{{ route('client.events.index') }}"
+                            class="{{ request()->routeIs('client.events.*') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-900' }} font-medium text-sm transition-colors px-1 py-2">My Events</a>
+                    @endif
                 </div>
 
                 <div class="flex items-center gap-4">

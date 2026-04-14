@@ -17,6 +17,20 @@ class EventController extends Controller
         $perPage = $request->input('per_page', 10);
         $user = Auth::user();
 
+        if ($user->role === 'klien') {
+            $events = Event::with(['package', 'pl'])
+                ->where('client_id', $user->id)
+                ->when($search, function ($q, $search) {
+                    return $q->where('title', 'like', "%{$search}%");
+                })
+                ->latest()
+                ->paginate($perPage)->appends(request()->query());
+
+            $packages = WeddingPackage::where('is_active', true)->orderBy('base_price', 'asc')->get();
+
+            return view('client.events', compact('events', 'packages', 'user'));
+        }
+
         $query = Event::with(['client', 'package', 'pl'])
             ->when($search, function ($q, $search) {
                 return $q->where('title', 'like', "%{$search}%")
@@ -50,7 +64,7 @@ class EventController extends Controller
     {
         $request->validate([
             'client_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:events,title',
             'event_date' => 'required|date|after:today',
             'package_id' => 'required',
         ]);
@@ -95,7 +109,10 @@ class EventController extends Controller
                 DB::table('event_vendor')->insert($slots);
             }
         }
-        return redirect()->route($role . '.events.manage', $event->id)
+
+        $routePrefix = ($role === 'klien') ? 'client' : $role;
+
+        return redirect()->route($routePrefix . '.events.manage', $event->id)
             ->with('success', 'New Event Arrangement created! You can now plan the vendors.');
     }
 
@@ -123,6 +140,10 @@ class EventController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'pl' && $event->pl_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($user->role === 'klien' && $event->client_id !== $user->id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -188,6 +209,20 @@ class EventController extends Controller
             ->whereIn('vendor_id', $assignedVendorIds)
             ->get()
             ->groupBy('vendor_id');
+
+        if ($user->role === 'klien') {
+            return view('client.manage', compact(
+                'event',
+                'user',
+                'slots',
+                'morningSlots',
+                'eveningSlots',
+                'categories',
+                'allowedVendors',
+                'vendorPackages',
+                'baseCosts'
+            ));
+        }
 
         return view('events.manage', compact(
             'event',
