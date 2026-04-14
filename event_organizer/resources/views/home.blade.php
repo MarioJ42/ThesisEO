@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fenix Event Organizer</title>
-    <link rel="icon" href="/images/logo-fenix.png" type="image/png">
+    <link rel="icon" href="/images/logo-fenix1.png" type="image/png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
@@ -31,7 +31,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{ route('home') }}'">
-                    <img src="/images/logo-fenix.png" alt="Fenix Logo" class="w-24 h-24 object-contain">
+                    <img src="/images/logo-fenix2.png" alt="Fenix Logo" class="w-24 h-24 object-contain">
                 </div>
 
                 <div class="hidden md:flex space-x-8">

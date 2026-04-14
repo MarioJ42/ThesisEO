@@ -5,7 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Fenix EO') }} - Admin Portal</title>
+
+    <title>Fenix Event Organizer</title>
+    <link rel="icon" href="/images/logo-fenix1.png" type="image/png">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         [x-cloak] { display: none !important; }
