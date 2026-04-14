@@ -95,8 +95,8 @@ class EventController extends Controller
                 DB::table('event_vendor')->insert($slots);
             }
         }
-
-        return redirect()->back()->with('success', 'New Event Arrangement created');
+        return redirect()->route($role . '.events.manage', $event->id)
+            ->with('success', 'New Event Arrangement created! You can now plan the vendors.');
     }
 
     public function update(Request $request, Event $event)

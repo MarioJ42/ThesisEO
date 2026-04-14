@@ -156,7 +156,7 @@ class OwnerController extends Controller
             'instagram' => 'nullable|string|max:255',
         ]);
 
-        $vendor = Vendor::create([
+        $vendor = \App\Models\Vendor::create([
             'name' => $request->name,
             'address' => $request->address,
             'instagram' => $request->instagram,
@@ -164,8 +164,8 @@ class OwnerController extends Controller
         ]);
 
         $vendor->categories()->attach($request->categories);
-
-        return redirect()->route('owner.vendors')->with('success', 'Vendor successfully added!');
+        return redirect()->route('owner.vendors.manage', $vendor->id)
+            ->with('success', 'Vendor successfully added! You can now add PIC, packages, and portfolios.');
     }
 
     public function updateVendor(Request $request, Vendor $vendor)
@@ -358,14 +358,13 @@ class OwnerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:wedding_packages,name',
         ]);
-
-        \App\Models\WeddingPackage::create([
+        $package = \App\Models\WeddingPackage::create([
             'name' => $request->name,
             'base_price' => 0,
             'is_active' => true,
         ]);
-
-        return redirect()->route('owner.wedding_packages')->with('success', 'Event Package successfully added!');
+        return redirect()->route('owner.wedding_packages.manage', $package->id)
+            ->with('success', 'Event Package successfully added! You can now arrange the templates.');
     }
 
     public function updateWeddingPackage(Request $request, \App\Models\WeddingPackage $package)
