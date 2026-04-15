@@ -14,11 +14,15 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->string('midtrans_order_id')->unique()->nullable();
+            $table->string('midtrans_snap_token')->nullable();
             $table->decimal('amount', 15, 2);
-            $table->date('payment_date');
-            $table->enum('payment_method', ['transfer', 'cash', 'midtrans']);
-            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->enum('payment_type', ['dp', 'termin_2', 'termin_3', 'settlement']);
+            $table->enum('payment_method', ['transfer', 'cash', 'midtrans'])->default('midtrans');
+            $table->enum('status', ['pending', 'success', 'failed', 'expired'])->default('pending');
+            $table->dateTime('payment_date')->nullable();
             $table->string('proof_image')->nullable();
+
             $table->timestamps();
         });
     }

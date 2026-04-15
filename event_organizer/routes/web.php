@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\Client\PaymentController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
@@ -129,6 +130,9 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('client.events.manage');
     Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('client.events.slots.assign');
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('client.events.slots.remove');
+
+    Route::get('/events/{event}/billing', [PaymentController::class, 'index'])->name('client.events.billing');
+    Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');
 });
 
 Route::middleware('auth')->group(function () {
@@ -136,5 +140,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::post('/midtrans/callback', [\App\Http\Controllers\Client\PaymentController::class, 'callback'])->name('midtrans.callback');
 
 require __DIR__ . '/auth.php';

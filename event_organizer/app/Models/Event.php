@@ -36,4 +36,10 @@ class Event extends Model
             ->withPivot('vendor_contact_id', 'vendor_package_id', 'deal_price', 'status')
             ->withTimestamps();
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
 }

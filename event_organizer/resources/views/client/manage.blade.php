@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $event->title }} - Fenix Event Organizer</title>
+    <title>Fenix Event Organizer</title>
     <link rel="icon" href="/images/logo-fenix1.png" type="image/png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -12,6 +12,8 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         [x-cloak] { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 
@@ -87,7 +89,15 @@
                         {{ $event->status }}
                     </span>
 
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-3">{{ $event->title }}</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-4">{{ $event->title }}</h1>
+
+                    <div class="mb-5 flex justify-center">
+                        <a href="{{ route('client.events.billing', $event->id) }}" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-gray-900 rounded-xl hover:bg-black shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            Go to Billing & Payment
+                        </a>
+                    </div>
+
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-gray-500 font-medium text-sm">
                         <span class="flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -115,10 +125,10 @@
             </div>
             @endif
 
-            <div class="flex flex-col lg:flex-row gap-8" x-data="{ searchCategory: '' }">
+            <div class="flex flex-col lg:flex-row gap-8 items-start" x-data="{ searchCategory: '' }">
 
                 <div class="w-full lg:w-1/4">
-                    <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28">
+                    <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
                         <h3 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-5">Category Checklist</h3>
                         <ul class="space-y-4">
                             @foreach($morningSlots->concat($eveningSlots) as $sidebarSlot)
@@ -145,10 +155,12 @@
                     </div>
                 </div>
 
-                <div class="w-full lg:w-3/4">
+                <div class="w-full lg:w-3/4 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pb-10">
                     <div class="mb-8 relative">
-                        <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" x-model="searchCategory" placeholder="Search category name..." class="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <input type="text" x-model="searchCategory" placeholder="Search category name" class="w-full pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors" style="padding-left: 3rem;">
                     </div>
 
                     @foreach(['morning' => 'Morning Session', 'evening' => 'Reception'] as $sessionKey => $sessionTitle)
@@ -244,7 +256,7 @@
                                                             <label class="block text-xs font-bold text-gray-700 mb-1.5">Select a Package</label>
                                                             <div class="flex gap-2">
                                                                 <select name="vendor_package_id" required class="flex-grow bg-white border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm">
-                                                                    <option value="" disabled selected>Choose the best option...</option>
+                                                                    <option value="" disabled selected>Choose the best option</option>
                                                                     @foreach($packages as $pkg)
                                                                         @php
                                                                             $upgradeFee = max(0, $pkg->price - $baseCost);
@@ -272,7 +284,7 @@
                                                         <label class="block text-xs font-bold text-gray-500 mb-1.5">Available Vendors</label>
                                                         <div class="flex gap-2">
                                                             <select name="vendor_id" required class="flex-grow bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:bg-white focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-colors">
-                                                                <option value="" disabled selected>Browse our partners...</option>
+                                                                <option value="" disabled selected>Browse our partners</option>
                                                                 @foreach($availableVendors as $v)
                                                                     <option value="{{ $v->id }}">{{ $v->name }}</option>
                                                                 @endforeach
