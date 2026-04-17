@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Payment;
-use App\Models\PackageTemplate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -23,29 +23,59 @@ class PaymentController extends Controller
 
     private function calculateTotalPrice(Event $event)
     {
-        $totalPrice = $event->package ? $event->package->base_price : 0;
-        $verifiedVendors = $event->vendors()->where('event_vendor.status', 'verified')->get();
+        // 1. Ambil Base Price dari paket
+        $package = $event->weddingPackage ?? $event->package;
+        $totalPrice = $package ? $package->base_price : 0;
 
-        foreach ($verifiedVendors as $vendor) {
-            $dealPrice = $vendor->pivot->deal_price;
-            $baseCost = 0;
+        $packageId = $event->wedding_package_id ?? $event->package_id;
 
-            if ($event->package_id) {
-                $categoryId = $vendor->pivot->vendor_category_id ?? $vendor->vendor_category_id ?? $vendor->category_id ?? null;
+        // 2. Kalkulasi Base Cost (Jatah Budget) persis seperti di EventController
+        $baseCosts = [];
+        if ($packageId) {
+            $allowedVendors = DB::table('package_vendor_pivot')
+                ->where('package_id', $packageId)
+                ->get()
+                ->groupBy('vendor_category_id');
 
-                if ($categoryId) {
-                    $template = PackageTemplate::where('wedding_package_id', $event->package_id)
-                        ->where('vendor_category_id', $categoryId)
-                        ->first();
+            $templateCategories = DB::table('package_templates')
+                ->where('package_id', $packageId)
+                ->where('is_included', true)
+                ->pluck('vendor_category_id')
+                ->toArray();
 
-                    if ($template) {
-                        $baseCost = $template->price ?? $template->base_price ?? $template->budget ?? $template->amount ?? $template->base_cost ?? 0;
-                    }
-                }
+            foreach ($templateCategories as $catId) {
+                $allowedIds = collect($allowedVendors[$catId] ?? [])->pluck('vendor_id');
+
+                $minPrice = DB::table('vendor_packages')
+                    ->whereIn('vendor_id', $allowedIds)
+                    ->where('vendor_category_id', $catId)
+                    ->min('price');
+
+                $baseCosts[$catId] = $minPrice ?? 0;
             }
+        }
 
-            $upgradeFee = max(0, $dealPrice - $baseCost);
-            $totalPrice += $upgradeFee;
+        // 3. Ambil slot vendor yang sudah Verified langsung dari database pivot
+        $verifiedSlots = DB::table('event_vendor')
+            ->where('event_id', $event->id)
+            ->where('status', 'verified')
+            ->get();
+
+        foreach ($verifiedSlots as $slot) {
+            $dealPrice = $slot->deal_price;
+            $isIncluded = $slot->is_included;
+            $categoryId = $slot->vendor_category_id;
+
+            // 4. Terapkan Logika Bisnis
+            if ($isIncluded) {
+                // Jika Included: Cari selisih Upgrade
+                $baseCost = $baseCosts[$categoryId] ?? 0;
+                $upgradeFee = max(0, $dealPrice - $baseCost);
+                $totalPrice += $upgradeFee;
+            } else {
+                // Jika Custom (Tidak Included): Tambahkan seluruh deal_price
+                $totalPrice += $dealPrice;
+            }
         }
 
         return $totalPrice;
@@ -128,6 +158,7 @@ class PaymentController extends Controller
     {
         $serverKey = env('MIDTRANS_SERVER_KEY');
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+
         if ($hashed == $request->signature_key) {
             $payment = Payment::where('midtrans_order_id', $request->order_id)->first();
 
@@ -141,6 +172,7 @@ class PaymentController extends Controller
                 }
             }
         }
+
         return response()->json(['message' => 'Callback handled successfully']);
     }
 }
