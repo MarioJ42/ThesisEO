@@ -23,13 +23,11 @@ class PaymentController extends Controller
 
     private function calculateTotalPrice(Event $event)
     {
-        // 1. Ambil Base Price dari paket
         $package = $event->weddingPackage ?? $event->package;
         $totalPrice = $package ? $package->base_price : 0;
 
         $packageId = $event->wedding_package_id ?? $event->package_id;
 
-        // 2. Kalkulasi Base Cost (Jatah Budget) persis seperti di EventController
         $baseCosts = [];
         if ($packageId) {
             $allowedVendors = DB::table('package_vendor_pivot')
@@ -55,7 +53,6 @@ class PaymentController extends Controller
             }
         }
 
-        // 3. Ambil slot vendor yang sudah Verified langsung dari database pivot
         $verifiedSlots = DB::table('event_vendor')
             ->where('event_id', $event->id)
             ->where('status', 'verified')
@@ -66,14 +63,11 @@ class PaymentController extends Controller
             $isIncluded = $slot->is_included;
             $categoryId = $slot->vendor_category_id;
 
-            // 4. Terapkan Logika Bisnis
             if ($isIncluded) {
-                // Jika Included: Cari selisih Upgrade
                 $baseCost = $baseCosts[$categoryId] ?? 0;
                 $upgradeFee = max(0, $dealPrice - $baseCost);
                 $totalPrice += $upgradeFee;
             } else {
-                // Jika Custom (Tidak Included): Tambahkan seluruh deal_price
                 $totalPrice += $dealPrice;
             }
         }
@@ -131,6 +125,9 @@ class PaymentController extends Controller
                     'quantity' => 1,
                     'name' => 'Payment ' . strtoupper(str_replace('_', ' ', $request->payment_type)) . ' - ' . $event->title
                 ]
+            ],
+            'callbacks' => [
+                'finish' => route('client.events.billing', $event->id)
             ]
         ];
 
@@ -156,6 +153,8 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Midtrans Webhook Masuk:', $request->all());
+
         $serverKey = env('MIDTRANS_SERVER_KEY');
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
@@ -165,12 +164,17 @@ class PaymentController extends Controller
             if ($payment) {
                 if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
                     $payment->update(['status' => 'success']);
+                    \Illuminate\Support\Facades\Log::info('Sukses! Database diupdate untuk Order: ' . $request->order_id);
                 } elseif ($request->transaction_status == 'expire') {
                     $payment->update(['status' => 'expired']);
                 } elseif ($request->transaction_status == 'cancel' || $request->transaction_status == 'deny') {
                     $payment->update(['status' => 'failed']);
                 }
+            } else {
+                \Illuminate\Support\Facades\Log::warning('Gagal: Order ID tidak ditemukan di database.');
             }
+        } else {
+            \Illuminate\Support\Facades\Log::error('Gagal: Signature Key Keamanan Midtrans Tidak Cocok!');
         }
 
         return response()->json(['message' => 'Callback handled successfully']);
