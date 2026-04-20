@@ -17,7 +17,13 @@
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 antialiased" x-data="{ isCreateModalOpen: false, activeTab: 'all' }">
+<body class="bg-gray-50 text-gray-800 antialiased"
+      x-data="{
+          isCreateModalOpen: new URLSearchParams(location.search).has('plan_package'),
+          activeTab: 'all',
+          selectedPackage: new URLSearchParams(location.search).get('plan_package') || ''
+      }"
+      x-init="if(isCreateModalOpen) { window.history.replaceState({}, document.title, window.location.pathname); }">
 
     <nav class="fixed w-full z-50 top-0 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -238,7 +244,7 @@
 
                     <div>
                         <label class="block mb-1.5 text-sm font-bold text-gray-900">Select Package <span class="text-red-500">*</span></label>
-                        <select name="package_id" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
+                        <select name="package_id" required x-model="selectedPackage" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
                             <option value="" disabled selected>Choose a base arrangement</option>
                             @foreach($packages as $package)
                                 <option value="{{ $package->id }}">{{ $package->name }} (Start from Rp {{ number_format($package->base_price, 0, ',', '.') }})</option>
