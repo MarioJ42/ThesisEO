@@ -211,17 +211,34 @@ class EventController extends Controller
             ->groupBy('vendor_id');
 
         if ($user->role === 'klien') {
-            return view('client.manage', compact(
-                'event',
-                'user',
-                'slots',
-                'morningSlots',
-                'eveningSlots',
-                'categories',
-                'allowedVendors',
-                'vendorPackages',
-                'baseCosts'
-            ));
+            $hiddenCategories = [
+                'Robe & Veil',
+                'Tie',
+                'Meal Crew',
+                'Headpiece',
+                'Ring Box',
+                'Wedding Car',
+                'Baloon & Dove'
+            ];
+
+            $clientSlots = $slots->filter(function ($slot) use ($hiddenCategories) {
+                return !in_array(strtolower(trim($slot->category_name)), array_map('strtolower', $hiddenCategories));
+            });
+
+            $clientMorningSlots = $clientSlots->where('session', 'morning');
+            $clientEveningSlots = $clientSlots->where('session', 'evening');
+
+            return view('client.manage', [
+                'event' => $event,
+                'user' => $user,
+                'slots' => $clientSlots,
+                'morningSlots' => $clientMorningSlots,
+                'eveningSlots' => $clientEveningSlots,
+                'categories' => $categories,
+                'allowedVendors' => $allowedVendors,
+                'vendorPackages' => $vendorPackages,
+                'baseCosts' => $baseCosts
+            ]);
         }
 
         return view('events.manage', compact(
