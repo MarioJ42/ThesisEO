@@ -422,12 +422,14 @@
                     if (result.isConfirmed) {
                         window.location.href = "{{ route('login') }}";
                     } else if (result.dismiss === Swal.DismissReason.cancel) {
-                        Swal.fire({
-                            title: 'Contact Us',
-                            text: 'To create a new event and get an account, please contact Michael H via WhatsApp at +6285855788100.',
-                            icon: 'info',
-                            confirmButtonText: 'OK'
-                        });
+
+                        const phoneNumber = "6285855788100";
+
+                        const message = "Hello Fenix Organizer! Saya tertarik untuk merencanakan event wedding di Surabaya. Apakah Anda bisa membuatkan akun baru untuk saya?";
+
+                        const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+                        window.open(waUrl, '_blank');
                     }
                 });
             @endauth

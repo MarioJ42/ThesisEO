@@ -250,35 +250,26 @@
 
                                                 @php
                                                     $packages = $vendor->packages ?? collect();
-                                                    $minPrice = $packages->isNotEmpty()
-                                                        ? $packages->min('min_price')
-                                                        : null;
-                                                    $maxPrice = $packages->isNotEmpty()
-                                                        ? $packages->max('max_price')
-                                                        : null;
+                                                    $minPrice = $packages->isNotEmpty() ? $packages->min('price') : null;
                                                 @endphp
 
                                                 <p class="text-xs text-gray-500 mb-6 flex-grow">
-                                                    Price Range:<br>
+                                                    starting from:<br>
                                                     <span class="text-sm font-semibold text-gray-700 block mt-0.5">
-                                                        @if ($minPrice !== null && $maxPrice !== null)
-                                                            Rp {{ number_format($minPrice, 0, ',', '.') }} - Rp
-                                                            {{ number_format($maxPrice, 0, ',', '.') }}
+                                                        @if ($minPrice !== null)
+                                                            Rp {{ number_format($minPrice, 0, ',', '.') }}
                                                         @else
-                                                            Contact for pricing
+                                                            New Collaboration
                                                         @endif
                                                     </span>
                                                 </p>
 
-                                                <button type="button"
-                                                    class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl transition-colors mt-auto flex items-center justify-center gap-2">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                                    </svg>
-                                                    Add to Your Event
-                                                </button>
+                                                @auth
+                                                    <button type="button"
+                                                        class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl transition-colors mt-auto flex items-center justify-center gap-2">
+                                                        Vendor Detail
+                                                    </button>
+                                                @endauth
                                             </div>
                                         </div>
                                     @endforeach
