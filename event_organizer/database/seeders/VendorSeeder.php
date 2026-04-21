@@ -151,6 +151,7 @@ class VendorSeeder extends Seeder
                 'name' => 'Possa Wedding',
                 'address' => 'Surabaya',
                 'instagram' => '@possawedding',
+                'logo' => 'vendor_logos/logo-possa.jpg',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -571,6 +572,13 @@ class VendorSeeder extends Seeder
                 'updated_at' => now()
             ],
         ];
+
+        $vendors = array_map(function ($vendor) {
+            if (!array_key_exists('logo', $vendor)) {
+                $vendor['logo'] = null;
+            }
+            return $vendor;
+        }, $vendors);
 
         DB::table('vendors')->insert($vendors);
 

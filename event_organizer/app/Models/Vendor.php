@@ -16,6 +16,7 @@ class Vendor extends Model
         'address',
         'instagram',
         'is_active',
+        'logo',
     ];
 
     public function categories()

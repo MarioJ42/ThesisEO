@@ -132,7 +132,7 @@
                     'Tie',
                 ];
 
-                $excludedVendors = ['Pribadi', 'EO'];
+                $excludedVendors = ['Pribadi', 'EO', 'Fenix EO'];
 
                 $displayCategories = isset($categories)
                     ? $categories
@@ -230,17 +230,15 @@
                                         <div x-show="searchQuery === '' || {{ json_encode(strtolower($vendor->name)) }}.includes(searchQuery.toLowerCase())"
                                             class="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col h-full hover:-translate-y-1">
 
-                                            <div
-                                                class="aspect-[4/3] bg-gray-100 flex items-center justify-center border-b border-gray-100">
-                                                <svg class="w-16 h-16 text-gray-300" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="1.5"
-                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                                    </path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                </svg>
+                                            <div class="aspect-[4/3] bg-gray-100 flex items-center justify-center border-b border-gray-100 overflow-hidden">
+                                                @if($vendor->logo)
+                                                    <img src="{{ asset('storage/' . $vendor->logo) }}" alt="{{ $vendor->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                                @else
+                                                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    </svg>
+                                                @endif
                                             </div>
 
                                             <div class="p-6 flex-grow flex flex-col">
