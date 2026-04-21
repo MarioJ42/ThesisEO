@@ -392,4 +392,29 @@ class EventController extends Controller
 
         return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
     }
+
+    public function addPackageFromVendor(Request $request)
+    {
+        $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'vendor_id' => 'required|exists:vendors,id',
+            'package_id' => 'required|exists:vendor_packages,id',
+            'session' => 'required|string',
+        ]);
+
+        $event = \App\Models\Event::where('id', $request->event_id)
+            ->where('client_id', \Illuminate\Support\Facades\Auth::id())
+            ->firstOrFail();
+
+        $event->vendors()->attach($request->vendor_id, [
+            'vendor_package_id' => $request->package_id,
+            'session' => $request->session,
+            'status' => 'Pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('client.events.manage', $event->id)
+            ->with('success', 'Package successfully added! Waiting for verification.');
+    }
 }

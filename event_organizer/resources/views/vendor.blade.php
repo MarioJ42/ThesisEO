@@ -273,13 +273,10 @@
                                                         @endif
                                                     </span>
                                                 </p>
-
-                                                @auth
-                                                    <a href="{{ route('vendor.show', $vendor->id) }}"
-                                                        class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl transition-colors mt-auto flex items-center justify-center gap-2 text-center">
-                                                        Vendor Detail
-                                                    </a>
-                                                @endauth
+                                                <a href="{{ route('vendor.show', $vendor->id) }}"
+                                                    class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl transition-colors mt-auto flex items-center justify-center gap-2 text-center">
+                                                    Vendor Detail
+                                                </a>
                                             </div>
                                         </div>
                                     @endforeach

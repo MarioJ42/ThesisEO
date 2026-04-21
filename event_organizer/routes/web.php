@@ -52,15 +52,19 @@ Route::get('/vendor', function () {
 
 Route::get('/vendor/{id}/detail', function ($id) {
     if (Auth::check()) {
-        if (Auth::user()->role === 'owner') {
-            return redirect()->route('owner.dashboard');
-        } elseif (Auth::user()->role === 'pl') {
-            return redirect()->route('pl.dashboard');
-        }
+        if (Auth::user()->role === 'owner') return redirect()->route('owner.dashboard');
+        if (Auth::user()->role === 'pl') return redirect()->route('pl.dashboard');
     }
-    $vendor = Vendor::with(['categories', 'packages', 'portfolios'])->findOrFail($id);
 
-    return view('vendor_detail', compact('vendor'));
+    $vendor = \App\Models\Vendor::with(['categories', 'packages', 'portfolios'])->findOrFail($id);
+
+    $clientEvents = collect();
+    if (Auth::check() && Auth::user()->role === 'klien') {
+        $clientEvents = \App\Models\Event::where('client_id', Auth::id())
+            ->where('status', 'Planning')->get();
+    }
+
+    return view('vendor_detail', compact('vendor', 'clientEvents'));
 })->name('vendor.show');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
@@ -141,6 +145,7 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
 Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('client.events.index');
     Route::post('/events', [EventController::class, 'store'])->name('client.events.store');
+    Route::post('/events/add-package-direct', [EventController::class, 'addPackageFromVendor'])->name('client.events.add_package_direct');
     Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('client.events.manage');
     Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('client.events.slots.assign');
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('client.events.slots.remove');
