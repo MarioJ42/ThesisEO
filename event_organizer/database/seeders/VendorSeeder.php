@@ -573,14 +573,22 @@ class VendorSeeder extends Seeder
             ],
         ];
 
-        $vendors = array_map(function ($vendor) {
-            if (!array_key_exists('logo', $vendor)) {
-                $vendor['logo'] = null;
-            }
-            return $vendor;
-        }, $vendors);
+        $formattedVendors = [];
+        foreach ($vendors as $v) {
+            $formattedVendors[] = [
+                'id' => $v['id'],
+                'name' => $v['name'],
+                'address' => $v['address'],
+                'instagram' => $v['instagram'],
+                'logo' => $v['logo'] ?? null,
+                'created_at' => $v['created_at'],
+                'updated_at' => $v['updated_at'],
+            ];
+        }
 
-        DB::table('vendors')->insert($vendors);
+        foreach (array_chunk($formattedVendors, 50) as $chunk) {
+            DB::table('vendors')->insert($chunk);
+        }
 
         $categoryVendor = [
             //Fenix EO
@@ -667,7 +675,7 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 22, 'category_id' => 6], //Photographer
             ['vendor_id' => 22, 'category_id' => 5], //Videographer
 
-            //Dave Gallery
+            //Dave Galery
             ['vendor_id' => 23, 'category_id' => 6], //Photographer
             ['vendor_id' => 23, 'category_id' => 5], //Videographer
 
@@ -691,7 +699,7 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 28, 'category_id' => 6], //Photographer
             ['vendor_id' => 28, 'category_id' => 5], //Videographer
 
-            //Best Deccoration
+            //Best Decoration
             ['vendor_id' => 29, 'category_id' => 13], //Room Decoration
             ['vendor_id' => 29, 'category_id' => 14], //Hand Bouquet
             ['vendor_id' => 29, 'category_id' => 15], //Corsage
@@ -822,7 +830,7 @@ class VendorSeeder extends Seeder
             //Athalia Usherettes
             ['vendor_id' => 56, 'category_id' => 37], //Usherettes
 
-            //Probadi
+            //Pribadi
             ['vendor_id' => 57, 'category_id' => 2], //MUA
             ['vendor_id' => 57, 'category_id' => 3], //Gown
             ['vendor_id' => 57, 'category_id' => 4], //Suit
@@ -831,7 +839,7 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 57, 'category_id' => 12], //Tie
             ['vendor_id' => 57, 'category_id' => 16], //Ring Box
 
-            //Novotel Samator East Surabaya
+            //Novotel Samator East Surabaya Hotel
             ['vendor_id' => 58, 'category_id' => 1], //Hotel
             ['vendor_id' => 58, 'category_id' => 22], //Venue
             ['vendor_id' => 58, 'category_id' => 26], //LED
@@ -878,6 +886,22 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 70, 'category_id' => 21], //Guest Lunch
         ];
 
-        DB::table('category_vendor')->insert($categoryVendor);
+        foreach (array_chunk($categoryVendor, 50) as $chunk) {
+            DB::table('category_vendor')->insert($chunk);
+        }
+
+        $vendorPortfolios = [
+            //Possa Wedding
+            ['vendor_id' => 18, 'title' => 'Wedding of Wandy & Vira', 'image_path' => 'vendor_portfolios/porto-possa1.png', 'description' => 'Beautiful wedding documentation captured by Possa Wedding.', 'created_at' => now(), 'updated_at' => now()],
+            ['vendor_id' => 18, 'title' => 'Wedding of Wandy & Vira', 'image_path' => 'vendor_portfolios/porto-possa2.png', 'description' => 'Capturing the genuine emotions of your special day.', 'created_at' => now(), 'updated_at' => now()],
+            ['vendor_id' => 18, 'title' => 'Wedding of Yosua & Jessica', 'image_path' => 'vendor_portfolios/porto-possa4.png', 'description' => 'Every detail of your wedding, perfectly framed.', 'created_at' => now(), 'updated_at' => now()],
+            ['vendor_id' => 18, 'title' => 'Wedding of Yosua & Jessica', 'image_path' => 'vendor_portfolios/porto-possa5.png', 'description' => 'Candid shots that tell a thousand words.', 'created_at' => now(), 'updated_at' => now()],
+            ['vendor_id' => 18, 'title' => 'Wedding of Yosua & Jessica', 'image_path' => 'vendor_portfolios/porto-possa6.png', 'description' => 'Professional lighting and composition for every moment.', 'created_at' => now(), 'updated_at' => now()],
+            ['vendor_id' => 18, 'title' => 'Wedding of Yosua & Jessica', 'image_path' => 'vendor_portfolios/porto-possa7.png', 'description' => 'Your memories, preserved beautifully forever.', 'created_at' => now(), 'updated_at' => now()],
+        ];
+
+        foreach (array_chunk($vendorPortfolios, 50) as $chunk) {
+            DB::table('vendor_portfolios')->insert($chunk);
+        }
     }
 }

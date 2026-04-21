@@ -9,6 +9,7 @@ use App\Http\Controllers\Client\PaymentController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
+use App\Models\Vendor;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -48,6 +49,19 @@ Route::get('/vendor', function () {
         ->header('Pragma', 'no-cache')
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->name('vendor');
+
+Route::get('/vendor/{id}/detail', function ($id) {
+    if (Auth::check()) {
+        if (Auth::user()->role === 'owner') {
+            return redirect()->route('owner.dashboard');
+        } elseif (Auth::user()->role === 'pl') {
+            return redirect()->route('pl.dashboard');
+        }
+    }
+    $vendor = Vendor::with(['categories', 'packages', 'portfolios'])->findOrFail($id);
+
+    return view('vendor_detail', compact('vendor'));
+})->name('vendor.show');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/dashboard', function () {
