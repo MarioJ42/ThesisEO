@@ -399,6 +399,7 @@ class EventController extends Controller
             'event_id' => 'required|exists:events,id',
             'vendor_id' => 'required|exists:vendors,id',
             'package_id' => 'required|exists:vendor_packages,id',
+            'category_id' => 'required',
             'session' => 'required|string',
         ]);
 
@@ -406,10 +407,17 @@ class EventController extends Controller
             ->where('client_id', \Illuminate\Support\Facades\Auth::id())
             ->firstOrFail();
 
+        $package = DB::table('vendor_packages')->where('id', $request->package_id)->first();
+
         $event->vendors()->attach($request->vendor_id, [
+            'vendor_category_id' => $request->category_id,
             'vendor_package_id' => $request->package_id,
             'session' => $request->session,
-            'status' => 'Pending',
+            'deal_price' => $package ? $package->price : 0,
+            'is_included' => 0,
+            'status' => 'reviewing',
+            'role_detail' => '-',
+            'meal_crew' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
