@@ -295,34 +295,32 @@ class OwnerController extends Controller
             ->with('active_tab', 'packages');
     }
 
-    public function storeVendorPortfolio(Request $request, Vendor $vendor)
+    public function storeVendorPortfolio(Request $request, \App\Models\Vendor $vendor)
     {
-        if ($vendor->portfolios()->count() >= 10) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Maximum limit of 10 portfolio photos reached for this vendor.'])
-                ->with('active_tab', 'portfolios');
-        }
-
+        // 1. Tambahkan validasi untuk title dan description
         $request->validate([
             'images' => 'required|array|max:5',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        $remainingSlots = 10 - $vendor->portfolios()->count();
-        $imagesToProcess = array_slice($request->file('images'), 0, $remainingSlots);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('vendor_portfolios', 'public');
 
-        foreach ($imagesToProcess as $image) {
-            $path = $image->store('portfolios', 'public');
-
-            $vendor->portfolios()->create([
-                'title' => pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME),
-                'image_path' => $path,
-            ]);
+                \Illuminate\Support\Facades\DB::table('vendor_portfolios')->insert([
+                    'vendor_id' => $vendor->id,
+                    'title' => $request->title,
+                    'description' => $request->description,
+                    'image_path' => $path,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
 
-        return redirect()->back()
-            ->with('success', count($imagesToProcess) . ' Photo(s) successfully uploaded!')
-            ->with('active_tab', 'portfolios');
+        return redirect()->back()->with('success', 'Photos and description uploaded successfully!');
     }
 
     public function destroyVendorPortfolio(\App\Models\VendorPortfolio $portfolio)

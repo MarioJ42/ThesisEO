@@ -397,10 +397,20 @@
             </div>
             <form action="{{ route('owner.vendors.portfolios.store', $vendor->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="p-6">
-                    <label class="block mb-2 text-sm font-medium text-gray-900">Select Images (Max 5 at once) <span class="text-red-500">*</span></label>
-                    <input type="file" name="images[]" multiple accept=".jpg,.jpeg,.png" required class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2.5">
-                    <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, PNG. Max size: 2MB per file.</p>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Wedding of Groom & Bride">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+                        <textarea name="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Write a captivating description"></textarea>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Select Images (Max 5 at once) <span class="text-red-500">*</span></label>
+                        <input type="file" name="images[]" multiple accept=".jpg,.jpeg,.png" required class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2.5">
+                        <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, PNG. Max size: 2MB per file.</p>
+                    </div>
                 </div>
                 <div class="flex justify-end p-4 border-t gap-2">
                     <button type="button" @click="isPortfolioModalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
