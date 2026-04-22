@@ -706,7 +706,7 @@
                 </div>
 
                 <div class="relative w-full mb-4">
-                    <input type="text" x-model="guestSearch" placeholder="Search guest name or phone..."
+                    <input type="text" x-model="guestSearch" placeholder="Search guest name or phone"
                         class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                     <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
@@ -761,9 +761,14 @@
                                         </td>
                                         <td class="px-5 py-4 text-sm text-center">
                                             <div class="flex justify-center gap-2">
+                                                <a href="{{ route('invitation.show', $guest->barcode_token) }}"
+                                                    target="_blank"
+                                                    class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">View</a>
+
                                                 <button
                                                     @click="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->name) }}', '{{ addslashes($guest->phone_number) }}', {{ $guest->pax_invited }}, '{{ addslashes($guest->table_name) }}', '{{ $guest->status }}')"
                                                     class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Edit</button>
+
                                                 <form
                                                     action="{{ route($user->role . '.events.guests.destroy', ['event' => $event->id, 'guest' => $guest->id]) }}"
                                                     method="POST" class="inline">
@@ -933,10 +938,12 @@
                         <div>
                             <label
                                 class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
-                            <select name="status"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            <select name="status" x-model="guestForm.status"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
+                                <option value="pending">Pending</option>
                                 <option value="attending">Attending</option>
                                 <option value="not_attending">Not Attending</option>
+                                <option value="checked_in">Checked In</option>
                             </select>
                         </div>
                     </div>
@@ -1050,6 +1057,38 @@
                         } else if (button.closest('form')) {
                             button.closest('form').submit();
                         }
+                    }
+                });
+            }
+
+            function confirmBlastWA() {
+                Swal.fire({
+                    title: 'Blast WA Reminders?',
+                    text: "Pesan pengingat akan dikirimkan ke semua tamu yang berstatus 'Attending'. Proses ini akan berjalan di latar belakang (Background Job).",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, Blast Now!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('blastWaForm').submit();
+
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Memasukkan data ke dalam antrean (Queue)...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                     }
                 });
             }

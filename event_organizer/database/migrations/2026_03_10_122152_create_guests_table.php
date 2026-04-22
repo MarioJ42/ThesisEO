@@ -19,7 +19,8 @@ return new class extends Migration
             $table->integer('pax_invited')->default(1);
             $table->string('table_name', 50)->nullable();
             $table->string('barcode_token')->unique()->nullable();
-            $table->enum('status', ['attending', 'not_attending', 'checked_in'])->default('attending');
+            $table->enum('status', ['pending', 'attending', 'not_attending', 'checked_in'])->default('pending');
+
             $table->dateTime('check_in_time')->nullable();
             $table->integer('pax_actual')->nullable();
             $table->integer('angpao_count')->nullable();

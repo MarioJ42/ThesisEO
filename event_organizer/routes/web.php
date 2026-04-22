@@ -176,4 +176,7 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/midtrans/callback', [\App\Http\Controllers\Client\PaymentController::class, 'callback'])->name('midtrans.callback');
 
+Route::get('/invitation/{token}', [App\Http\Controllers\PublicInvitationController::class, 'show'])->name('invitation.show');
+Route::post('/invitation/{token}/rsvp', [App\Http\Controllers\PublicInvitationController::class, 'rsvp'])->name('invitation.rsvp');
+
 require __DIR__ . '/auth.php';
