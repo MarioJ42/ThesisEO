@@ -655,14 +655,19 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <h3 class="text-lg font-bold text-gray-900">Guestbook & RSVP</h3>
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <button
-                            class="flex-1 sm:flex-none bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
-                            Blast WA Reminders
-                        </button>
+                        <form action="{{ route($user->role . '.events.guests.blast', $event->id) }}" method="POST"
+                            class="flex-1 sm:flex-none m-0"
+                            onsubmit="return confirm('Are you sure you want to blast WhatsApp reminders to all attending guests? This process will run in the background.')">
+                            @csrf
+                            <button type="submit"
+                                class="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                                Blast WA Reminders
+                            </button>
+                        </form>
                         <button @click="isGuestModalOpen = true"
                             class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

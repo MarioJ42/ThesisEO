@@ -113,6 +113,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::post('/events/{event}/guests', [EventController::class, 'storeGuest'])->name('owner.events.guests.store');
     Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('owner.events.guests.update');
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('owner.events.guests.destroy');
+    Route::post('/events/{event}/guests/blast', [EventController::class, 'blastWaReminders'])->name('owner.events.guests.blast');
 
     Route::get('/event-packages', [OwnerController::class, 'weddingPackages'])->name('owner.wedding_packages');
     Route::post('/event-packages', [OwnerController::class, 'storeWeddingPackage'])->name('owner.wedding_packages.store');
@@ -147,7 +148,8 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::post('/events/{event}/guests', [EventController::class, 'storeGuest'])->name('pl.events.guests.store');
     Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('pl.events.guests.update');
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('pl.events.guests.destroy');
-});
+    Route::post('/events/{event}/guests/blast', [EventController::class, 'blastWaReminders'])->name('pl.events.guests.blast');
+    });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('client.events.index');

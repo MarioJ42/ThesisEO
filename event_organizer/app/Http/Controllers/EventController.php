@@ -513,4 +513,36 @@ class EventController extends Controller
 
         return view('client.guestbook', compact('event', 'user', 'guests'));
     }
+
+    public function blastWaReminders(Event $event)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'pl' && $event->pl_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $guests = DB::table('guests')
+            ->where('event_id', $event->id)
+            ->where('status', 'attending')
+            ->whereNotNull('phone_number')
+            ->where('phone_number', '!=', '')
+            ->get();
+
+        if ($guests->isEmpty()) {
+            return redirect()->back()
+                ->with('error', 'No attending guests with valid WhatsApp numbers found.')
+                ->with('active_tab', 'rsvp');
+        }
+
+        $count = 0;
+        foreach ($guests as $guest) {
+            \App\Jobs\SendRsvpReminder::dispatch($guest, $event);
+            $count++;
+        }
+
+        return redirect()->back()
+            ->with('success', "Success! $count messages have been queued and will be sent gradually.")
+            ->with('active_tab', 'rsvp');
+    }
 }
