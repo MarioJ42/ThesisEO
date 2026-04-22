@@ -6,8 +6,45 @@
             display: none !important;
         }
     </style>
-
-    <div class="max-w-7xl mx-auto" x-data="{ activeTab: localStorage.getItem('manageEventTab') || 'overview' }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
+    <div class="max-w-7xl mx-auto" x-data="{
+        isModalOpen: false,
+        activeTab: localStorage.getItem('manageEventTab') || 'overview',
+        isEditModalOpen: false,
+        editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '', status: '' },
+        openEditModal(id, title, pl_id, package_name, event_date, status) {
+            this.editForm.id = id;
+            this.editForm.title = title;
+            this.editForm.pl_id = pl_id || '';
+            this.editForm.package_name = package_name;
+            this.editForm.event_date = event_date;
+            this.editForm.status = status;
+            this.isEditModalOpen = true;
+        },
+        isPriceModalOpen: false,
+        priceForm: { slot_id: '', vendor_name: '', package_name: '', base_cost: 0, net_price: 0, deal_price: 0 },
+        openPriceModal(slot_id, vendor_name, package_name, base_cost, net_price, deal_price) {
+            this.priceForm.slot_id = slot_id;
+            this.priceForm.vendor_name = vendor_name;
+            this.priceForm.package_name = package_name;
+            this.priceForm.base_cost = base_cost;
+            this.priceForm.net_price = net_price;
+            this.priceForm.deal_price = deal_price;
+            this.isPriceModalOpen = true;
+        },
+        isGuestModalOpen: false,
+        isEditGuestModalOpen: false,
+        guestSearch: '',
+        guestForm: { id: '', name: '', phone_number: '', pax_invited: 1, table_name: '', status: 'attending' },
+        openEditGuestModal(id, name, phone, pax, table, status) {
+            this.guestForm.id = id;
+            this.guestForm.name = name;
+            this.guestForm.phone_number = phone;
+            this.guestForm.pax_invited = pax;
+            this.guestForm.table_name = table;
+            this.guestForm.status = status;
+            this.isEditGuestModalOpen = true;
+        }
+    }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
 
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -70,6 +107,12 @@
                             class="bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs font-bold">{{ $unverifiedCount }}</span>
                     @endif
                 </button>
+                <button @click="activeTab = 'rsvp'"
+                    :class="activeTab === 'rsvp' ? 'border-blue-500 text-blue-600' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
+                    RSVP & Guestbook
+                </button>
             </nav>
         </div>
 
@@ -81,9 +124,12 @@
                     $totalNetPrice = 0;
                     foreach ($slots as $s) {
                         if ($s->vendor_package_id) {
-                            $pkg = collect($vendorPackages[$s->vendor_id] ?? [])->firstWhere('id', $s->vendor_package_id);
-                            $dPrice = $s->deal_price > 0 ? $s->deal_price : ($pkg->price ?? 0);
-                            $nPrice = $s->net_price > 0 ? $s->net_price : ($pkg->net_price ?? 0);
+                            $pkg = collect($vendorPackages[$s->vendor_id] ?? [])->firstWhere(
+                                'id',
+                                $s->vendor_package_id,
+                            );
+                            $dPrice = $s->deal_price > 0 ? $s->deal_price : $pkg->price ?? 0;
+                            $nPrice = $s->net_price > 0 ? $s->net_price : $pkg->net_price ?? 0;
                             $totalDealPrice += $dPrice;
                             $totalNetPrice += $nPrice;
                         }
@@ -96,15 +142,22 @@
                 <div class="mb-8 bg-blue-50/50 border border-blue-100 rounded-xl p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
                         <h3 class="text-lg font-bold text-blue-900 flex items-center gap-2 m-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
                             Financial & Profit Summary
                         </h3>
-                        <div class="text-sm text-blue-800 bg-white/60 px-4 py-1.5 rounded-lg border border-blue-200/50 shadow-sm whitespace-nowrap">
+                        <div
+                            class="text-sm text-blue-800 bg-white/60 px-4 py-1.5 rounded-lg border border-blue-200/50 shadow-sm whitespace-nowrap">
                             <span class="font-semibold text-gray-500">Package:</span>
-                            <span class="font-bold ml-1">{{ $event->package ? $event->package->name : 'Custom Package' }}</span>
-                            @if($event->package)
+                            <span
+                                class="font-bold ml-1">{{ $event->package ? $event->package->name : 'Custom Package' }}</span>
+                            @if ($event->package)
                                 <span class="mx-2 text-blue-300">|</span>
-                                <span class="font-bold text-emerald-600">Rp {{ number_format($event->package->base_price, 0, ',', '.') }}</span>
+                                <span class="font-bold text-emerald-600">Rp
+                                    {{ number_format($event->package->base_price, 0, ',', '.') }}</span>
                             @endif
                         </div>
                     </div>
@@ -112,22 +165,28 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Selling Price</p>
-                            <p class="text-lg font-extrabold text-gray-900">Rp {{ number_format($totalDealPrice, 0, ',', '.') }}</p>
+                            <p class="text-lg font-extrabold text-gray-900">Rp
+                                {{ number_format($totalDealPrice, 0, ',', '.') }}</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendor's Prices</p>
-                            <p class="text-lg font-extrabold text-red-600">Rp {{ number_format($totalNetPrice, 0, ',', '.') }}</p>
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendor's
+                                Prices</p>
+                            <p class="text-lg font-extrabold text-red-600">Rp
+                                {{ number_format($totalNetPrice, 0, ',', '.') }}</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Margin</p>
-                            <p class="text-lg font-extrabold text-green-600">Rp {{ number_format($vendorMargin, 0, ',', '.') }}</p>
+                            <p class="text-lg font-extrabold text-green-600">Rp
+                                {{ number_format($vendorMargin, 0, ',', '.') }}</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50 relative overflow-hidden">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">EO Service</p>
-                            <p class="text-lg font-extrabold text-green-600">Rp {{ number_format($eoFee, 0, ',', '.') }}</p>
+                            <p class="text-lg font-extrabold text-green-600">Rp {{ number_format($eoFee, 0, ',', '.') }}
+                            </p>
                         </div>
                     </div>
-                    <div class="mt-4 bg-blue-600 rounded-lg p-5 flex flex-col sm:flex-row justify-between sm:items-center text-white shadow-md gap-2">
+                    <div
+                        class="mt-4 bg-blue-600 rounded-lg p-5 flex flex-col sm:flex-row justify-between sm:items-center text-white shadow-md gap-2">
                         <p class="text-sm font-bold uppercase tracking-widest text-blue-100">Grand Profit Estimation</p>
                         <p class="text-3xl font-black tracking-tight">Rp {{ number_format($grandProfit, 0, ',', '.') }}</p>
                     </div>
@@ -255,13 +314,16 @@
                                 <table class="min-w-full w-full whitespace-nowrap">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor
+                                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                                                Vendor
                                             </th>
                                             <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note
                                             </th>
-                                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Status
+                                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                                                Status
                                             </th>
-                                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-1/3">
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-1/3">
                                                 Action</th>
                                         </tr>
                                     </thead>
@@ -290,37 +352,74 @@
                                                 <td class="px-4 py-4 text-sm">
                                                     @if ($slot->vendor_id && $slot->vendor_package_id)
                                                         @php
-                                                            $selectedPkg = collect($vendorPackages[$slot->vendor_id] ?? [])->firstWhere('id', $slot->vendor_package_id);
-                                                            $baseCost = $slot->is_included && isset($baseCosts[$slot->vendor_category_id]) ? $baseCosts[$slot->vendor_category_id] : 0;
-                                                            $currentDealPrice = $slot->deal_price > 0 ? $slot->deal_price : ($selectedPkg->price ?? 0);
-                                                            $currentNetPrice = $slot->net_price > 0 ? $slot->net_price : ($selectedPkg->net_price ?? 0);
+                                                            $selectedPkg = collect(
+                                                                $vendorPackages[$slot->vendor_id] ?? [],
+                                                            )->firstWhere('id', $slot->vendor_package_id);
+                                                            $baseCost =
+                                                                $slot->is_included &&
+                                                                isset($baseCosts[$slot->vendor_category_id])
+                                                                    ? $baseCosts[$slot->vendor_category_id]
+                                                                    : 0;
+                                                            $currentDealPrice =
+                                                                $slot->deal_price > 0
+                                                                    ? $slot->deal_price
+                                                                    : $selectedPkg->price ?? 0;
+                                                            $currentNetPrice =
+                                                                $slot->net_price > 0
+                                                                    ? $slot->net_price
+                                                                    : $selectedPkg->net_price ?? 0;
                                                             $profit = $currentDealPrice - $currentNetPrice;
                                                             $upgradeFee = max(0, $currentDealPrice - $baseCost);
                                                         @endphp
-                                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white border border-gray-200 p-3 rounded-xl shadow-sm gap-3">
+                                                        <div
+                                                            class="flex flex-col sm:flex-row sm:items-center justify-between bg-white border border-gray-200 p-3 rounded-xl shadow-sm gap-3">
                                                             <div class="flex flex-col">
-                                                                <span class="font-bold text-gray-900">{{ $slot->vendor_name }}</span>
-                                                                <span class="text-[11px] text-gray-500 font-medium">{{ $selectedPkg->name ?? 'Package Selected' }}</span>
+                                                                <span
+                                                                    class="font-bold text-gray-900">{{ $slot->vendor_name }}</span>
+                                                                <span
+                                                                    class="text-[11px] text-gray-500 font-medium">{{ $selectedPkg->name ?? 'Package Selected' }}</span>
                                                                 <div class="flex items-center gap-2 mt-1.5">
-                                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md {{ $profit >= 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
-                                                                        Margin: Rp {{ number_format($profit, 0, ',', '.') }}
+                                                                    <span
+                                                                        class="text-[10px] font-bold px-2 py-0.5 rounded-md {{ $profit >= 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                                                                        Margin: Rp
+                                                                        {{ number_format($profit, 0, ',', '.') }}
                                                                     </span>
                                                                     @if ($upgradeFee > 0)
-                                                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 border border-orange-200">
-                                                                            Upgrade: +Rp {{ number_format($upgradeFee, 0, ',', '.') }}
+                                                                        <span
+                                                                            class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 border border-orange-200">
+                                                                            Upgrade: +Rp
+                                                                            {{ number_format($upgradeFee, 0, ',', '.') }}
                                                                         </span>
                                                                     @endif
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center gap-2">
-                                                                <button @click="$dispatch('open-price-modal', { slot_id: '{{ $slot->id }}', vendor_name: @js($slot->vendor_name), package_name: @js($selectedPkg->name ?? ''), base_cost: {{ $baseCost }}, net_price: {{ round($currentNetPrice) }}, deal_price: {{ round($currentDealPrice) }} })" class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors shadow-sm" title="Manage Pricing">
-                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                                <button
+                                                                    @click="$dispatch('open-price-modal', { slot_id: '{{ $slot->id }}', vendor_name: @js($slot->vendor_name), package_name: @js($selectedPkg->name ?? ''), base_cost: {{ $baseCost }}, net_price: {{ round($currentNetPrice) }}, deal_price: {{ round($currentDealPrice) }} })"
+                                                                    class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors shadow-sm"
+                                                                    title="Manage Pricing">
+                                                                    <svg class="w-3.5 h-3.5" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                                                        </path>
+                                                                    </svg>
                                                                     Pricing
                                                                 </button>
-                                                                <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="inline">
+                                                                <form
+                                                                    action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}"
+                                                                    method="POST" class="inline">
                                                                     @csrf @method('PUT')
-                                                                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg transition-colors shadow-sm" title="Unassign Vendor">
-                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                    <button type="submit"
+                                                                        class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
+                                                                        title="Unassign Vendor">
+                                                                        <svg class="w-3.5 h-3.5" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M6 18L18 6M6 6l12 12"></path>
+                                                                        </svg>
                                                                         Remove
                                                                     </button>
                                                                 </form>
@@ -552,98 +651,402 @@
                 </div>
             </div>
 
-        </div>
-    </div>
+            <div x-show="activeTab === 'rsvp'" x-cloak>
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <h3 class="text-lg font-bold text-gray-900">Guestbook & RSVP</h3>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button
+                            class="flex-1 sm:flex-none bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            Blast WA Reminders
+                        </button>
+                        <button @click="isGuestModalOpen = true"
+                            class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                                </path>
+                            </svg>
+                            Add Guest
+                        </button>
+                    </div>
+                </div>
 
-    <div x-data="{
+                @php
+                    $totalGuests = $guests->count();
+                    $totalPax = $guests->sum('pax_invited');
+                    $attendingGuests = $guests->where('status', 'attending')->count();
+                    $notAttendingGuests = $guests->where('status', 'not_attending')->count();
+                @endphp
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                        <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Invitations</p>
+                        <p class="text-3xl font-black text-gray-900">{{ $totalGuests }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 shadow-sm">
+                        <p class="text-[11px] text-blue-600 font-bold uppercase tracking-wider mb-1">Total Pax</p>
+                        <p class="text-3xl font-black text-blue-900">{{ $totalPax }}</p>
+                    </div>
+                    <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm">
+                        <p class="text-[11px] text-emerald-600 font-bold uppercase tracking-wider mb-1">Attending</p>
+                        <p class="text-3xl font-black text-emerald-900">{{ $attendingGuests }}</p>
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-2xl border border-red-100 shadow-sm">
+                        <p class="text-[11px] text-red-600 font-bold uppercase tracking-wider mb-1">Not Attending</p>
+                        <p class="text-3xl font-black text-red-900">{{ $notAttendingGuests }}</p>
+                    </div>
+                </div>
+
+                <div class="relative w-full mb-4">
+                    <input type="text" x-model="guestSearch" placeholder="Search guest name or phone..."
+                        class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="min-w-full w-full whitespace-nowrap">
+                            <thead class="bg-gray-50 border-b border-gray-100">
+                                <tr>
+                                    <th
+                                        class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Guest Name</th>
+                                    <th
+                                        class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Contact</th>
+                                    <th
+                                        class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Pax</th>
+                                    <th
+                                        class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Table</th>
+                                    <th
+                                        class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @forelse($guests as $guest)
+                                    <tr class="hover:bg-gray-50/50 transition-colors"
+                                        x-show="guestSearch === '' || '{{ strtolower(addslashes($guest->name . ' ' . $guest->phone_number)) }}'.includes(guestSearch.toLowerCase())">
+                                        <td class="px-5 py-4 text-sm font-bold text-gray-900">{{ $guest->name }}</td>
+                                        <td class="px-5 py-4 text-sm text-gray-500">{{ $guest->phone_number ?? '-' }}</td>
+                                        <td class="px-5 py-4 text-sm text-center font-extrabold text-blue-600">
+                                            {{ $guest->pax_invited }}</td>
+                                        <td class="px-5 py-4 text-sm text-center text-gray-600">
+                                            {{ $guest->table_name ?? '-' }}</td>
+                                        <td class="px-5 py-4 text-sm text-center">
+                                            <span
+                                                class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border
+                                                @if ($guest->status === 'attending') bg-emerald-50 text-emerald-700 border-emerald-200
+                                                @elseif($guest->status === 'not_attending') bg-red-50 text-red-700 border-red-200
+                                                @elseif($guest->status === 'checked_in') bg-blue-50 text-blue-700 border-blue-200 @endif">
+                                                {{ str_replace('_', ' ', $guest->status) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-4 text-sm text-center">
+                                            <div class="flex justify-center gap-2">
+                                                <button
+                                                    @click="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->name) }}', '{{ addslashes($guest->phone_number) }}', {{ $guest->pax_invited }}, '{{ addslashes($guest->table_name) }}', '{{ $guest->status }}')"
+                                                    class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Edit</button>
+                                                <form
+                                                    action="{{ route($user->role . '.events.guests.destroy', ['event' => $event->id, 'guest' => $guest->id]) }}"
+                                                    method="POST" class="inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="button"
+                                                        data-form-id="delete-guest-{{ $guest->id }}"
+                                                        onclick="confirmDelete(this)"
+                                                        class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Del</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-5 py-12 text-center">
+                                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                                <svg class="w-12 h-12 mb-3 text-gray-300" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                                    </path>
+                                                </svg>
+                                                <p class="text-sm font-medium text-gray-500">Your guestbook is empty.</p>
+                                                <p class="text-xs mt-1">Start adding guests to manage your invitations.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div x-data="{
             isOpen: false,
             form: { slot_id: '', vendor_name: '', package_name: '', base_cost: 0, net_price: 0, deal_price: 0 }
-        }"
-        @open-price-modal.window="form = $event.detail; isOpen = true;"
-        x-show="isOpen"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
-        <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl my-8" @click.away="isOpen = false">
-            <div class="flex justify-between items-center p-5 border-b border-gray-100">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900" x-text="form.vendor_name"></h3>
-                    <p class="text-xs font-medium text-gray-500 mt-0.5" x-text="form.package_name"></p>
+        }" @open-price-modal.window="form = $event.detail; isOpen = true;" x-show="isOpen"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto"
+            style="display: none;" x-cloak>
+            <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl my-8" @click.away="isOpen = false">
+                <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900" x-text="form.vendor_name"></h3>
+                        <p class="text-xs font-medium text-gray-500 mt-0.5" x-text="form.package_name"></p>
+                    </div>
+                    <button @click="isOpen = false" class="text-gray-400 hover:text-gray-900 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-                <button @click="isOpen = false" class="text-gray-400 hover:text-gray-900 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+
+                <form
+                    :action="'{{ url('/' . $user->role . '/events/' . $event->id . '/slots') }}/' + form.slot_id + '/price'"
+                    method="POST">
+                    @csrf @method('PUT')
+                    <div class="p-6 space-y-5">
+
+                        <div class="flex items-center justify-between p-4 rounded-lg border border-blue-100"
+                            :class="(form.deal_price - form.net_price) >= 0 ? 'bg-blue-50' : 'bg-red-50 border-red-100'">
+                            <span class="text-xs font-bold uppercase tracking-wider"
+                                :class="(form.deal_price - form.net_price) >= 0 ? 'text-blue-800' : 'text-red-800'">Margin /
+                                Profit</span>
+                            <span class="text-lg font-black"
+                                :class="(form.deal_price - form.net_price) >= 0 ? 'text-green-600' : 'text-red-600'"
+                                x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(form.deal_price - form.net_price)"></span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Net
+                                    Price (Modal Vendor)</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
+                                    <input type="number" name="net_price" x-model.number="form.net_price" required
+                                        min="0"
+                                        class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Deal
+                                    Price (Harga Jual)</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
+                                    <input type="number" name="deal_price" x-model.number="form.deal_price" required
+                                        min="0"
+                                        class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
+                                </div>
+                            </div>
+                        </div>
+
+                        <template x-if="form.base_cost > 0 && form.deal_price > form.base_cost">
+                            <div
+                                class="mt-4 text-[11px] text-orange-700 font-semibold bg-orange-50 p-3 rounded-lg border border-orange-100 flex gap-2 items-start">
+                                <svg class="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>Client upgraded vendor. Additional fee to client: <strong>+Rp <span
+                                            x-text="new Intl.NumberFormat('id-ID').format(form.deal_price - form.base_cost)"></span></strong></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
+                        <button type="button" @click="isOpen = false"
+                            class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Save
+                            Pricing</button>
+                    </div>
+                </form>
             </div>
-
-            <form :action="'{{ url('/' . $user->role . '/events/' . $event->id . '/slots') }}/' + form.slot_id + '/price'" method="POST">
-                @csrf @method('PUT')
-                <div class="p-6 space-y-5">
-
-                    <div class="flex items-center justify-between p-4 rounded-lg border border-blue-100" :class="(form.deal_price - form.net_price) >= 0 ? 'bg-blue-50' : 'bg-red-50 border-red-100'">
-                        <span class="text-xs font-bold uppercase tracking-wider" :class="(form.deal_price - form.net_price) >= 0 ? 'text-blue-800' : 'text-red-800'">Margin / Profit</span>
-                        <span class="text-lg font-black" :class="(form.deal_price - form.net_price) >= 0 ? 'text-green-600' : 'text-red-600'" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(form.deal_price - form.net_price)"></span>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Net Price (Modal Vendor)</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
-                                <input type="number" name="net_price" x-model.number="form.net_price" required min="0" class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Deal Price (Harga Jual)</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
-                                <input type="number" name="deal_price" x-model.number="form.deal_price" required min="0" class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
-                            </div>
-                        </div>
-                    </div>
-
-                    <template x-if="form.base_cost > 0 && form.deal_price > form.base_cost">
-                        <div class="mt-4 text-[11px] text-orange-700 font-semibold bg-orange-50 p-3 rounded-lg border border-orange-100 flex gap-2 items-start">
-                            <svg class="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Client upgraded vendor. Additional fee to client: <strong>+Rp <span x-text="new Intl.NumberFormat('id-ID').format(form.deal_price - form.base_cost)"></span></strong></span>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
-                    <button type="button" @click="isOpen = false" class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Save Pricing</button>
-                </div>
-            </form>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let scrollpos = localStorage.getItem('manageEventScroll');
-            if (scrollpos) {
-                window.scrollTo(0, parseInt(scrollpos));
-                localStorage.removeItem('manageEventScroll');
-            }
-        });
+        <div x-show="isGuestModalOpen"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto"
+            style="display: none;" x-cloak>
+            <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl my-8"
+                @click.away="isGuestModalOpen = false">
+                <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900">Add New Guest</h3>
+                    <button @click="isGuestModalOpen = false" class="text-gray-400 hover:text-gray-900 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form action="{{ route($user->role . '.events.guests.store', $event->id) }}" method="POST">
+                    @csrf
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Guest Name
+                                <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">WhatsApp
+                                Number</label>
+                            <input type="text" name="phone_number" placeholder="08123456789"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-1/2">
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Pax
+                                    Invited <span class="text-red-500">*</span></label>
+                                <input type="number" name="pax_invited" value="1" min="1" required
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Table
+                                    Name</label>
+                                <input type="text" name="table_name" placeholder="Optional"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
+                            <select name="status"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                <option value="attending">Attending</option>
+                                <option value="not_attending">Not Attending</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
+                        <button type="button" @click="isGuestModalOpen = false"
+                            class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Save
+                            Guest</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        window.addEventListener("beforeunload", function() {
-            localStorage.setItem('manageEventScroll', window.scrollY);
-        });
+        <div x-show="isEditGuestModalOpen"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto"
+            style="display: none;" x-cloak>
+            <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl my-8"
+                @click.away="isEditGuestModalOpen = false">
+                <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900">Edit Guest</h3>
+                    <button @click="isEditGuestModalOpen = false"
+                        class="text-gray-400 hover:text-gray-900 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form :action="'{{ url('/' . $user->role . '/events/' . $event->id . '/guests') }}/' + guestForm.id"
+                    method="POST">
+                    @csrf @method('PUT')
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Guest Name
+                                <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" x-model="guestForm.name" required
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">WhatsApp
+                                Number</label>
+                            <input type="text" name="phone_number" x-model="guestForm.phone_number"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-1/2">
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Pax
+                                    Invited <span class="text-red-500">*</span></label>
+                                <input type="number" name="pax_invited" x-model="guestForm.pax_invited" min="1"
+                                    required
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Table
+                                    Name</label>
+                                <input type="text" name="table_name" x-model="guestForm.table_name"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
+                            <select name="status" x-model="guestForm.status"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                <option value="attending">Attending</option>
+                                <option value="not_attending">Not Attending</option>
+                                <option value="checked_in">Checked In</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
+                        <button type="button" @click="isEditGuestModalOpen = false"
+                            class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Update
+                            Guest</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        function confirmDelete(button) {
-            const formId = button.getAttribute('data-form-id');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'You want to delete this slot?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById(formId).submit();
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let scrollpos = localStorage.getItem('manageEventScroll');
+                if (scrollpos) {
+                    window.scrollTo(0, parseInt(scrollpos));
+                    localStorage.removeItem('manageEventScroll');
                 }
             });
-        }
-    </script>
-@endsection
+
+            window.addEventListener("beforeunload", function() {
+                localStorage.setItem('manageEventScroll', window.scrollY);
+            });
+
+            function confirmDelete(button) {
+                const formId = button.getAttribute('data-form-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This action cannot be undone!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (document.getElementById(formId)) {
+                            document.getElementById(formId).submit();
+                        } else if (button.closest('form')) {
+                            button.closest('form').submit();
+                        }
+                    }
+                });
+            }
+        </script>
+    @endsection

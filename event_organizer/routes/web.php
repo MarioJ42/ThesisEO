@@ -9,7 +9,6 @@ use App\Http\Controllers\Client\PaymentController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
-use App\Models\Vendor;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -111,6 +110,10 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('owner.events.slots.status');
     Route::put('/events/{event}/slots/{slot}/price', [EventController::class, 'updateDealPrice'])->name('owner.events.slots.price');
 
+    Route::post('/events/{event}/guests', [EventController::class, 'storeGuest'])->name('owner.events.guests.store');
+    Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('owner.events.guests.update');
+    Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('owner.events.guests.destroy');
+
     Route::get('/event-packages', [OwnerController::class, 'weddingPackages'])->name('owner.wedding_packages');
     Route::post('/event-packages', [OwnerController::class, 'storeWeddingPackage'])->name('owner.wedding_packages.store');
     Route::put('/event-packages/{package}', [OwnerController::class, 'updateWeddingPackage'])->name('owner.wedding_packages.update');
@@ -140,6 +143,10 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::delete('/events/{event}/slots/{slot}', [EventController::class, 'destroySlot'])->name('pl.events.slots.destroy');
     Route::put('/events/{event}/slots/{slot}/status', [EventController::class, 'updateSlotStatus'])->name('pl.events.slots.status');
     Route::put('/events/{event}/slots/{slot}/price', [EventController::class, 'updateDealPrice'])->name('pl.events.slots.price');
+
+    Route::post('/events/{event}/guests', [EventController::class, 'storeGuest'])->name('pl.events.guests.store');
+    Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('pl.events.guests.update');
+    Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('pl.events.guests.destroy');
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
@@ -149,6 +156,11 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events/{event}/manage', [EventController::class, 'manage'])->name('client.events.manage');
     Route::put('/events/{event}/slots/{slot}', [EventController::class, 'assignVendorToSlot'])->name('client.events.slots.assign');
     Route::put('/events/{event}/slots/{slot}/remove', [EventController::class, 'removeVendorFromSlot'])->name('client.events.slots.remove');
+
+    Route::get('/events/{event}/guestbook', [EventController::class, 'guestbook'])->name('client.events.guestbook');
+    Route::post('/events/{event}/guests', [EventController::class, 'storeGuest'])->name('client.events.guests.store');
+    Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('client.events.guests.update');
+    Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('client.events.guests.destroy');
 
     Route::get('/events/{event}/billing', [PaymentController::class, 'index'])->name('client.events.billing');
     Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');

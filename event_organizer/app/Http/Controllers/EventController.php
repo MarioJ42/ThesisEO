@@ -8,6 +8,7 @@ use App\Models\WeddingPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -99,7 +100,6 @@ class EventController extends Controller
                     'is_included' => $template->is_included,
                     'status' => 'unassigned',
                     'deal_price' => 0,
-                    'net_price' => 0,
                     'meal_crew' => 0,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -211,6 +211,8 @@ class EventController extends Controller
             ->get()
             ->groupBy('vendor_id');
 
+        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
+
         if ($user->role === 'klien') {
             $hiddenCategories = [
                 'Robe & Veil',
@@ -253,7 +255,8 @@ class EventController extends Controller
             'allowedVendors',
             'vendorContacts',
             'vendorPackages',
-            'baseCosts'
+            'baseCosts',
+            'guests'
         ));
     }
 
@@ -273,7 +276,6 @@ class EventController extends Controller
             'is_included' => false,
             'status' => 'unassigned',
             'deal_price' => 0,
-            'net_price' => 0,
             'meal_crew' => 0,
             'created_at' => now(),
             'updated_at' => now(),
@@ -321,7 +323,6 @@ class EventController extends Controller
                 ->update([
                     'vendor_package_id' => $package->id,
                     'deal_price' => $package->price,
-                    'net_price' => $package->net_price,
                 ]);
 
             return redirect()->back()->with('success', 'Package successfully assigned!');
@@ -341,7 +342,6 @@ class EventController extends Controller
                 'vendor_package_id' => null,
                 'status' => 'unassigned',
                 'deal_price' => 0,
-                'net_price' => 0,
                 'meal_crew' => 0
             ]);
 
@@ -385,7 +385,6 @@ class EventController extends Controller
     {
         $request->validate([
             'deal_price' => 'required|numeric|min:0',
-            'net_price' => 'required|numeric|min:0',
         ]);
 
         DB::table('event_vendor')
@@ -393,7 +392,6 @@ class EventController extends Controller
             ->where('event_id', $event->id)
             ->update([
                 'deal_price' => $request->deal_price,
-                'net_price' => $request->net_price,
             ]);
 
         return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
@@ -420,7 +418,6 @@ class EventController extends Controller
             'vendor_package_id' => $request->package_id,
             'session' => $request->session,
             'deal_price' => $package ? $package->price : 0,
-            'net_price' => $package ? $package->net_price : 0,
             'is_included' => 0,
             'status' => 'reviewing',
             'role_detail' => '-',
@@ -431,5 +428,89 @@ class EventController extends Controller
 
         return redirect()->route('client.events.manage', $event->id)
             ->with('success', 'Package successfully added! Waiting for verification.');
+    }
+
+    public function storeGuest(Request $request, Event $event)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:50',
+            'pax_invited' => 'required|integer|min:1',
+            'table_name' => 'nullable|string|max:50',
+            'status' => 'required|in:attending,not_attending',
+        ]);
+
+        $token = Str::random(10);
+        while (DB::table('guests')->where('barcode_token', $token)->exists()) {
+            $token = Str::random(10);
+        }
+
+        DB::table('guests')->insert([
+            'event_id' => $event->id,
+            'name' => $request->name,
+            'phone_number' => $request->phone_number,
+            'pax_invited' => $request->pax_invited,
+            'table_name' => $request->table_name,
+            'status' => $request->status,
+            'barcode_token' => $token,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Guest successfully added!')->with('active_tab', 'rsvp');
+    }
+
+    public function updateGuest(Request $request, Event $event, $guestId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:50',
+            'pax_invited' => 'required|integer|min:1',
+            'table_name' => 'nullable|string|max:50',
+            'status' => 'required|in:attending,not_attending,checked_in',
+        ]);
+
+        DB::table('guests')->where('id', $guestId)->where('event_id', $event->id)->update([
+            'name' => $request->name,
+            'phone_number' => $request->phone_number,
+            'pax_invited' => $request->pax_invited,
+            'table_name' => $request->table_name,
+            'status' => $request->status,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Guest details updated!')->with('active_tab', 'rsvp');
+    }
+
+    public function destroyGuest(Event $event, $guestId)
+    {
+        DB::table('guests')->where('id', $guestId)->where('event_id', $event->id)->delete();
+        return redirect()->back()->with('success', 'Guest successfully removed!')->with('active_tab', 'rsvp');
+    }
+
+    public function guestbook(Event $event)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'klien' && $event->client_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $hasFenixGuestbook = DB::table('event_vendor')
+            ->leftJoin('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+            ->leftJoin('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
+            ->where('event_vendor.event_id', $event->id)
+            ->where('vendor_categories.name', 'like', '%Guest Book%')
+            ->where('vendors.name', 'like', '%Fenix EO%')
+            ->exists();
+
+        if (!$hasFenixGuestbook) {
+            return redirect()->route('client.events.manage', $event->id)->with('error', 'Digital Guestbook feature requires Fenix EO vendor.');
+        }
+
+        $event->load(['client', 'package']);
+        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
+
+        return view('client.guestbook', compact('event', 'user', 'guests'));
     }
 }

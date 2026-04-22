@@ -98,7 +98,6 @@
 
             <div class="flex items-center justify-between mb-6">
                 <div class="flex-1"></div>
-                <div class="flex-1"></div>
                 <div class="flex-1 flex justify-end">
                     <a href="{{ route('client.events.index') }}"
                         class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors">
@@ -111,13 +110,11 @@
                 </div>
             </div>
 
-            <div
-                class="max-w-3xl mx-auto bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden mb-12">
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden mb-12">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gray-900"></div>
 
                 <div class="text-center mt-2">
-                    <span
-                        class="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full mb-4
+                    <span class="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full mb-4
                         @if ($event->status == 'draft') bg-gray-100 text-gray-600
                         @elseif($event->status == 'planning') bg-blue-50 text-blue-600
                         @elseif($event->status == 'ongoing') bg-yellow-50 text-yellow-700
@@ -126,37 +123,44 @@
                         {{ $event->status }}
                     </span>
 
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-4">{{ $event->title }}
-                    </h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-4">{{ $event->title }}</h1>
 
-                    <div class="mb-5 flex justify-center">
+                    @php
+                        $hasFenixGuestbook = $slots->contains(function ($slot) {
+                            return str_contains(strtolower(trim($slot->category_name)), 'guest book') &&
+                                   str_contains(strtolower(trim($slot->vendor_name)), 'fenix eo');
+                        });
+                    @endphp
+
+                    <div class="mb-5 flex flex-wrap justify-center gap-3">
                         <a href="{{ route('client.events.billing', $event->id) }}"
                             class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-gray-900 rounded-xl hover:bg-black shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                             </svg>
                             Go to Billing & Payment
                         </a>
+
+                        @if($hasFenixGuestbook)
+                            <a href="{{ route('client.events.guestbook', $event->id) }}"
+                                class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-blue-900 bg-blue-100 border border-blue-200 rounded-xl hover:bg-blue-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Open Digital Guestbook
+                            </a>
+                        @endif
                     </div>
 
-                    <div
-                        class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-gray-500 font-medium text-sm">
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-gray-500 font-medium text-sm">
                         <span class="flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                             {{ \Carbon\Carbon::parse($event->event_date)->format('l, d F Y') }}
                         </span>
                         <span class="hidden sm:block text-gray-300">•</span>
                         <span class="flex items-center gap-2 text-gray-900">
-                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             {{ $event->package ? $event->package->name : 'Custom Arrangement' }}
                         </span>
@@ -165,34 +169,36 @@
             </div>
 
             @if (session('success'))
-                <div
-                    class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-xl flex items-center gap-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                        </path>
+                <div class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-xl flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     <span class="font-medium">{{ session('success') }}</span>
                 </div>
             @endif
             @if (session('error'))
-                <div
-                    class="mb-8 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center gap-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
+                <div class="mb-8 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                     <span class="font-medium">{{ session('error') }}</span>
+                </div>
+            @endif
+            @if ($errors->any())
+                <div class="mb-8 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
+                    <ul class="list-disc list-inside text-sm font-medium">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
             <div class="flex flex-col lg:flex-row gap-8 items-start" x-data="{ searchCategory: '' }">
 
                 <div class="w-full lg:w-1/4">
-                    <div
-                        class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
-                        <h3 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-5">Category
-                            Checklist</h3>
+                    <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar">
+                        <h3 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-5">Category Checklist</h3>
                         <ul class="space-y-4">
                             @foreach ($morningSlots->concat($eveningSlots) as $sidebarSlot)
                                 @php
@@ -205,16 +211,12 @@
                                 @endphp
                                 <li class="text-sm {{ $statusColor }} flex items-center gap-3">
                                     @if (in_array($sidebarSlot->status, ['verified', 'signed']))
-                                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
+                                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
                                     @elseif($sidebarSlot->vendor_id)
-                                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     @else
                                         <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0"></div>
@@ -229,15 +231,11 @@
                 <div class="w-full lg:w-3/4 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar pb-10">
                     <div class="mb-8 relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <input type="text" x-model="searchCategory" placeholder="Search category name"
-                            class="w-full pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors"
-                            style="padding-left: 3rem;">
+                        <input type="text" x-model="searchCategory" placeholder="Search category name" class="w-full pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-colors" style="padding-left: 3rem;">
                     </div>
 
                     @foreach (['morning' => 'Morning Session', 'evening' => 'Reception'] as $sessionKey => $sessionTitle)
@@ -258,220 +256,112 @@
                                         @elseif($slot->vendor_id && !$slot->vendor_package_id) border-blue-300 ring-2 ring-blue-50
                                         @else border-gray-200 @endif">
 
-                                            <div
-                                                class="p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
+                                            <div class="p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
                                                 <div class="w-full md:w-5/12">
                                                     <div class="flex items-center gap-2 mb-1.5">
-                                                        <h4
-                                                            class="font-extrabold text-gray-900 uppercase tracking-wide text-sm">
-                                                            {{ $slot->category_name }}</h4>
+                                                        <h4 class="font-extrabold text-gray-900 uppercase tracking-wide text-sm">{{ $slot->category_name }}</h4>
                                                         @if ($slot->is_included)
-                                                            <span
-                                                                class="text-[9px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-extrabold tracking-wider">INCLUDED</span>
+                                                            <span class="text-[9px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-extrabold tracking-wider">INCLUDED</span>
                                                         @endif
                                                     </div>
                                                     @if ($slot->role_detail && $slot->role_detail !== '-')
-                                                        <p class="text-xs text-gray-500 leading-relaxed">
-                                                            {{ $slot->role_detail }}</p>
+                                                        <p class="text-xs text-gray-500 leading-relaxed">{{ $slot->role_detail }}</p>
                                                     @endif
                                                 </div>
 
-                                                <div
-                                                    class="w-full md:w-7/12 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+                                                <div class="w-full md:w-7/12 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
                                                     @if ($slot->vendor_id && $slot->vendor_package_id)
-                                                        <div
-                                                            class="flex items-start justify-between bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                                                        <div class="flex items-start justify-between bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
                                                             <div>
-                                                                <p
-                                                                    class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">
-                                                                    Assigned Vendor</p>
-                                                                <p class="font-bold text-gray-900 text-lg">
-                                                                    {{ $slot->vendor_name }}</p>
-                                                                <p class="text-sm text-gray-600 mt-0.5">
-                                                                    {{ $slot->package_name }}</p>
+                                                                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Assigned Vendor</p>
+                                                                <p class="font-bold text-gray-900 text-lg">{{ $slot->vendor_name }}</p>
+                                                                <p class="text-sm text-gray-600 mt-0.5">{{ $slot->package_name }}</p>
 
                                                                 @php
-                                                                    $baseCost =
-                                                                        $slot->is_included &&
-                                                                        isset($baseCosts[$slot->vendor_category_id])
-                                                                            ? $baseCosts[$slot->vendor_category_id]
-                                                                            : 0;
+                                                                    $baseCost = $slot->is_included && isset($baseCosts[$slot->vendor_category_id]) ? $baseCosts[$slot->vendor_category_id] : 0;
                                                                     $upgradeFee = max(0, $slot->deal_price - $baseCost);
                                                                 @endphp
 
-                                                                <div
-                                                                    class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border {{ $upgradeFee > 0 ? 'border-red-100' : 'border-emerald-100' }}">
+                                                                <div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border {{ $upgradeFee > 0 ? 'border-red-100' : 'border-emerald-100' }}">
                                                                     @if ($upgradeFee > 0)
-                                                                        <svg class="w-4 h-4 text-red-500"
-                                                                            fill="none" stroke="currentColor"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round"
-                                                                                stroke-linejoin="round"
-                                                                                stroke-width="2"
-                                                                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
-                                                                            </path>
-                                                                        </svg>
-                                                                        <span
-                                                                            class="text-[11px] font-bold text-red-600">Upgrade
-                                                                            +Rp
-                                                                            {{ number_format($upgradeFee, 0, ',', '.') }}</span>
+                                                                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                                                        <span class="text-[11px] font-bold text-red-600">Upgrade +Rp {{ number_format($upgradeFee, 0, ',', '.') }}</span>
                                                                     @else
-                                                                        <svg class="w-4 h-4 text-emerald-500"
-                                                                            fill="none" stroke="currentColor"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round"
-                                                                                stroke-linejoin="round"
-                                                                                stroke-width="2" d="M5 13l4 4L19 7">
-                                                                            </path>
-                                                                        </svg>
-                                                                        <span
-                                                                            class="text-[11px] font-bold text-emerald-600">Standard
-                                                                            (Free)</span>
+                                                                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                                        <span class="text-[11px] font-bold text-emerald-600">Standard (Free)</span>
                                                                     @endif
                                                                 </div>
                                                             </div>
 
                                                             @if (in_array($slot->status, ['verified', 'signed']))
-                                                                <div
-                                                                    class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg">
-                                                                    <svg class="w-4 h-4" fill="none"
-                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                                        </path>
-                                                                    </svg>
-                                                                    <span
-                                                                        class="text-[11px] font-bold uppercase tracking-wider">Verified</span>
+                                                                <div class="flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                    <span class="text-[11px] font-bold uppercase tracking-wider">Verified</span>
                                                                 </div>
                                                             @else
-                                                                <form
-                                                                    action="{{ route('client.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                                    method="POST">
+                                                                <form action="{{ route('client.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
                                                                     @csrf @method('PUT')
-                                                                    <button type="submit"
-                                                                        class="text-xs font-semibold text-gray-400 hover:text-red-600 transition-colors underline underline-offset-2">Change</button>
+                                                                    <button type="submit" class="text-xs font-semibold text-gray-400 hover:text-red-600 transition-colors underline underline-offset-2">Change</button>
                                                                 </form>
                                                             @endif
                                                         </div>
                                                     @elseif($slot->vendor_id && !$slot->vendor_package_id)
                                                         <div class="flex flex-col gap-3">
-                                                            <div
-                                                                class="flex justify-between items-center bg-blue-50 px-4 py-2.5 rounded-lg border border-blue-100">
-                                                                <span
-                                                                    class="text-sm font-bold text-blue-900 flex items-center gap-2">
-                                                                    <svg class="w-4 h-4" fill="none"
-                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M5 13l4 4L19 7"></path>
-                                                                    </svg>
+                                                            <div class="flex justify-between items-center bg-blue-50 px-4 py-2.5 rounded-lg border border-blue-100">
+                                                                <span class="text-sm font-bold text-blue-900 flex items-center gap-2">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                                     {{ $slot->vendor_name }}
                                                                 </span>
-
                                                                 @if (!in_array($slot->status, ['verified', 'signed']))
-                                                                    <form
-                                                                        action="{{ route('client.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                                        method="POST">
+                                                                    <form action="{{ route('client.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
                                                                         @csrf @method('PUT')
-                                                                        <button type="submit"
-                                                                            class="text-[11px] font-semibold text-blue-600 hover:text-red-600 transition-colors underline">Cancel</button>
+                                                                        <button type="submit" class="text-[11px] font-semibold text-blue-600 hover:text-red-600 transition-colors underline">Cancel</button>
                                                                     </form>
                                                                 @endif
                                                             </div>
 
-                                                            <form
-                                                                action="{{ route('client.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                                method="POST">
+                                                            <form action="{{ route('client.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
                                                                 @csrf @method('PUT')
                                                                 @php
-                                                                    $packages = collect(
-                                                                        $vendorPackages[$slot->vendor_id] ?? [],
-                                                                    )->where(
-                                                                        'vendor_category_id',
-                                                                        $slot->vendor_category_id,
-                                                                    );
-                                                                    $baseCost =
-                                                                        $slot->is_included &&
-                                                                        isset($baseCosts[$slot->vendor_category_id])
-                                                                            ? $baseCosts[$slot->vendor_category_id]
-                                                                            : 0;
+                                                                    $packages = collect($vendorPackages[$slot->vendor_id] ?? [])->where('vendor_category_id', $slot->vendor_category_id);
+                                                                    $baseCost = $slot->is_included && isset($baseCosts[$slot->vendor_category_id]) ? $baseCosts[$slot->vendor_category_id] : 0;
                                                                 @endphp
-                                                                <label
-                                                                    class="block text-xs font-bold text-gray-700 mb-1.5">Select
-                                                                    a Package</label>
+                                                                <label class="block text-xs font-bold text-gray-700 mb-1.5">Select a Package</label>
                                                                 <div class="flex gap-2">
-                                                                    <select name="vendor_package_id" required
-                                                                        class="flex-grow bg-white border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm">
-                                                                        <option value="" disabled selected>Choose
-                                                                            the best option</option>
+                                                                    <select name="vendor_package_id" required class="flex-grow bg-white border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm">
+                                                                        <option value="" disabled selected>Choose the best option</option>
                                                                         @foreach ($packages as $pkg)
                                                                             @php
-                                                                                $upgradeFee = max(
-                                                                                    0,
-                                                                                    $pkg->price - $baseCost,
-                                                                                );
-                                                                                $upgradeText =
-                                                                                    $upgradeFee > 0
-                                                                                        ? '(+Rp ' .
-                                                                                            number_format(
-                                                                                                $upgradeFee,
-                                                                                                0,
-                                                                                                ',',
-                                                                                                '.',
-                                                                                            ) .
-                                                                                            ')'
-                                                                                        : '(Free)';
+                                                                                $upgradeFee = max(0, $pkg->price - $baseCost);
+                                                                                $upgradeText = $upgradeFee > 0 ? '(+Rp ' . number_format($upgradeFee, 0, ',', '.') . ')' : '(Free)';
                                                                             @endphp
-                                                                            <option value="{{ $pkg->id }}">
-                                                                                {{ $pkg->name }}
-                                                                                {{ $upgradeText }}</option>
+                                                                            <option value="{{ $pkg->id }}">{{ $pkg->name }} {{ $upgradeText }}</option>
                                                                         @endforeach
                                                                     </select>
-                                                                    <button type="submit"
-                                                                        class="bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-bold px-6 transition-colors shadow-sm">Save</button>
+                                                                    <button type="submit" class="bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-bold px-6 transition-colors shadow-sm">Save</button>
                                                                 </div>
                                                             </form>
                                                         </div>
                                                     @else
                                                         @php
-                                                            $cat = $categories
-                                                                ->where('id', $slot->vendor_category_id)
-                                                                ->first();
+                                                            $cat = $categories->where('id', $slot->vendor_category_id)->first();
                                                             $availableVendors = $cat ? $cat->vendors : collect();
-                                                            if (
-                                                                $slot->is_included &&
-                                                                isset($allowedVendors[$slot->vendor_category_id]) &&
-                                                                $allowedVendors[$slot->vendor_category_id]->isNotEmpty()
-                                                            ) {
-                                                                $allowedIds = $allowedVendors[$slot->vendor_category_id]
-                                                                    ->pluck('vendor_id')
-                                                                    ->toArray();
-                                                                $availableVendors = $availableVendors->whereIn(
-                                                                    'id',
-                                                                    $allowedIds,
-                                                                );
+                                                            if ($slot->is_included && isset($allowedVendors[$slot->vendor_category_id]) && $allowedVendors[$slot->vendor_category_id]->isNotEmpty()) {
+                                                                $allowedIds = $allowedVendors[$slot->vendor_category_id]->pluck('vendor_id')->toArray();
+                                                                $availableVendors = $availableVendors->whereIn('id', $allowedIds);
                                                             }
                                                         @endphp
-                                                        <form
-                                                            action="{{ route('client.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                            method="POST">
+                                                        <form action="{{ route('client.events.slots.assign', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST">
                                                             @csrf @method('PUT')
-                                                            <label
-                                                                class="block text-xs font-bold text-gray-500 mb-1.5">Available
-                                                                Vendors</label>
+                                                            <label class="block text-xs font-bold text-gray-500 mb-1.5">Available Vendors</label>
                                                             <div class="flex gap-2">
-                                                                <select name="vendor_id" required
-                                                                    class="flex-grow bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:bg-white focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-colors">
-                                                                    <option value="" disabled selected>Browse our
-                                                                        partners</option>
+                                                                <select name="vendor_id" required class="flex-grow bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:bg-white focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-colors">
+                                                                    <option value="" disabled selected>Browse our partners</option>
                                                                     @foreach ($availableVendors as $v)
-                                                                        <option value="{{ $v->id }}">
-                                                                            {{ $v->name }}</option>
+                                                                        <option value="{{ $v->id }}">{{ $v->name }}</option>
                                                                     @endforeach
                                                                 </select>
-                                                                <button type="submit"
-                                                                    class="bg-white border border-gray-300 text-gray-900 hover:bg-gray-50 rounded-xl text-sm font-bold px-6 transition-colors shadow-sm">Select</button>
+                                                                <button type="submit" class="bg-white border border-gray-300 text-gray-900 hover:bg-gray-50 rounded-xl text-sm font-bold px-6 transition-colors shadow-sm">Select</button>
                                                             </div>
                                                         </form>
                                                     @endif
@@ -489,6 +379,20 @@
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let scrollpos = localStorage.getItem('manageEventScroll');
+            if (scrollpos) {
+                window.scrollTo(0, parseInt(scrollpos));
+                localStorage.removeItem('manageEventScroll');
+            }
+        });
+
+        window.addEventListener("beforeunload", function() {
+            localStorage.setItem('manageEventScroll', window.scrollY);
+        });
+    </script>
 </body>
 
 </html>
