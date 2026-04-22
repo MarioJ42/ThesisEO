@@ -23,22 +23,35 @@
             </a>
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">{{ $package->name }}</h2>
-                <div class="flex items-center gap-4 mt-1">
-                    <span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md border border-blue-100">
+                <div class="flex items-center gap-3 mt-2 flex-wrap">
+                    <span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md border border-blue-100 shadow-sm">
                         Selling Price: Rp {{ number_format($package->base_price, 0, ',', '.') }}
                     </span>
-                    <span class="text-sm font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-md border border-gray-200" title="This is the total cost if the client chooses the cheapest vendors in all categories.">
-                        Base Cost (Start From): Rp {{ number_format($minCost, 0, ',', '.') }}
+                    <span class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-100 shadow-sm">
+                        EO Service: Rp {{ number_format($package->eo_fee ?? 0, 0, ',', '.') }}
                     </span>
-                    @if($package->base_price >= $minCost && $minCost > 0)
-                        <span class="text-sm font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-md border border-green-100 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                            Safe Base Margin
+                    <span class="text-sm font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-md border border-gray-200 shadow-sm" title="This is the total cost if the client chooses the cheapest vendors in all categories.">
+                        Base Cost (Vendors): Rp {{ number_format($minCost, 0, ',', '.') }}
+                    </span>
+
+                    @php
+                        $totalMinimumCost = $minCost + ($package->eo_fee ?? 0);
+                    @endphp
+
+                    @if($package->base_price >= $totalMinimumCost && $minCost > 0)
+                        <span class="text-sm font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-md border border-green-100 flex items-center gap-1 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Safe Margin
+                        </span>
+                    @elseif($package->base_price >= $minCost && $package->base_price < $totalMinimumCost && $minCost > 0)
+                        <span class="text-sm font-semibold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-md border border-yellow-100 flex items-center gap-1 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Warning: EO Fee Cut!
                         </span>
                     @elseif($package->base_price < $minCost && $minCost > 0)
-                        <span class="text-sm font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-md border border-red-100 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            Below Base Cost!
+                        <span class="text-sm font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-md border border-red-100 flex items-center gap-1 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            Below Vendor Cost!
                         </span>
                     @endif
                 </div>
@@ -130,18 +143,28 @@
 
         <div x-show="activeTab === 'assignment'" x-cloak>
 
-            <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-sm font-bold text-gray-900">Set Selling Price</h3>
-                    <p class="text-xs text-gray-500">Determine the final selling price for this package after reviewing the base cost.</p>
+            <div class="mb-6 p-5 bg-blue-50/50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-gray-900">Set Package Pricing & EO Service</h3>
+                    <p class="text-xs text-gray-500 mt-1">Determine the final selling price for the client and the dedicated fee/profit for Fenix EO.</p>
                 </div>
-                <form action="{{ route('owner.wedding_packages.price.update', $package->id) }}" method="POST" class="flex items-center gap-2 w-full sm:w-auto">
+                <form action="{{ route('owner.wedding_packages.price.update', $package->id) }}" method="POST" class="flex flex-col sm:flex-row items-end gap-3 w-full md:w-auto">
                     @csrf @method('PUT')
-                    <div class="relative w-full sm:w-56">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
-                        <input type="number" name="base_price" value="{{ round($package->base_price) }}" required min="0" class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold">
+                    <div class="w-full sm:w-48">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Selling Price (Rp)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
+                            <input type="number" name="base_price" value="{{ round($package->base_price) }}" required min="0" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold">
+                        </div>
                     </div>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">Save Price</button>
+                    <div class="w-full sm:w-48">
+                        <label class="block text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">EO SERVICE (RP)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-blue-500 font-bold">Rp</span>
+                            <input type="number" name="eo_fee" value="{{ round($package->eo_fee ?? 0) }}" required min="0" class="w-full pl-9 pr-3 py-2 border border-blue-300 bg-blue-50 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold text-blue-700">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto h-[38px] flex items-center justify-center whitespace-nowrap shadow-sm">Save</button>
                 </form>
             </div>
 

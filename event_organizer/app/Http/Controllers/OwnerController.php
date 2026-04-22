@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class OwnerController extends Controller
 {
@@ -36,7 +38,7 @@ class OwnerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_active' => true,
         ]);
@@ -61,7 +63,7 @@ class OwnerController extends Controller
             $user->role = $request->role;
 
             if ($request->filled('password')) {
-                $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+                $user->password = Hash::make($request->password);
             }
         } else {
             $request->validate([
@@ -102,7 +104,7 @@ class OwnerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'role' => 'klien',
             'is_active' => true,
         ]);
@@ -261,10 +263,11 @@ class OwnerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'net_price' => 'required|numeric|min:0',
             'details' => 'nullable|string',
         ]);
 
-        $vendor->packages()->create($request->only('name', 'price', 'details'));
+        $vendor->packages()->create($request->only('name', 'price', 'net_price', 'details'));
 
         return redirect()->back()
             ->with('success', 'Package successfully added!')
@@ -276,10 +279,11 @@ class OwnerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'net_price' => 'required|numeric|min:0',
             'details' => 'nullable|string',
         ]);
 
-        $package->update($request->only('name', 'price', 'details'));
+        $package->update($request->only('name', 'price', 'net_price', 'details'));
 
         return redirect()->back()
             ->with('success', 'Package successfully updated!')
@@ -297,7 +301,6 @@ class OwnerController extends Controller
 
     public function storeVendorPortfolio(Request $request, \App\Models\Vendor $vendor)
     {
-        // 1. Tambahkan validasi untuk title dan description
         $request->validate([
             'images' => 'required|array|max:5',
             'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -309,7 +312,7 @@ class OwnerController extends Controller
             foreach ($request->file('images') as $image) {
                 $path = $image->store('vendor_portfolios', 'public');
 
-                \Illuminate\Support\Facades\DB::table('vendor_portfolios')->insert([
+                DB::table('vendor_portfolios')->insert([
                     'vendor_id' => $vendor->id,
                     'title' => $request->title,
                     'description' => $request->description,
@@ -325,8 +328,8 @@ class OwnerController extends Controller
 
     public function destroyVendorPortfolio(\App\Models\VendorPortfolio $portfolio)
     {
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($portfolio->image_path)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($portfolio->image_path);
+        if (Storage::disk('public')->exists($portfolio->image_path)) {
+            Storage::disk('public')->delete($portfolio->image_path);
         }
 
         $portfolio->delete();
@@ -356,11 +359,14 @@ class OwnerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:wedding_packages,name',
         ]);
+
         $package = \App\Models\WeddingPackage::create([
             'name' => $request->name,
             'base_price' => 0,
+            'eo_fee' => 0,
             'is_active' => true,
         ]);
+
         return redirect()->route('owner.wedding_packages.manage', $package->id)
             ->with('success', 'Event Package successfully added! You can now arrange the templates.');
     }
@@ -384,10 +390,12 @@ class OwnerController extends Controller
     {
         $request->validate([
             'base_price' => 'required|numeric|min:0',
+            'eo_fee' => 'required|numeric|min:0',
         ]);
 
         $package->update([
             'base_price' => $request->base_price,
+            'eo_fee' => $request->eo_fee,
         ]);
 
         return redirect()->back()
@@ -403,14 +411,19 @@ class OwnerController extends Controller
 
         $minCost = 0;
 
-        foreach ($package->templates->where('is_included', true) as $template) {
-            $assignedVendors = $package->vendors->where('pivot.vendor_category_id', $template->vendor_category_id);
+        $includedCategoryIds = $package->templates
+            ->where('is_included', true)
+            ->pluck('vendor_category_id')
+            ->unique();
+
+        foreach ($includedCategoryIds as $categoryId) {
+            $assignedVendors = $package->vendors->where('pivot.vendor_category_id', $categoryId);
 
             if ($assignedVendors->isNotEmpty()) {
                 $categoryMin = null;
 
                 foreach ($assignedVendors as $vendor) {
-                    $validPackages = $vendor->packages->where('vendor_category_id', $template->vendor_category_id);
+                    $validPackages = $vendor->packages->where('vendor_category_id', $categoryId);
 
                     if ($validPackages->isNotEmpty()) {
                         $vMin = $validPackages->min('price');

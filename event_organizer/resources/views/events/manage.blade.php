@@ -6,21 +6,8 @@
             display: none !important;
         }
     </style>
-    <div class="max-w-7xl mx-auto" x-data="{
-        isModalOpen: false,
-        activeTab: localStorage.getItem('manageEventTab') || 'overview',
-        isEditModalOpen: false,
-        editForm: { id: '', title: '', pl_id: '', package_name: '', event_date: '', status: '' },
-        openEditModal(id, title, pl_id, package_name, event_date, status) {
-            this.editForm.id = id;
-            this.editForm.title = title;
-            this.editForm.pl_id = pl_id || '';
-            this.editForm.package_name = package_name;
-            this.editForm.event_date = event_date;
-            this.editForm.status = status;
-            this.isEditModalOpen = true;
-        }
-    }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
+
+    <div class="max-w-7xl mx-auto" x-data="{ activeTab: localStorage.getItem('manageEventTab') || 'overview' }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
 
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -89,6 +76,63 @@
         <div class="bg-white rounded-b-lg shadow-sm border border-gray-200 border-t-0 p-6">
 
             <div x-show="activeTab === 'overview'" x-cloak>
+                @php
+                    $totalDealPrice = 0;
+                    $totalNetPrice = 0;
+                    foreach ($slots as $s) {
+                        if ($s->vendor_package_id) {
+                            $pkg = collect($vendorPackages[$s->vendor_id] ?? [])->firstWhere('id', $s->vendor_package_id);
+                            $dPrice = $s->deal_price > 0 ? $s->deal_price : ($pkg->price ?? 0);
+                            $nPrice = $s->net_price > 0 ? $s->net_price : ($pkg->net_price ?? 0);
+                            $totalDealPrice += $dPrice;
+                            $totalNetPrice += $nPrice;
+                        }
+                    }
+                    $vendorMargin = $totalDealPrice - $totalNetPrice;
+                    $eoFee = $event->package ? $event->package->eo_fee : 0;
+                    $grandProfit = $vendorMargin + $eoFee;
+                @endphp
+
+                <div class="mb-8 bg-blue-50/50 border border-blue-100 rounded-xl p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                        <h3 class="text-lg font-bold text-blue-900 flex items-center gap-2 m-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Financial & Profit Summary
+                        </h3>
+                        <div class="text-sm text-blue-800 bg-white/60 px-4 py-1.5 rounded-lg border border-blue-200/50 shadow-sm whitespace-nowrap">
+                            <span class="font-semibold text-gray-500">Package:</span>
+                            <span class="font-bold ml-1">{{ $event->package ? $event->package->name : 'Custom Package' }}</span>
+                            @if($event->package)
+                                <span class="mx-2 text-blue-300">|</span>
+                                <span class="font-bold text-emerald-600">Rp {{ number_format($event->package->base_price, 0, ',', '.') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Selling Price</p>
+                            <p class="text-lg font-extrabold text-gray-900">Rp {{ number_format($totalDealPrice, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendor's Prices</p>
+                            <p class="text-lg font-extrabold text-red-600">Rp {{ number_format($totalNetPrice, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Margin</p>
+                            <p class="text-lg font-extrabold text-green-600">Rp {{ number_format($vendorMargin, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50 relative overflow-hidden">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">EO Service</p>
+                            <p class="text-lg font-extrabold text-green-600">Rp {{ number_format($eoFee, 0, ',', '.') }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-blue-600 rounded-lg p-5 flex flex-col sm:flex-row justify-between sm:items-center text-white shadow-md gap-2">
+                        <p class="text-sm font-bold uppercase tracking-widest text-blue-100">Grand Profit Estimation</p>
+                        <p class="text-3xl font-black tracking-tight">Rp {{ number_format($grandProfit, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+
                 <h3 class="text-lg font-bold text-gray-900 mb-6">Verified Vendor</h3>
 
                 @foreach (['morning' => 'Morning Session', 'evening' => 'Reception'] as $sessionKey => $sessionTitle)
@@ -245,85 +289,40 @@
                                                 </td>
                                                 <td class="px-4 py-4 text-sm">
                                                     @if ($slot->vendor_id && $slot->vendor_package_id)
-                                                        <div class="flex items-center justify-between bg-white border border-green-200 p-2 rounded-lg"
-                                                            x-data="{ editPrice: false }">
-                                                            <div class="flex flex-col w-full pr-4">
-                                                                <span
-                                                                    class="font-bold text-gray-800">{{ $slot->vendor_name }}</span>
-                                                                @php
-                                                                    $selectedPkg = collect(
-                                                                        $vendorPackages[$slot->vendor_id] ?? [],
-                                                                    )->firstWhere('id', $slot->vendor_package_id);
-                                                                    $baseCost =
-                                                                        $slot->is_included &&
-                                                                        isset($baseCosts[$slot->vendor_category_id])
-                                                                            ? $baseCosts[$slot->vendor_category_id]
-                                                                            : 0;
-
-                                                                    $currentDealPrice =
-                                                                        $slot->deal_price > 0
-                                                                            ? $slot->deal_price
-                                                                            : $selectedPkg->price ?? 0;
-                                                                    $upgradeFee = max(0, $currentDealPrice - $baseCost);
-                                                                @endphp
-                                                                <span
-                                                                    class="text-[11px] text-gray-600">{{ $selectedPkg->name ?? 'Package Selected' }}</span>
-
-                                                                <div x-show="!editPrice"
-                                                                    class="flex items-center gap-2 mt-0.5">
+                                                        @php
+                                                            $selectedPkg = collect($vendorPackages[$slot->vendor_id] ?? [])->firstWhere('id', $slot->vendor_package_id);
+                                                            $baseCost = $slot->is_included && isset($baseCosts[$slot->vendor_category_id]) ? $baseCosts[$slot->vendor_category_id] : 0;
+                                                            $currentDealPrice = $slot->deal_price > 0 ? $slot->deal_price : ($selectedPkg->price ?? 0);
+                                                            $currentNetPrice = $slot->net_price > 0 ? $slot->net_price : ($selectedPkg->net_price ?? 0);
+                                                            $profit = $currentDealPrice - $currentNetPrice;
+                                                            $upgradeFee = max(0, $currentDealPrice - $baseCost);
+                                                        @endphp
+                                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white border border-gray-200 p-3 rounded-xl shadow-sm gap-3">
+                                                            <div class="flex flex-col">
+                                                                <span class="font-bold text-gray-900">{{ $slot->vendor_name }}</span>
+                                                                <span class="text-[11px] text-gray-500 font-medium">{{ $selectedPkg->name ?? 'Package Selected' }}</span>
+                                                                <div class="flex items-center gap-2 mt-1.5">
+                                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md {{ $profit >= 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                                                                        Margin: Rp {{ number_format($profit, 0, ',', '.') }}
+                                                                    </span>
                                                                     @if ($upgradeFee > 0)
-                                                                        <span
-                                                                            class="text-[10px] font-bold text-red-500">Upgrade
-                                                                            +Rp
-                                                                            {{ number_format($upgradeFee, 0, ',', '.') }}</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="text-[10px] font-bold text-green-600">Standard
-                                                                            (No Add. Fee)</span>
+                                                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 border border-orange-200">
+                                                                            Upgrade: +Rp {{ number_format($upgradeFee, 0, ',', '.') }}
+                                                                        </span>
                                                                     @endif
-                                                                    <span
-                                                                        class="text-[10px] text-gray-500 border-l border-gray-300 pl-2">Deal:
-                                                                        Rp
-                                                                        {{ number_format($currentDealPrice, 0, ',', '.') }}</span>
-                                                                    <button @click="editPrice = true"
-                                                                        class="text-blue-500 hover:text-blue-700 ml-1"
-                                                                        title="Edit Deal Price">
-                                                                        <svg class="w-3 h-3 inline" fill="none"
-                                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round"
-                                                                                stroke-linejoin="round" stroke-width="2"
-                                                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                                                            </path>
-                                                                        </svg>
-                                                                    </button>
                                                                 </div>
-
-                                                                <form x-show="editPrice"
-                                                                    action="{{ route($user->role . '.events.slots.price', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                                    method="POST" class="flex items-center gap-2 mt-1"
-                                                                    x-cloak>
-                                                                    @csrf @method('PUT')
-                                                                    <div class="relative w-full max-w-[150px]">
-                                                                        <span
-                                                                            class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold">Rp</span>
-                                                                        <input type="number" name="deal_price"
-                                                                            value="{{ round($currentDealPrice) }}"
-                                                                            required min="0"
-                                                                            class="w-full pl-6 pr-2 py-1 border border-gray-300 rounded text-[10px] focus:ring-blue-500 focus:border-blue-500 font-semibold">
-                                                                    </div>
-                                                                    <button type="submit"
-                                                                        class="bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold px-2 py-1 transition-colors">Save</button>
-                                                                    <button type="button" @click="editPrice = false"
-                                                                        class="text-gray-500 hover:text-gray-700 text-[10px] px-1 font-semibold">Cancel</button>
-                                                                </form>
                                                             </div>
-                                                            <div class="flex items-center divide-x divide-gray-300">
-                                                                <form
-                                                                    action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}"
-                                                                    method="POST">
+                                                            <div class="flex items-center gap-2">
+                                                                <button @click="$dispatch('open-price-modal', { slot_id: '{{ $slot->id }}', vendor_name: @js($slot->vendor_name), package_name: @js($selectedPkg->name ?? ''), base_cost: {{ $baseCost }}, net_price: {{ round($currentNetPrice) }}, deal_price: {{ round($currentDealPrice) }} })" class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors shadow-sm" title="Manage Pricing">
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                                    Pricing
+                                                                </button>
+                                                                <form action="{{ route($user->role . '.events.slots.remove', ['event' => $event->id, 'slot' => $slot->id]) }}" method="POST" class="inline">
                                                                     @csrf @method('PUT')
-                                                                    <button type="submit"
-                                                                        class="text-orange-500 hover:text-orange-700 text-xs font-bold px-2">Unassign</button>
+                                                                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg transition-colors shadow-sm" title="Unassign Vendor">
+                                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                                        Remove
+                                                                    </button>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -556,8 +555,80 @@
         </div>
     </div>
 
+    <div x-data="{
+            isOpen: false,
+            form: { slot_id: '', vendor_name: '', package_name: '', base_cost: 0, net_price: 0, deal_price: 0 }
+        }"
+        @open-price-modal.window="form = $event.detail; isOpen = true;"
+        x-show="isOpen"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto" style="display: none;" x-cloak>
+        <div class="relative w-full max-w-md bg-white rounded-xl shadow-2xl my-8" @click.away="isOpen = false">
+            <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900" x-text="form.vendor_name"></h3>
+                    <p class="text-xs font-medium text-gray-500 mt-0.5" x-text="form.package_name"></p>
+                </div>
+                <button @click="isOpen = false" class="text-gray-400 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form :action="'{{ url('/' . $user->role . '/events/' . $event->id . '/slots') }}/' + form.slot_id + '/price'" method="POST">
+                @csrf @method('PUT')
+                <div class="p-6 space-y-5">
+
+                    <div class="flex items-center justify-between p-4 rounded-lg border border-blue-100" :class="(form.deal_price - form.net_price) >= 0 ? 'bg-blue-50' : 'bg-red-50 border-red-100'">
+                        <span class="text-xs font-bold uppercase tracking-wider" :class="(form.deal_price - form.net_price) >= 0 ? 'text-blue-800' : 'text-red-800'">Margin / Profit</span>
+                        <span class="text-lg font-black" :class="(form.deal_price - form.net_price) >= 0 ? 'text-green-600' : 'text-red-600'" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(form.deal_price - form.net_price)"></span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Net Price (Modal Vendor)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
+                                <input type="number" name="net_price" x-model.number="form.net_price" required min="0" class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Deal Price (Harga Jual)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
+                                <input type="number" name="deal_price" x-model.number="form.deal_price" required min="0" class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 font-semibold bg-gray-50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <template x-if="form.base_cost > 0 && form.deal_price > form.base_cost">
+                        <div class="mt-4 text-[11px] text-orange-700 font-semibold bg-orange-50 p-3 rounded-lg border border-orange-100 flex gap-2 items-start">
+                            <svg class="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Client upgraded vendor. Additional fee to client: <strong>+Rp <span x-text="new Intl.NumberFormat('id-ID').format(form.deal_price - form.base_cost)"></span></strong></span>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
+                    <button type="button" @click="isOpen = false" class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Save Pricing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let scrollpos = localStorage.getItem('manageEventScroll');
+            if (scrollpos) {
+                window.scrollTo(0, parseInt(scrollpos));
+                localStorage.removeItem('manageEventScroll');
+            }
+        });
+
+        window.addEventListener("beforeunload", function() {
+            localStorage.setItem('manageEventScroll', window.scrollY);
+        });
+
         function confirmDelete(button) {
             const formId = button.getAttribute('data-form-id');
             Swal.fire({

@@ -12,6 +12,7 @@ class WeddingPackage extends Model
     protected $fillable = [
         'name',
         'base_price',
+        'eo_fee',
         'is_active'
     ];
 

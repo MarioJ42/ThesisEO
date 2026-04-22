@@ -99,6 +99,7 @@ class EventController extends Controller
                     'is_included' => $template->is_included,
                     'status' => 'unassigned',
                     'deal_price' => 0,
+                    'net_price' => 0,
                     'meal_crew' => 0,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -272,6 +273,7 @@ class EventController extends Controller
             'is_included' => false,
             'status' => 'unassigned',
             'deal_price' => 0,
+            'net_price' => 0,
             'meal_crew' => 0,
             'created_at' => now(),
             'updated_at' => now(),
@@ -319,6 +321,7 @@ class EventController extends Controller
                 ->update([
                     'vendor_package_id' => $package->id,
                     'deal_price' => $package->price,
+                    'net_price' => $package->net_price,
                 ]);
 
             return redirect()->back()->with('success', 'Package successfully assigned!');
@@ -338,6 +341,7 @@ class EventController extends Controller
                 'vendor_package_id' => null,
                 'status' => 'unassigned',
                 'deal_price' => 0,
+                'net_price' => 0,
                 'meal_crew' => 0
             ]);
 
@@ -381,6 +385,7 @@ class EventController extends Controller
     {
         $request->validate([
             'deal_price' => 'required|numeric|min:0',
+            'net_price' => 'required|numeric|min:0',
         ]);
 
         DB::table('event_vendor')
@@ -388,6 +393,7 @@ class EventController extends Controller
             ->where('event_id', $event->id)
             ->update([
                 'deal_price' => $request->deal_price,
+                'net_price' => $request->net_price,
             ]);
 
         return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
@@ -414,6 +420,7 @@ class EventController extends Controller
             'vendor_package_id' => $request->package_id,
             'session' => $request->session,
             'deal_price' => $package ? $package->price : 0,
+            'net_price' => $package ? $package->net_price : 0,
             'is_included' => 0,
             'status' => 'reviewing',
             'role_detail' => '-',
