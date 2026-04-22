@@ -437,7 +437,7 @@ class EventController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
-            'status' => 'required|in:attending,not_attending',
+            'status' => 'required|in:pending,attending,not_attending,checked_in',
         ]);
 
         $token = Str::random(10);
@@ -467,7 +467,7 @@ class EventController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
-            'status' => 'required|in:attending,not_attending,checked_in',
+            'status' => 'required|in:pending,attending,not_attending,checked_in',
         ]);
 
         DB::table('guests')->where('id', $guestId)->where('event_id', $event->id)->update([

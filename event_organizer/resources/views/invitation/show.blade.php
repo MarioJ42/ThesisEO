@@ -28,7 +28,7 @@
 
 <body class="bg-[#0b1121] text-white antialiased overflow-x-hidden">
 
-    <div x-data="{ isOpen: false }">
+    <div x-data="{ isOpen: {{ $guest->status !== 'pending' ? 'true' : 'false' }} }">
 
         <section x-show="!isOpen" x-transition.opacity.duration.800ms
             class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b1121] text-center p-6">
@@ -98,11 +98,6 @@
                         </div>
                     @elseif($guest->status === 'not_attending')
                         <div class="py-6">
-                            <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
                             <h3 class="font-bold text-lg mb-2">Confirmation Received</h3>
                             <p class="text-gray-500 text-sm">Thank you for your confirmation. We are sorry you cannot
                                 attend the event.</p>

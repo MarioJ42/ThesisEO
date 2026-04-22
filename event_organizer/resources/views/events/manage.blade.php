@@ -655,11 +655,9 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <h3 class="text-lg font-bold text-gray-900">Guestbook & RSVP</h3>
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <form action="{{ route($user->role . '.events.guests.blast', $event->id) }}" method="POST"
-                            class="flex-1 sm:flex-none m-0"
-                            onsubmit="return confirm('Are you sure you want to blast WhatsApp reminders to all attending guests? This process will run in the background.')">
+                        <form id="blastWaForm" action="{{ route($user->role . '.events.guests.blast', $event->id) }}" method="POST" class="flex-1 sm:flex-none m-0">
                             @csrf
-                            <button type="submit"
+                            <button type="button" onclick="confirmBlastWA()"
                                 class="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -755,7 +753,8 @@
                                                 class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border
                                                 @if ($guest->status === 'attending') bg-emerald-50 text-emerald-700 border-emerald-200
                                                 @elseif($guest->status === 'not_attending') bg-red-50 text-red-700 border-red-200
-                                                @elseif($guest->status === 'checked_in') bg-blue-50 text-blue-700 border-blue-200 @endif">
+                                                @elseif($guest->status === 'checked_in') bg-blue-50 text-blue-700 border-blue-200
+                                                @elseif($guest->status === 'pending') bg-gray-50 text-gray-700 border-gray-200 @endif">
                                                 {{ str_replace('_', ' ', $guest->status) }}
                                             </span>
                                         </td>
@@ -776,7 +775,7 @@
                                                     <button type="button"
                                                         data-form-id="delete-guest-{{ $guest->id }}"
                                                         onclick="confirmDelete(this)"
-                                                        class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Del</button>
+                                                        class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Delete</button>
                                                 </form>
                                             </div>
                                         </td>
@@ -845,7 +844,7 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Net
-                                    Price (Modal Vendor)</label>
+                                    Price</label>
                                 <div class="relative">
                                     <span
                                         class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
@@ -856,7 +855,7 @@
                             </div>
                             <div>
                                 <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Deal
-                                    Price (Harga Jual)</label>
+                                    Price</label>
                                 <div class="relative">
                                     <span
                                         class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-bold">Rp</span>
@@ -936,14 +935,12 @@
                             </div>
                         </div>
                         <div>
-                            <label
-                                class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
-                            <select name="status" x-model="guestForm.status"
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
+                            <select name="status"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
                                 <option value="pending">Pending</option>
                                 <option value="attending">Attending</option>
                                 <option value="not_attending">Not Attending</option>
-                                <option value="checked_in">Checked In</option>
                             </select>
                         </div>
                     </div>
@@ -1005,10 +1002,10 @@
                             </div>
                         </div>
                         <div>
-                            <label
-                                class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
                             <select name="status" x-model="guestForm.status"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
+                                <option value="pending">Pending</option>
                                 <option value="attending">Attending</option>
                                 <option value="not_attending">Not Attending</option>
                                 <option value="checked_in">Checked In</option>
@@ -1064,7 +1061,7 @@
             function confirmBlastWA() {
                 Swal.fire({
                     title: 'Blast WA Reminders?',
-                    text: "Pesan pengingat akan dikirimkan ke semua tamu yang berstatus 'Attending'. Proses ini akan berjalan di latar belakang (Background Job).",
+                    text: "Reminder messages will be sent to all guests with 'Attending' status. This process will run in the background (Background Job).",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#10b981',
@@ -1083,7 +1080,7 @@
 
                         Swal.fire({
                             title: 'Processing...',
-                            text: 'Memasukkan data ke dalam antrean (Queue)...',
+                            text: 'Inserting data into the queue...',
                             allowOutsideClick: false,
                             didOpen: () => {
                                 Swal.showLoading();
