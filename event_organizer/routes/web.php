@@ -8,6 +8,7 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\PublicInvitationController;
 use App\Http\Controllers\CrewRsvpController;
+use App\Http\Controllers\CrewController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
@@ -122,6 +123,10 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('owner.events.guests.destroy');
     Route::post('/events/{event}/guests/blast', [EventController::class, 'blastWaReminders'])->name('owner.events.guests.blast');
 
+    Route::post('/events/{event}/crew/generate', [EventController::class, 'generateCrewSlots'])->name('owner.events.crew.generate');
+    Route::put('/events/{event}/crew/{slot}/approve', [EventController::class, 'approveCrew'])->name('owner.events.crew.approve');
+    Route::put('/events/{event}/crew/{slot}/reject', [EventController::class, 'rejectCrew'])->name('owner.events.crew.reject');
+
     Route::get('/event-packages', [OwnerController::class, 'weddingPackages'])->name('owner.wedding_packages');
     Route::post('/event-packages', [OwnerController::class, 'storeWeddingPackage'])->name('owner.wedding_packages.store');
     Route::put('/event-packages/{package}', [OwnerController::class, 'updateWeddingPackage'])->name('owner.wedding_packages.update');
@@ -156,18 +161,15 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('pl.events.guests.update');
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('pl.events.guests.destroy');
     Route::post('/events/{event}/guests/blast', [EventController::class, 'blastWaReminders'])->name('pl.events.guests.blast');
+
+    Route::post('/events/{event}/crew/generate', [EventController::class, 'generateCrewSlots'])->name('pl.events.crew.generate');
+    Route::put('/events/{event}/crew/{slot}/approve', [EventController::class, 'approveCrew'])->name('pl.events.crew.approve');
+    Route::put('/events/{event}/crew/{slot}/reject', [EventController::class, 'rejectCrew'])->name('pl.events.crew.reject');
 });
 
 Route::middleware(['auth'])->prefix('crew')->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'crew_eo') {
-            return redirect('/');
-        }
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $events = $user->assignedEvents()->whereIn('status', ['planning', 'ongoing'])->get();
-        return view('crew.dashboard', compact('events'));
-    })->name('crew.dashboard');
+    Route::get('/dashboard', [CrewController::class, 'dashboard'])->name('crew.dashboard');
+    Route::post('/apply/{slot}', [CrewController::class, 'applyJob'])->name('crew.jobs.apply');
 
     Route::prefix('events/{event}/rsvp')->group(function () {
         Route::get('/', [CrewRsvpController::class, 'hub'])->name('crew.rsvp.hub');

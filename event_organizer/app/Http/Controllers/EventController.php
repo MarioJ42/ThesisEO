@@ -213,7 +213,20 @@ class EventController extends Controller
 
         $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
 
-        if ($user->role === 'klien') {
+        // ... (kode sebelumnya) ...
+        $vendorPackages = DB::table('vendor_packages')->whereIn('vendor_id', $assignedVendorIds)->get()->groupBy('vendor_id');
+        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
+
+        // TAMBAHKAN INI UNTUK CREW MANAGEMENT
+        $crewSlots = DB::table('event_crew')
+            ->leftJoin('users', 'event_crew.user_id', '=', 'users.id')
+            ->where('event_crew.event_id', $event->id)
+            ->select('event_crew.*', 'users.name as crew_name', 'users.phone as crew_phone')
+            ->orderBy('event_crew.session')
+            ->orderBy('event_crew.id')
+            ->get();
+
+            if ($user->role === 'klien') {
             $hiddenCategories = [
                 'Robe & Veil',
                 'Tie',
@@ -256,7 +269,8 @@ class EventController extends Controller
             'vendorContacts',
             'vendorPackages',
             'baseCosts',
-            'guests'
+            'guests',
+            'crewSlots'
         ));
     }
 
@@ -544,5 +558,42 @@ class EventController extends Controller
         return redirect()->back()
             ->with('success', "Success! $count messages have been queued and will be sent gradually.")
             ->with('active_tab', 'rsvp');
+    }
+
+    public function generateCrewSlots(Event $event)
+    {
+        $morningJobs = ['PL', 'Groom', 'Bride', 'Family Groom', 'Family Bride', 'Runner', 'Gereja', 'Loading', 'Bridesmaid', 'Groomsman', 'Runner VIP Family Groom', 'Runner VIP Family Bride'];
+        $receptionJobs = ['VIP', 'Family Groom', 'Family Bride', 'MC', 'MD', 'Lighting', 'Band', 'Effect', 'Banquet', 'Usherettes', 'Leader Area', 'Area 1', 'Area 2', 'FD 1', 'FD 2', 'Teapai', 'Area 3', 'Area 4', 'Area 5', 'Banquet 2', 'Banquet 3', 'Stall 1', 'Stall 2', 'Stall 3', 'Stall 4', 'Entertainment', 'Guest Star'];
+
+        $slots = [];
+        foreach ($morningJobs as $job) {
+            $slots[] = ['event_id' => $event->id, 'user_id' => null, 'jobdesk' => $job, 'session' => 'morning', 'assignment_status' => 'vacant', 'created_at' => now(), 'updated_at' => now()];
+        }
+        foreach ($receptionJobs as $job) {
+            $slots[] = ['event_id' => $event->id, 'user_id' => null, 'jobdesk' => $job, 'session' => 'reception', 'assignment_status' => 'vacant', 'created_at' => now(), 'updated_at' => now()];
+        }
+        DB::table('event_crew')->insert($slots);
+        return redirect()->back()->with('success', 'Template Jobdesk successfully generated!')->with('active_tab', 'crew');
+    }
+
+    public function approveCrew(Request $request, Event $event, $slotId)
+    {
+        DB::table('event_crew')->where('id', $slotId)->update([
+            'fee' => $request->fee ?? 0,
+            'assignment_status' => 'approved',
+            'updated_at' => now()
+        ]);
+        return redirect()->back()->with('success', 'Crew approved & assigned!')->with('active_tab', 'crew');
+    }
+
+    public function rejectCrew(Event $event, $slotId)
+    {
+        DB::table('event_crew')->where('id', $slotId)->update([
+            'user_id' => null,
+            'fee' => 0,
+            'assignment_status' => 'vacant',
+            'updated_at' => now()
+        ]);
+        return redirect()->back()->with('error', 'Crew removed/rejected. Slot is vacant again.')->with('active_tab', 'crew');
     }
 }
