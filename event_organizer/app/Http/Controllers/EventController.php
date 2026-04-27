@@ -213,20 +213,27 @@ class EventController extends Controller
 
         $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
 
-        // ... (kode sebelumnya) ...
         $vendorPackages = DB::table('vendor_packages')->whereIn('vendor_id', $assignedVendorIds)->get()->groupBy('vendor_id');
         $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
 
-        // TAMBAHKAN INI UNTUK CREW MANAGEMENT
         $crewSlots = DB::table('event_crew')
             ->leftJoin('users', 'event_crew.user_id', '=', 'users.id')
             ->where('event_crew.event_id', $event->id)
+            ->whereNotNull('event_crew.jobdesk')
             ->select('event_crew.*', 'users.name as crew_name', 'users.phone as crew_phone')
             ->orderBy('event_crew.session')
             ->orderBy('event_crew.id')
             ->get();
 
-            if ($user->role === 'klien') {
+        $applicants = DB::table('event_crew')
+            ->join('users', 'event_crew.user_id', '=', 'users.id')
+            ->where('event_crew.event_id', $event->id)
+            ->whereIn('event_crew.status', ['Requested', 'Verified'])
+            ->select('users.id as user_id', 'users.name', 'users.phone')
+            ->distinct()
+            ->get();
+
+        if ($user->role === 'klien') {
             $hiddenCategories = [
                 'Robe & Veil',
                 'Tie',
@@ -270,7 +277,8 @@ class EventController extends Controller
             'vendorPackages',
             'baseCosts',
             'guests',
-            'crewSlots'
+            'crewSlots',
+            'applicants'
         ));
     }
 
@@ -594,12 +602,25 @@ class EventController extends Controller
 
     public function approveCrew(Request $request, Event $event, $slotId)
     {
+        $request->validate([
+            'fee' => 'required|numeric',
+            'user_id' => 'required|exists:users,id'
+        ]);
+
         DB::table('event_crew')->where('id', $slotId)->update([
-            'fee' => $request->fee ?? 0,
+            'user_id' => $request->user_id,
+            'fee' => $request->fee,
             'status' => 'Verified',
             'updated_at' => now()
         ]);
-        return redirect()->back()->with('success', 'Crew approved & assigned!')->with('active_tab', 'crew');
+
+        DB::table('event_crew')
+            ->where('event_id', $event->id)
+            ->where('user_id', $request->user_id)
+            ->where('status', 'Requested')
+            ->delete();
+
+        return redirect()->back()->with('success', 'Crew successfully assigned to Jobdesk!')->with('active_tab', 'crew');
     }
 
     public function rejectCrew(Event $event, $slotId)
@@ -612,7 +633,7 @@ class EventController extends Controller
         ]);
         return redirect()->back()->with('error', 'Crew removed/rejected. Slot is vacant again.')->with('active_tab', 'crew');
     }
-    // Tambahkan di bagian paling bawah file EventController.php
+
     public function addCustomCrewSlot(Request $request, Event $event)
     {
         $request->validate([
@@ -633,6 +654,7 @@ class EventController extends Controller
 
         return redirect()->back()->with('success', 'Custom Jobdesk successfully added!')->with('active_tab', 'crew');
     }
+
     public function deleteCrewSlot(Event $event, $slotId)
     {
         DB::table('event_crew')

@@ -173,7 +173,7 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
 
 Route::middleware(['auth'])->prefix('crew')->group(function () {
     Route::get('/dashboard', [CrewController::class, 'dashboard'])->name('crew.dashboard');
-    Route::post('/apply/{slot}', [CrewController::class, 'applyJob'])->name('crew.jobs.apply');
+    Route::post('/apply/{event}', [CrewController::class, 'applyEvent'])->name('crew.jobs.apply');
 
     Route::prefix('events/{event}/rsvp')->group(function () {
         Route::get('/', [CrewRsvpController::class, 'hub'])->name('crew.rsvp.hub');

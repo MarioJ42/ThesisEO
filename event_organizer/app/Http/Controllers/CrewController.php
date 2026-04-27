@@ -29,34 +29,32 @@ class CrewController extends Controller
             ->orderBy('events.event_date', 'asc')
             ->get();
 
-        $vacantSlots = DB::table('event_crew')
-            ->join('events', 'event_crew.event_id', '=', 'events.id')
-            ->where('event_crew.status', 'Vacant')
-            ->whereIn('events.status', ['planning', 'ongoing'])
-            ->where('events.event_date', '>=', Carbon::now()->toDateString())
-            ->where('events.event_date', '<=', Carbon::now()->addDays(14)->toDateString())
-            ->select('event_crew.*', 'events.title', 'events.event_date')
-            ->orderBy('events.event_date', 'asc')
+        $availableEvents = DB::table('events')
+            ->whereIn('status', ['planning', 'ongoing'])
+            ->where('event_date', '>=', Carbon::now()->toDateString())
+            ->where('event_date', '<=', Carbon::now()->addDays(14)->toDateString())
+            ->whereNotIn('id', function ($query) use ($user) {
+                $query->select('event_id')->from('event_crew')->where('user_id', $user->id);
+            })
+            ->orderBy('event_date', 'asc')
             ->get();
 
-        return view('crew.dashboard', compact('myEvents', 'pendingRequests', 'vacantSlots'));
+        return view('crew.dashboard', compact('myEvents', 'pendingRequests', 'availableEvents'));
     }
 
-    public function applyJob(Request $request, $slotId)
+    public function applyEvent(Request $request, $eventId)
     {
-        $updated = DB::table('event_crew')
-            ->where('id', $slotId)
-            ->where('status', 'Vacant')
-            ->update([
-                'user_id' => Auth::id(),
-                'status' => 'Requested',
-                'updated_at' => now()
-            ]);
+        DB::table('event_crew')->insert([
+            'event_id' => $eventId,
+            'user_id' => Auth::id(),
+            'jobdesk' => null,
+            'session' => 'reception',
+            'status' => 'Requested',
+            'fee' => 0,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
 
-        if ($updated) {
-            return redirect()->back()->with('success', 'Application sent successfully! Please wait for PL approval.');
-        }
-
-        return redirect()->back()->with('error', 'Sorry, this slot has already been taken by someone else.');
+        return redirect()->back()->with('success', 'Application sent successfully! Please wait for PL assignment.');
     }
 }
