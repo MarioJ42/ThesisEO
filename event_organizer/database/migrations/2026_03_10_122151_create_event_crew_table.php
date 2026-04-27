@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('jobdesk')->nullable();
             $table->string('session')->default('reception');
             $table->decimal('fee', 15, 2)->default(0);
-            $table->enum('status', ['Vacant', 'Waiting', 'Verified', 'Rejected'])->default('Vacant');
+            $table->enum('status', ['Vacant', 'Requested', 'Verified', 'Rejected'])->default('Vacant');
             $table->timestamps();
         });
     }

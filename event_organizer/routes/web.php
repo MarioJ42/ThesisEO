@@ -135,7 +135,9 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::delete('/event-packages/{package}/template/{template}', [OwnerController::class, 'destroyPackageTemplate'])->name('owner.wedding_packages.template.destroy');
     Route::put('/event-packages/{package}/template/{template}/assign', [OwnerController::class, 'assignVendorToTemplate'])->name('owner.wedding_packages.template.assign');
     Route::put('/event-packages/{package}/price', [OwnerController::class, 'updatePackagePrice'])->name('owner.wedding_packages.price.update');
-});
+    Route::post('/events/{event}/crew/add-custom-job', [EventController::class, 'addCustomCrewSlot'])->name('owner.events.crew.add_custom_job');
+    Route::delete('/events/{event}/crew/{slot}/delete', [EventController::class, 'deleteCrewSlot'])->name('owner.events.crew.delete');
+    });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::get('/dashboard', function () {
@@ -165,6 +167,8 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::post('/events/{event}/crew/generate', [EventController::class, 'generateCrewSlots'])->name('pl.events.crew.generate');
     Route::put('/events/{event}/crew/{slot}/approve', [EventController::class, 'approveCrew'])->name('pl.events.crew.approve');
     Route::put('/events/{event}/crew/{slot}/reject', [EventController::class, 'rejectCrew'])->name('pl.events.crew.reject');
+    Route::post('/events/{event}/crew/add-custom-job', [EventController::class, 'addCustomCrewSlot'])->name('pl.events.crew.add_custom_job');
+    Route::delete('/events/{event}/crew/{slot}/delete', [EventController::class, 'deleteCrewSlot'])->name('pl.events.crew.delete');
 });
 
 Route::middleware(['auth'])->prefix('crew')->group(function () {

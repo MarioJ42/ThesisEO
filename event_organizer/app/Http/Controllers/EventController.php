@@ -562,15 +562,31 @@ class EventController extends Controller
 
     public function generateCrewSlots(Event $event)
     {
-        $morningJobs = ['PL', 'Groom', 'Bride', 'Family Groom', 'Family Bride', 'Runner', 'Gereja', 'Loading', 'Bridesmaid', 'Groomsman', 'Runner VIP Family Groom', 'Runner VIP Family Bride'];
-        $receptionJobs = ['VIP', 'Family Groom', 'Family Bride', 'MC', 'MD', 'Lighting', 'Band', 'Effect', 'Banquet', 'Usherettes', 'Leader Area', 'Area 1', 'Area 2', 'FD 1', 'FD 2', 'Teapai', 'Area 3', 'Area 4', 'Area 5', 'Banquet 2', 'Banquet 3', 'Stall 1', 'Stall 2', 'Stall 3', 'Stall 4', 'Entertainment', 'Guest Star'];
+        $morningJobs = ['PL', 'Groom', 'Bride', 'Family Groom', 'Family Bride', 'Runner', 'Gereja', 'Loading', 'Bridesmaid', 'Groomsman'];
+        $receptionJobs = ['VIP', 'Family Groom', 'Family Bride', 'MC', 'MD', 'Lighting', 'Band', 'Effect', 'Banquet', 'Usherettes', 'Leader Area', 'Area 1', 'Area 2', 'FD 1', 'FD 2', 'Teapai'];
 
         $slots = [];
         foreach ($morningJobs as $job) {
-            $slots[] = ['event_id' => $event->id, 'user_id' => null, 'jobdesk' => $job, 'session' => 'morning', 'assignment_status' => 'vacant', 'created_at' => now(), 'updated_at' => now()];
+            $slots[] = [
+                'event_id' => $event->id,
+                'user_id' => null,
+                'jobdesk' => $job,
+                'session' => 'morning',
+                'status' => 'Vacant',
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
         }
         foreach ($receptionJobs as $job) {
-            $slots[] = ['event_id' => $event->id, 'user_id' => null, 'jobdesk' => $job, 'session' => 'reception', 'assignment_status' => 'vacant', 'created_at' => now(), 'updated_at' => now()];
+            $slots[] = [
+                'event_id' => $event->id,
+                'user_id' => null,
+                'jobdesk' => $job,
+                'session' => 'reception',
+                'status' => 'Vacant',
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
         }
         DB::table('event_crew')->insert($slots);
         return redirect()->back()->with('success', 'Template Jobdesk successfully generated!')->with('active_tab', 'crew');
@@ -580,7 +596,7 @@ class EventController extends Controller
     {
         DB::table('event_crew')->where('id', $slotId)->update([
             'fee' => $request->fee ?? 0,
-            'assignment_status' => 'approved',
+            'status' => 'Verified',
             'updated_at' => now()
         ]);
         return redirect()->back()->with('success', 'Crew approved & assigned!')->with('active_tab', 'crew');
@@ -591,9 +607,39 @@ class EventController extends Controller
         DB::table('event_crew')->where('id', $slotId)->update([
             'user_id' => null,
             'fee' => 0,
-            'assignment_status' => 'vacant',
+            'status' => 'Vacant',
             'updated_at' => now()
         ]);
         return redirect()->back()->with('error', 'Crew removed/rejected. Slot is vacant again.')->with('active_tab', 'crew');
+    }
+    // Tambahkan di bagian paling bawah file EventController.php
+    public function addCustomCrewSlot(Request $request, Event $event)
+    {
+        $request->validate([
+            'jobdesk' => 'required|string|max:255',
+            'session' => 'required|in:morning,reception'
+        ]);
+
+        DB::table('event_crew')->insert([
+            'event_id' => $event->id,
+            'user_id' => null,
+            'jobdesk' => $request->jobdesk,
+            'session' => $request->session,
+            'status' => 'Vacant',
+            'fee' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Custom Jobdesk successfully added!')->with('active_tab', 'crew');
+    }
+    public function deleteCrewSlot(Event $event, $slotId)
+    {
+        DB::table('event_crew')
+            ->where('id', $slotId)
+            ->where('event_id', $event->id)
+            ->delete();
+
+        return redirect()->back()->with('success', 'Jobdesk slot completely deleted!')->with('active_tab', 'crew');
     }
 }

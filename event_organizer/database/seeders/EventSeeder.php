@@ -14,7 +14,7 @@ class EventSeeder extends Seeder
             'pl_id' => 2,
             'package_id' => 3,
             'title' => 'Wedding of Yoshua & Jessica',
-            'event_date' => '2026-05-18',
+            'event_date' => '2026-05-05',
             'status' => 'planning',
             'created_at' => now(),
             'updated_at' => now(),
