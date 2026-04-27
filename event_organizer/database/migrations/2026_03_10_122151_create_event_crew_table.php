@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('jobdesk')->nullable();
+            $table->decimal('fee', 15, 2)->default(0);
+            $table->enum('assignment_status', ['requested', 'approved', 'rejected'])->default('requested');
             $table->timestamps();
         });
     }

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Client\PaymentController;
+use App\Http\Controllers\PublicInvitationController;
+use App\Http\Controllers\CrewRsvpController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
@@ -16,6 +18,8 @@ Route::get('/', function () {
             return redirect()->route('owner.dashboard');
         } elseif (Auth::user()->role === 'pl') {
             return redirect()->route('pl.dashboard');
+        } elseif (Auth::user()->role === 'crew_eo') {
+            return redirect()->route('crew.dashboard');
         }
     }
 
@@ -35,6 +39,8 @@ Route::get('/vendor', function () {
             return redirect()->route('owner.dashboard');
         } elseif (Auth::user()->role === 'pl') {
             return redirect()->route('pl.dashboard');
+        } elseif (Auth::user()->role === 'crew_eo') {
+            return redirect()->route('crew.dashboard');
         }
     }
 
@@ -53,6 +59,7 @@ Route::get('/vendor/{id}/detail', function ($id) {
     if (Auth::check()) {
         if (Auth::user()->role === 'owner') return redirect()->route('owner.dashboard');
         if (Auth::user()->role === 'pl') return redirect()->route('pl.dashboard');
+        if (Auth::user()->role === 'crew_eo') return redirect()->route('crew.dashboard');
     }
 
     $vendor = \App\Models\Vendor::with(['categories', 'packages', 'portfolios'])->findOrFail($id);
@@ -149,7 +156,27 @@ Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::put('/events/{event}/guests/{guest}', [EventController::class, 'updateGuest'])->name('pl.events.guests.update');
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('pl.events.guests.destroy');
     Route::post('/events/{event}/guests/blast', [EventController::class, 'blastWaReminders'])->name('pl.events.guests.blast');
+});
+
+Route::middleware(['auth'])->prefix('crew')->group(function () {
+    Route::get('/dashboard', function () {
+        if (Auth::user()->role !== 'crew_eo') {
+            return redirect('/');
+        }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $events = $user->assignedEvents()->whereIn('status', ['planning', 'ongoing'])->get();
+        return view('crew.dashboard', compact('events'));
+    })->name('crew.dashboard');
+
+    Route::prefix('events/{event}/rsvp')->group(function () {
+        Route::get('/', [CrewRsvpController::class, 'hub'])->name('crew.rsvp.hub');
+        Route::get('/scan', [CrewRsvpController::class, 'scan'])->name('crew.rsvp.scan');
+        Route::get('/search', [CrewRsvpController::class, 'search'])->name('crew.rsvp.search');
+        Route::get('/checkin/{token}', [CrewRsvpController::class, 'checkInForm'])->name('crew.rsvp.checkin.form');
+        Route::post('/checkin/{guest}', [CrewRsvpController::class, 'processCheckIn'])->name('crew.rsvp.checkin.process');
     });
+});
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('client.events.index');
@@ -174,9 +201,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::post('/midtrans/callback', [\App\Http\Controllers\Client\PaymentController::class, 'callback'])->name('midtrans.callback');
-
-Route::get('/invitation/{token}', [App\Http\Controllers\PublicInvitationController::class, 'show'])->name('invitation.show');
-Route::post('/invitation/{token}/rsvp', [App\Http\Controllers\PublicInvitationController::class, 'rsvp'])->name('invitation.rsvp');
+Route::post('/midtrans/callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
+Route::get('/invitation/{token}', [PublicInvitationController::class, 'show'])->name('invitation.show');
+Route::post('/invitation/{token}/rsvp', [PublicInvitationController::class, 'rsvp'])->name('invitation.rsvp');
 
 require __DIR__ . '/auth.php';

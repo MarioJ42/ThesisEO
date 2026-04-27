@@ -41,4 +41,9 @@ class Event extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function crews()
+    {
+        return $this->belongsToMany(User::class, 'event_crew')->withPivot('jobdesk')->withTimestamps();
+    }
 }

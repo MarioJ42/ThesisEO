@@ -51,7 +51,7 @@ class UserSeeder extends Seeder
                 'name' => 'Kezia',
                 'email' => 'k@k.com',
                 'phone' => '081234567890',
-                'role' => 'crew_rsvp',
+                'role' => 'crew_eo',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()
