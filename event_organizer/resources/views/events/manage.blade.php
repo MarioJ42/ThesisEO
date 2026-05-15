@@ -167,6 +167,7 @@
                     confirmButtonText: 'Yes, Blast Now!',
                     cancelButtonText: 'Cancel',
                     reverseButtons: true,
+                    heightAuto: false,
                     customClass: {
                         popup: 'rounded-3xl',
                         confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
@@ -180,6 +181,7 @@
                             title: 'Processing...',
                             text: 'Inserting data into the queue...',
                             allowOutsideClick: false,
+                            heightAuto: false,
                             didOpen: () => {
                                 Swal.showLoading();
                             }
