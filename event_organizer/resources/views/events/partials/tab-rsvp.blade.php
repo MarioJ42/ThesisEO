@@ -66,24 +66,12 @@
             <table class="min-w-full w-full whitespace-nowrap">
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr>
-                        <th
-                            class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Guest Name</th>
-                        <th
-                            class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Contact</th>
-                        <th
-                            class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Pax</th>
-                        <th
-                            class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Table</th>
-                        <th
-                            class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Status</th>
-                        <th
-                            class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">
-                            Action</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Guest Name</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Pax</th>
+                        <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Table</th>
+                        <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -97,8 +85,7 @@
                             <td class="px-5 py-4 text-sm text-center text-gray-600">
                                 {{ $guest->table_name ?? '-' }}</td>
                             <td class="px-5 py-4 text-sm text-center">
-                                <span
-                                    class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border
+                                <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border
                                                 @if ($guest->status === 'attending') bg-emerald-50 text-emerald-700 border-emerald-200
                                                 @elseif($guest->status === 'not_attending') bg-red-50 text-red-700 border-red-200
                                                 @elseif($guest->status === 'checked_in') bg-blue-50 text-blue-700 border-blue-200
@@ -111,17 +98,15 @@
                                     <a href="{{ route('invitation.show', $guest->barcode_token) }}" target="_blank"
                                         class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">View</a>
 
-                                    <button
-                                        @click="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->name) }}', '{{ addslashes($guest->phone_number) }}', {{ $guest->pax_invited }}, '{{ addslashes($guest->table_name) }}', '{{ $guest->status }}')"
+                                    <button @click="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->name) }}', '{{ addslashes($guest->phone_number) }}', {{ $guest->pax_invited }}, '{{ addslashes($guest->table_name) }}', '{{ $guest->status }}')"
                                         class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Edit</button>
 
-                                    <form
-                                        action="{{ route($user->role . '.events.guests.destroy', ['event' => $event->id, 'guest' => $guest->id]) }}"
-                                        method="POST" class="inline">
-                                        @csrf @method('DELETE')
-                                        <button type="button" data-form-id="delete-guest-{{ $guest->id }}"
-                                            onclick="confirmDelete(this)"
+                                    <button type="button" onclick="confirmDeleteGuest({{ $guest->id }})"
                                             class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Delete</button>
+
+                                    <form id="delete-guest-{{ $guest->id }}" action="{{ route($user->role . '.events.guests.destroy', [$event->id, $guest->id]) }}" method="POST" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
                                     </form>
                                 </div>
                             </td>

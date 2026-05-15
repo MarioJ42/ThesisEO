@@ -55,18 +55,6 @@
             </a>
         </div>
 
-        @if (session('success'))
-            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
                 <ul class="list-disc list-inside text-sm">
@@ -135,23 +123,45 @@
                 localStorage.setItem('manageEventScroll', window.scrollY);
             });
 
-            function confirmDelete(button) {
-                const formId = button.getAttribute('data-form-id');
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: "{{ session('success') }}",
+                    heightAuto: false,
+                    confirmButtonColor: '#3b82f6',
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: "{{ session('error') }}",
+                    heightAuto: false,
+                    confirmButtonColor: '#ef4444',
+                });
+            @endif
+
+            function confirmDeleteGuest(guestId) {
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'This action cannot be undone!',
+                    text: "This action cannot be undone!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, delete it!'
+                    confirmButtonText: 'Yes, delete it!',
+                    heightAuto: false,
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        if (document.getElementById(formId)) {
-                            document.getElementById(formId).submit();
-                        } else if (button.closest('form')) {
-                            button.closest('form').submit();
-                        }
+                        document.getElementById('delete-guest-' + guestId).submit();
                     }
                 });
             }

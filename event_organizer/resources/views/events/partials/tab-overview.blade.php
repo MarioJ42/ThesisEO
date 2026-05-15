@@ -1,19 +1,28 @@
 <div x-show="activeTab === 'overview'" x-cloak>
     @php
-        $totalDealPrice = 0;
+        $basePackagePrice = $event->package ? $event->package->base_price : 0;
+        $eoFee = $event->package ? $event->package->eo_fee : 0;
+
+        $additionalSellingPrice = 0;
         $totalNetPrice = 0;
+
         foreach ($slots as $s) {
             if ($s->vendor_package_id) {
                 $pkg = collect($vendorPackages[$s->vendor_id] ?? [])->firstWhere('id', $s->vendor_package_id);
-                $dPrice = $s->deal_price > 0 ? $s->deal_price : $pkg->price ?? 0;
-                $nPrice = $s->net_price > 0 ? $s->net_price : $pkg->net_price ?? 0;
-                $totalDealPrice += $dPrice;
+
+                $dPrice = $s->deal_price > 0 ? $s->deal_price : ($pkg->price ?? 0);
+                $nPrice = (isset($s->net_price) && $s->net_price > 0) ? $s->net_price : ($pkg->net_price ?? 0);
                 $totalNetPrice += $nPrice;
+
+                if (!$event->package || !$s->is_included) {
+                    $additionalSellingPrice += $dPrice;
+                }
             }
         }
-        $vendorMargin = $totalDealPrice - $totalNetPrice;
-        $eoFee = $event->package ? $event->package->eo_fee : 0;
-        $grandProfit = $vendorMargin + $eoFee;
+
+        $sellingPrice = $basePackagePrice + $additionalSellingPrice;
+        $grandProfit = $sellingPrice - $totalNetPrice;
+        $vendorMargin = $grandProfit - $eoFee;
     @endphp
 
     <div class="mb-8 bg-blue-50/50 border border-blue-100 rounded-xl p-6">
@@ -42,11 +51,10 @@
             <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
                 <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Selling Price</p>
                 <p class="text-lg font-extrabold text-gray-900">Rp
-                    {{ number_format($totalDealPrice, 0, ',', '.') }}</p>
+                    {{ number_format($sellingPrice, 0, ',', '.') }}</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow-sm border border-blue-50">
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendor's
-                    Prices</p>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Total Vendor's Prices</p>
                 <p class="text-lg font-extrabold text-red-600">Rp
                     {{ number_format($totalNetPrice, 0, ',', '.') }}</p>
             </div>
@@ -80,18 +88,12 @@
                     <table class="min-w-full w-full whitespace-nowrap">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor
-                                </th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
-                                    Vendor's Name</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note
-                                </th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">PIC
-                                </th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone
-                                </th>
-                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Meal
-                                    Crew</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Vendor's Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Note</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">PIC</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Meal Crew</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
