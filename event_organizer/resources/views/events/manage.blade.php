@@ -124,24 +124,24 @@
             });
 
             @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: "{{ session('success') }}",
-                    heightAuto: false,
-                    confirmButtonColor: '#3b82f6',
-                });
-            @endif
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: {!! json_encode(session('success')) !!},
+                heightAuto: false,
+                confirmButtonColor: '#3b82f6',
+            });
+        @endif
 
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: "{{ session('error') }}",
-                    heightAuto: false,
-                    confirmButtonColor: '#ef4444',
-                });
-            @endif
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: {!! json_encode(session('error')) !!},
+                heightAuto: false,
+                confirmButtonColor: '#ef4444',
+            });
+        @endif
 
             function confirmDeleteGuest(guestId) {
                 Swal.fire({

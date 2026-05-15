@@ -7,14 +7,22 @@
         $totalNetPrice = 0;
 
         foreach ($slots as $s) {
-            if ($s->vendor_package_id) {
+
+            if ($s->vendor_package_id || $s->vendor_id) {
                 $pkg = collect($vendorPackages[$s->vendor_id] ?? [])->firstWhere('id', $s->vendor_package_id);
 
                 $dPrice = $s->deal_price > 0 ? $s->deal_price : ($pkg->price ?? 0);
                 $nPrice = (isset($s->net_price) && $s->net_price > 0) ? $s->net_price : ($pkg->net_price ?? 0);
+
                 $totalNetPrice += $nPrice;
 
-                if (!$event->package || !$s->is_included) {
+                if ($event->package && $s->is_included) {
+                    $baseAllowance = $baseCosts[$s->vendor_category_id] ?? 0;
+                    if ($dPrice > $baseAllowance) {
+                        $upgradeFee = $dPrice - $baseAllowance;
+                        $additionalSellingPrice += $upgradeFee;
+                    }
+                } else {
                     $additionalSellingPrice += $dPrice;
                 }
             }

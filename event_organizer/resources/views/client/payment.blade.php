@@ -231,7 +231,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="mb-12">
                     <div class="flex items-center gap-4 mb-6">
                         <h3 class="text-xl font-bold text-gray-900">Payment History</h3>
                         <div class="flex-grow h-px bg-gray-200"></div>
@@ -283,6 +283,37 @@
                     @endif
                 </div>
 
+                <div class="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Invoice Breakdown</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                            <div>
+                                <p class="font-bold text-gray-800">Base Package</p>
+                                <p class="text-xs text-gray-500">{{ $billingDetails['basePackageName'] }}</p>
+                            </div>
+                            <p class="font-bold text-gray-900">Rp {{ number_format($billingDetails['basePackagePrice'], 0, ',', '.') }}</p>
+                        </div>
+
+                        @foreach($billingDetails['additionalItems'] as $item)
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                            <div class="flex flex-col">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{{ \Carbon\Carbon::parse($item->verified_at)->format('d M Y, H:i') }}</p>
+                                <p class="font-bold text-gray-800">
+                                    {{ $item->category_name }}
+                                    <span class="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded ml-1 uppercase align-middle">{{ $item->type }}</span>
+                                </p>
+                                <p class="text-xs text-gray-500">{{ $item->vendor_name }}</p>
+                            </div>
+                            <p class="font-bold text-red-500">+ Rp {{ number_format($item->added_cost, 0, ',', '.') }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-6 flex justify-between items-center bg-gray-50 p-4 rounded-xl">
+                        <p class="font-bold text-gray-900 uppercase tracking-wider text-sm">Total Final Amount</p>
+                        <p class="text-xl font-black text-gray-900">Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
@@ -313,19 +344,10 @@
 
                         if (data.snap_token) {
                             window.snap.pay(data.snap_token, {
-                                onSuccess: function(result) {
-                                    window.location.reload();
-                                },
-                                onPending: function(result) {
-                                    window.location.reload();
-                                },
-                                onError: function(result) {
-                                    alert("Payment failed!");
-                                    window.location.reload();
-                                },
-                                onClose: function() {
-                                    window.location.reload();
-                                }
+                                onSuccess: function(result) { window.location.reload(); },
+                                onPending: function(result) { window.location.reload(); },
+                                onError: function(result) { alert("Payment failed!"); window.location.reload(); },
+                                onClose: function() { window.location.reload(); }
                             });
                         } else {
                             alert(data.error || 'Failed to get payment token');

@@ -21,14 +21,16 @@ class PaymentController extends Controller
         Config::$is3ds = env('MIDTRANS_IS_3DS');
     }
 
-    private function calculateTotalPrice(Event $event)
+    private function getBillingDetails(Event $event)
     {
         $package = $event->weddingPackage ?? $event->package;
-        $totalPrice = $package ? $package->base_price : 0;
+        $basePackageName = $package ? $package->name : 'Custom Package';
+        $basePackagePrice = $package ? $package->base_price : 0;
+        $totalPrice = $basePackagePrice;
 
         $packageId = $event->wedding_package_id ?? $event->package_id;
-
         $baseCosts = [];
+
         if ($packageId) {
             $allowedVendors = DB::table('package_vendor_pivot')
                 ->where('package_id', $packageId)
@@ -43,36 +45,62 @@ class PaymentController extends Controller
 
             foreach ($templateCategories as $catId) {
                 $allowedIds = collect($allowedVendors[$catId] ?? [])->pluck('vendor_id');
-
                 $minPrice = DB::table('vendor_packages')
                     ->whereIn('vendor_id', $allowedIds)
                     ->where('vendor_category_id', $catId)
                     ->min('price');
-
                 $baseCosts[$catId] = $minPrice ?? 0;
             }
         }
 
         $verifiedSlots = DB::table('event_vendor')
-            ->where('event_id', $event->id)
-            ->where('status', 'verified')
+            ->leftJoin('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+            ->leftJoin('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
+            ->where('event_vendor.event_id', $event->id)
+            ->whereIn('event_vendor.status', ['verified', 'signed'])
+            ->select('event_vendor.*', 'vendor_categories.name as category_name', 'vendors.name as vendor_name')
+            ->orderBy('event_vendor.updated_at', 'desc')
             ->get();
+
+        $additionalItems = [];
 
         foreach ($verifiedSlots as $slot) {
             $dealPrice = $slot->deal_price;
             $isIncluded = $slot->is_included;
             $categoryId = $slot->vendor_category_id;
+            $addedCost = 0;
+            $type = '';
 
-            if ($isIncluded) {
+            if ($isIncluded && $packageId) {
                 $baseCost = $baseCosts[$categoryId] ?? 0;
                 $upgradeFee = max(0, $dealPrice - $baseCost);
-                $totalPrice += $upgradeFee;
+                if ($upgradeFee > 0) {
+                    $addedCost = $upgradeFee;
+                    $type = 'Upgrade Fee';
+                }
             } else {
-                $totalPrice += $dealPrice;
+                $addedCost = $dealPrice;
+                $type = 'Custom Add-on';
+            }
+
+            if ($addedCost > 0) {
+                $additionalItems[] = (object)[
+                    'vendor_name' => $slot->vendor_name,
+                    'category_name' => $slot->category_name,
+                    'added_cost' => $addedCost,
+                    'type' => $type,
+                    'verified_at' => $slot->updated_at,
+                ];
+                $totalPrice += $addedCost;
             }
         }
 
-        return $totalPrice;
+        return [
+            'basePackageName' => $basePackageName,
+            'basePackagePrice' => $basePackagePrice,
+            'additionalItems' => $additionalItems,
+            'totalPrice' => $totalPrice
+        ];
     }
 
     public function index(Event $event)
@@ -81,12 +109,14 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $totalPrice = $this->calculateTotalPrice($event);
+        $billingDetails = $this->getBillingDetails($event);
+        $totalPrice = $billingDetails['totalPrice'];
+
         $successfulPayments = $event->payments()->where('status', 'success')->sum('amount');
         $remainingBalance = max(0, $totalPrice - $successfulPayments);
         $payments = $event->payments()->orderBy('created_at', 'desc')->get();
 
-        return view('client.payment', compact('event', 'totalPrice', 'successfulPayments', 'remainingBalance', 'payments'));
+        return view('client.payment', compact('event', 'totalPrice', 'successfulPayments', 'remainingBalance', 'payments', 'billingDetails'));
     }
 
     public function pay(Request $request, Event $event)

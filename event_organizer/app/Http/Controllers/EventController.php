@@ -407,6 +407,7 @@ class EventController extends Controller
     {
         $request->validate([
             'deal_price' => 'required|numeric|min:0',
+            'net_price' => 'nullable|numeric|min:0',
         ]);
 
         DB::table('event_vendor')
@@ -414,9 +415,10 @@ class EventController extends Controller
             ->where('event_id', $event->id)
             ->update([
                 'deal_price' => $request->deal_price,
+                'net_price' => $request->net_price ?? 0,
             ]);
 
-        return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
+        return redirect()->back()->with('success', 'Deal & Net price successfully updated!');
     }
 
     public function addPackageFromVendor(Request $request)
