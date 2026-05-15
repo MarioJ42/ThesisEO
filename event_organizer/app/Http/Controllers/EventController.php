@@ -393,7 +393,8 @@ class EventController extends Controller
             ->update([
                 'status' => $request->status,
                 'meal_crew' => $request->meal_crew ?? 0,
-                'vendor_contact_id' => $request->vendor_contact_id
+                'vendor_contact_id' => $request->vendor_contact_id,
+                'updated_at' => now(), // <--- TAMBAHKAN BARIS INI JUGA
             ]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -407,7 +408,7 @@ class EventController extends Controller
     {
         $request->validate([
             'deal_price' => 'required|numeric|min:0',
-            'net_price' => 'nullable|numeric|min:0',
+            'net_price' => 'nullable|numeric|min:0', // Tambahkan ini jika belum ada dari perbaikan sebelumnya
         ]);
 
         DB::table('event_vendor')
@@ -416,9 +417,10 @@ class EventController extends Controller
             ->update([
                 'deal_price' => $request->deal_price,
                 'net_price' => $request->net_price ?? 0,
+                'updated_at' => now(), // <--- TAMBAHKAN BARIS INI
             ]);
 
-        return redirect()->back()->with('success', 'Deal & Net price successfully updated!');
+        return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
     }
 
     public function addPackageFromVendor(Request $request)

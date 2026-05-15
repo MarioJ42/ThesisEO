@@ -297,7 +297,7 @@
                         @foreach($billingDetails['additionalItems'] as $item)
                         <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                             <div class="flex flex-col">
-                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{{ \Carbon\Carbon::parse($item->verified_at)->format('d M Y, H:i') }}</p>
+                               <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{{ \Carbon\Carbon::parse($item->verified_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</p>
                                 <p class="font-bold text-gray-800">
                                     {{ $item->category_name }}
                                     <span class="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded ml-1 uppercase align-middle">{{ $item->type }}</span>
