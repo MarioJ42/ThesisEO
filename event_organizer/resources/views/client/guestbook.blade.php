@@ -413,17 +413,6 @@
                                             class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50">
                                     </div>
                                 </div>
-                                <div>
-                                    <label
-                                        class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
-                                    <select name="status" x-model="guestForm.status"
-                                        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
-                                        <option value="pending">Pending</option>
-                                        <option value="attending">Attending</option>
-                                        <option value="not_attending">Not Attending</option>
-                                        <option value="checked_in">Checked In</option>
-                                    </select>
-                                </div>
                             </div>
                             <div
                                 class="flex justify-end p-6 border-t border-gray-100 gap-3 bg-gray-50/50 rounded-b-2xl">

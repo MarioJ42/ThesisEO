@@ -29,7 +29,7 @@
             </div>
             <div class="w-full sm:w-2/4">
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Note</label>
-                <input type="text" name="role_detail" required
+                <input type="text" name="role_detail" placeholder="Optional"
                     class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <div>

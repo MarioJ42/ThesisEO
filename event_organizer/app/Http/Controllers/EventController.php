@@ -41,19 +41,7 @@ class EventController extends Controller
             })
             ->latest();
 
-        if ($user->role === 'pl') {
-            $query->where('pl_id', $user->id);
-            $events = $query->paginate($perPage)->appends(request()->query());
-            $myEvents = $events;
-            $plEvents = collect();
-            $unassignedEvents = collect();
-        } else {
-            $events = $query->paginate($perPage)->appends(request()->query());
-            $myEvents = $events;
-            $plEvents = collect();
-            $unassignedEvents = collect();
-        }
-
+        $events = $query->paginate($perPage)->appends(request()->query());
         $clients = User::where('role', 'klien')->orderBy('name', 'asc')->get();
         $packages = WeddingPackage::orderBy('name', 'asc')->get();
         $projectLeaders = User::whereIn('role', ['pl', 'owner'])->orderBy('name', 'asc')->get();
@@ -73,7 +61,7 @@ class EventController extends Controller
         $packageId = $request->package_id === 'custom' ? null : $request->package_id;
         $role = Auth::user()->role;
         $status = ($role === 'owner' || $role === 'pl') ? 'planning' : 'draft';
-        $plId = ($role === 'owner') ? Auth::id() : (($role === 'pl') ? Auth::id() : null);
+        $plId = ($role === 'owner' || $role === 'pl') ? Auth::id() : null;
 
         $event = Event::create([
             'client_id' => $request->client_id,
@@ -112,7 +100,6 @@ class EventController extends Controller
         }
 
         $routePrefix = ($role === 'klien') ? 'client' : $role;
-
         return redirect()->route($routePrefix . '.events.manage', $event->id)
             ->with('success', 'New Event Arrangement created! You can now plan the vendors.');
     }
@@ -132,7 +119,6 @@ class EventController extends Controller
         }
 
         $event->save();
-
         return redirect()->back()->with('success', 'Event successfully updated!');
     }
 
@@ -169,9 +155,9 @@ class EventController extends Controller
 
         $morningSlots = $slots->where('session', 'morning');
         $eveningSlots = $slots->where('session', 'evening');
-        $verifiedSlots = $slots->where('status', 'verified');
+        $verifiedSlots = $slots->whereIn('status', ['verified', 'signed']);
 
-        $categories = \App\Models\VendorCategory::with('vendors')->get();
+        $categories = \App\Models\VendorCategory::with('vendors')->orderBy('name', 'asc')->get();
 
         $allowedVendors = collect();
         $baseCosts = [];
@@ -190,12 +176,10 @@ class EventController extends Controller
 
             foreach ($templateCategories as $catId) {
                 $allowedIds = collect($allowedVendors[$catId] ?? [])->pluck('vendor_id');
-
                 $minPrice = DB::table('vendor_packages')
                     ->whereIn('vendor_id', $allowedIds)
                     ->where('vendor_category_id', $catId)
                     ->min('price');
-
                 $baseCosts[$catId] = $minPrice ?? 0;
             }
         }
@@ -211,10 +195,10 @@ class EventController extends Controller
             ->get()
             ->groupBy('vendor_id');
 
-        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
-
-        $vendorPackages = DB::table('vendor_packages')->whereIn('vendor_id', $assignedVendorIds)->get()->groupBy('vendor_id');
-        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
+        $guests = DB::table('guests')
+            ->where('event_id', $event->id)
+            ->orderBy('id', 'desc')
+            ->get();
 
         $crewSlots = DB::table('event_crew')
             ->leftJoin('users', 'event_crew.user_id', '=', 'users.id')
@@ -287,14 +271,14 @@ class EventController extends Controller
         $request->validate([
             'session' => 'required|in:morning,evening,all_day',
             'vendor_category_id' => 'required|exists:vendor_categories,id',
-            'role_detail' => 'required|string|max:255',
+            'role_detail' => 'nullable|string|max:255',
         ]);
 
         DB::table('event_vendor')->insert([
             'event_id' => $event->id,
             'vendor_category_id' => $request->vendor_category_id,
             'session' => $request->session,
-            'role_detail' => $request->role_detail,
+            'role_detail' => $request->role_detail ?? '-',
             'is_included' => false,
             'status' => 'unassigned',
             'deal_price' => 0,
@@ -328,7 +312,8 @@ class EventController extends Controller
                     'vendor_contact_id' => $contactId,
                     'vendor_package_id' => null,
                     'deal_price' => 0,
-                    'status' => 'reviewing'
+                    'status' => 'reviewing',
+                    'updated_at' => now(),
                 ]);
 
             return redirect()->back()->with('success', 'Vendor selected! Please choose the package.');
@@ -345,6 +330,7 @@ class EventController extends Controller
                 ->update([
                     'vendor_package_id' => $package->id,
                     'deal_price' => $package->price,
+                    'updated_at' => now(),
                 ]);
 
             return redirect()->back()->with('success', 'Package successfully assigned!');
@@ -364,7 +350,8 @@ class EventController extends Controller
                 'vendor_package_id' => null,
                 'status' => 'unassigned',
                 'deal_price' => 0,
-                'meal_crew' => 0
+                'meal_crew' => 0,
+                'updated_at' => now(),
             ]);
 
         return redirect()->back()->with('error', 'Vendor removed from slot.');
@@ -394,7 +381,7 @@ class EventController extends Controller
                 'status' => $request->status,
                 'meal_crew' => $request->meal_crew ?? 0,
                 'vendor_contact_id' => $request->vendor_contact_id,
-                'updated_at' => now(), // <--- TAMBAHKAN BARIS INI JUGA
+                'updated_at' => now(),
             ]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -408,7 +395,7 @@ class EventController extends Controller
     {
         $request->validate([
             'deal_price' => 'required|numeric|min:0',
-            'net_price' => 'nullable|numeric|min:0', // Tambahkan ini jika belum ada dari perbaikan sebelumnya
+            'net_price' => 'nullable|numeric|min:0',
         ]);
 
         DB::table('event_vendor')
@@ -417,7 +404,7 @@ class EventController extends Controller
             ->update([
                 'deal_price' => $request->deal_price,
                 'net_price' => $request->net_price ?? 0,
-                'updated_at' => now(), // <--- TAMBAHKAN BARIS INI
+                'updated_at' => now(),
             ]);
 
         return redirect()->back()->with('success', 'Deal price successfully negotiated & updated!');
@@ -463,7 +450,6 @@ class EventController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
-            'status' => 'required|in:pending,attending,not_attending,checked_in',
         ]);
 
         $token = Str::random(10);
@@ -477,13 +463,13 @@ class EventController extends Controller
             'phone_number' => $request->phone_number,
             'pax_invited' => $request->pax_invited,
             'table_name' => $request->table_name,
-            'status' => $request->status,
+            'status' => 'attending',
             'barcode_token' => $token,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Guest successfully added!')->with('active_tab', 'rsvp');
+        return redirect()->back()->with('success', 'Guest successfully added as Attending!')->with('active_tab', 'rsvp');
     }
 
     public function updateGuest(Request $request, Event $event, $guestId)
@@ -528,14 +514,18 @@ class EventController extends Controller
             ->where('event_vendor.event_id', $event->id)
             ->where('vendor_categories.name', 'like', '%Guest Book%')
             ->where('vendors.name', 'like', '%Fenix EO%')
+            ->whereIn('event_vendor.status', ['verified', 'signed'])
             ->exists();
 
         if (!$hasFenixGuestbook) {
-            return redirect()->route('client.events.manage', $event->id)->with('error', 'Digital Guestbook feature requires Fenix EO vendor.');
+            return redirect()->route('client.events.manage', $event->id)->with('error', 'Digital Guestbook feature requires Fenix EO vendor to be verified first.');
         }
 
         $event->load(['client', 'package']);
-        $guests = DB::table('guests')->where('event_id', $event->id)->orderBy('name', 'asc')->get();
+        $guests = DB::table('guests')
+            ->where('event_id', $event->id)
+            ->orderBy('id', 'desc')
+            ->get();
 
         return view('client.guestbook', compact('event', 'user', 'guests'));
     }

@@ -128,7 +128,8 @@
                     @php
                         $hasFenixGuestbook = $slots->contains(function ($slot) {
                             return str_contains(strtolower(trim($slot->category_name)), 'guest book') &&
-                                   str_contains(strtolower(trim($slot->vendor_name)), 'fenix eo');
+                                   str_contains(strtolower(trim($slot->vendor_name)), 'fenix eo') &&
+                                   in_array($slot->status, ['verified', 'signed']);
                         });
                     @endphp
 

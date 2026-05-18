@@ -5,6 +5,14 @@
         [x-cloak] { display: none !important; }
     </style>
 
+    {{-- Logika Pengecekan Fenix EO Digital Guestbook --}}
+    @php
+        $hasFenixGuestbook = $verifiedSlots->contains(function ($slot) {
+            return stripos($slot->category_name, 'Guest Book') !== false &&
+                   stripos($slot->vendor_name, 'Fenix EO') !== false;
+        });
+    @endphp
+
     <div class="max-w-7xl mx-auto" x-data="{
         isModalOpen: false,
         activeTab: localStorage.getItem('manageEventTab') || 'overview',
@@ -43,7 +51,12 @@
             this.guestForm.status = status;
             this.isEditGuestModalOpen = true;
         }
-    }" x-init="$watch('activeTab', value => localStorage.setItem('manageEventTab', value))">
+    }" x-init="
+        if (activeTab === 'rsvp' && !{{ $hasFenixGuestbook ? 'true' : 'false' }}) {
+            activeTab = 'overview';
+        }
+        $watch('activeTab', value => localStorage.setItem('manageEventTab', value))
+    ">
 
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -54,6 +67,18 @@
                 Back to Events
             </a>
         </div>
+
+        @if (session('success'))
+            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('error') }}</span>
+            </div>
+        @endif
 
         @if ($errors->any())
             <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
@@ -76,9 +101,14 @@
                 <button @click="activeTab = 'verification'" :class="activeTab === 'verification' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
                     Vendor Verification
                 </button>
+
+                {{-- Tab RSVP hanya muncul jika Fenix EO adalah vendor Guest Book --}}
+                @if($hasFenixGuestbook)
                 <button @click="activeTab = 'rsvp'" :class="activeTab === 'rsvp' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
                     RSVP & Guestbook
                 </button>
+                @endif
+
                 <button @click="activeTab = 'crew'" :class="activeTab === 'crew' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
                     Crew Management
                 </button>
@@ -98,9 +128,12 @@
                 @include('events.partials.tab-verification')
             </div>
 
+            {{-- Konten RSVP hanya di-render jika Fenix EO adalah vendor Guest Book --}}
+            @if($hasFenixGuestbook)
             <div x-show="activeTab === 'rsvp'" x-cloak>
                 @include('events.partials.tab-rsvp')
             </div>
+            @endif
 
             <div x-show="activeTab === 'crew'" x-cloak>
                 @include('events.partials.tab-crew')
@@ -123,45 +156,23 @@
                 localStorage.setItem('manageEventScroll', window.scrollY);
             });
 
-            @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: {!! json_encode(session('success')) !!},
-                heightAuto: false,
-                confirmButtonColor: '#3b82f6',
-            });
-        @endif
-
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: {!! json_encode(session('error')) !!},
-                heightAuto: false,
-                confirmButtonColor: '#ef4444',
-            });
-        @endif
-
-            function confirmDeleteGuest(guestId) {
+            function confirmDelete(button) {
+                const formId = button.getAttribute('data-form-id');
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "This action cannot be undone!",
+                    text: 'This action cannot be undone!',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, delete it!',
-                    heightAuto: false,
-                    reverseButtons: true,
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
-                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
-                    }
+                    confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        document.getElementById('delete-guest-' + guestId).submit();
+                        if (document.getElementById(formId)) {
+                            document.getElementById(formId).submit();
+                        } else if (button.closest('form')) {
+                            button.closest('form').submit();
+                        }
                     }
                 });
             }
