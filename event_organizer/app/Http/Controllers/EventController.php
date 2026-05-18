@@ -195,10 +195,26 @@ class EventController extends Controller
             ->get()
             ->groupBy('vendor_id');
 
-        $guests = DB::table('guests')
-            ->where('event_id', $event->id)
-            ->orderBy('id', 'desc')
-            ->get();
+        $statusFilter = request('guest_status');
+        $sort = request('guest_sort', 'newest');
+
+        $guestsQuery = DB::table('guests')->where('event_id', $event->id);
+
+        if ($statusFilter && $statusFilter !== 'all') {
+            $guestsQuery->where('status', $statusFilter);
+        }
+
+        if ($sort === 'oldest') {
+            $guestsQuery->orderBy('id', 'asc');
+        } elseif ($sort === 'name_asc') {
+            $guestsQuery->orderBy('name', 'asc');
+        } elseif ($sort === 'name_desc') {
+            $guestsQuery->orderBy('name', 'desc');
+        } else {
+            $guestsQuery->orderBy('id', 'desc');
+        }
+
+        $guests = $guestsQuery->get();
 
         $crewSlots = DB::table('event_crew')
             ->leftJoin('users', 'event_crew.user_id', '=', 'users.id')
@@ -469,7 +485,7 @@ class EventController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Guest successfully added as Attending!')->with('active_tab', 'rsvp');
+        return redirect()->back()->with('success', 'Guest added successfully as Attending!')->with('active_tab', 'rsvp');
     }
 
     public function updateGuest(Request $request, Event $event, $guestId)
@@ -522,10 +538,27 @@ class EventController extends Controller
         }
 
         $event->load(['client', 'package']);
-        $guests = DB::table('guests')
-            ->where('event_id', $event->id)
-            ->orderBy('id', 'desc')
-            ->get();
+
+        $statusFilter = request('guest_status');
+        $sort = request('guest_sort', 'newest');
+
+        $guestsQuery = DB::table('guests')->where('event_id', $event->id);
+
+        if ($statusFilter && $statusFilter !== 'all') {
+            $guestsQuery->where('status', $statusFilter);
+        }
+
+        if ($sort === 'oldest') {
+            $guestsQuery->orderBy('id', 'asc');
+        } elseif ($sort === 'name_asc') {
+            $guestsQuery->orderBy('name', 'asc');
+        } elseif ($sort === 'name_desc') {
+            $guestsQuery->orderBy('name', 'desc');
+        } else {
+            $guestsQuery->orderBy('id', 'desc');
+        }
+
+        $guests = $guestsQuery->get();
 
         return view('client.guestbook', compact('event', 'user', 'guests'));
     }
