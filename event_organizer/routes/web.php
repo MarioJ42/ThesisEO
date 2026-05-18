@@ -137,7 +137,7 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::put('/event-packages/{package}/price', [OwnerController::class, 'updatePackagePrice'])->name('owner.wedding_packages.price.update');
     Route::post('/events/{event}/crew/add-custom-job', [EventController::class, 'addCustomCrewSlot'])->name('owner.events.crew.add_custom_job');
     Route::delete('/events/{event}/crew/{slot}/delete', [EventController::class, 'deleteCrewSlot'])->name('owner.events.crew.delete');
-    });
+});
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
     Route::get('/dashboard', function () {
@@ -179,8 +179,11 @@ Route::middleware(['auth'])->prefix('crew')->group(function () {
         Route::get('/', [CrewRsvpController::class, 'hub'])->name('crew.rsvp.hub');
         Route::get('/scan', [CrewRsvpController::class, 'scan'])->name('crew.rsvp.scan');
         Route::get('/search', [CrewRsvpController::class, 'search'])->name('crew.rsvp.search');
+        Route::get('/guests/create', [CrewRsvpController::class, 'createGuest'])->name('crew.rsvp.guests.create');
+        Route::post('/guests/store', [CrewRsvpController::class, 'storeGuest'])->name('crew.rsvp.guests.store');
         Route::get('/checkin/{token}', [CrewRsvpController::class, 'checkInForm'])->name('crew.rsvp.checkin.form');
         Route::post('/checkin/{guest}', [CrewRsvpController::class, 'processCheckIn'])->name('crew.rsvp.checkin.process');
+        Route::get('/checkin/{guest}/summary', [CrewRsvpController::class, 'checkInSummary'])->name('crew.rsvp.checkin.summary');
     });
 });
 

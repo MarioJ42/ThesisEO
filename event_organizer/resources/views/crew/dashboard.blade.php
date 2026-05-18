@@ -29,9 +29,9 @@
                 <h1 class="text-xl md:text-2xl font-bold text-gray-900">{{ Auth::user()->name }}</h1>
             </div>
         </div>
-        <form method="POST" action="{{ route('logout') }}" class="m-0">
+        <form id="logout-form" method="POST" action="{{ route('logout') }}" class="m-0">
             @csrf
-            <button type="submit" class="text-sm font-bold text-red-500 hover:text-white bg-red-50 hover:bg-red-500 px-5 py-2.5 rounded-xl transition-all shadow-sm">Logout</button>
+            <button type="button" onclick="confirmLogout()" class="text-sm font-bold text-red-500 hover:text-white bg-red-50 hover:bg-red-500 px-5 py-2.5 rounded-xl transition-all shadow-sm">Logout</button>
         </form>
     </div>
 
@@ -105,6 +105,28 @@
                     </div>
                 </div>
             @endif
+
+            @if(isset($historyEvents) && $historyEvents->count() > 0)
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        History Events (Completed)
+                    </h2>
+                    <div class="space-y-3">
+                        @foreach($historyEvents as $history)
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm opacity-80 hover:opacity-100 transition-opacity">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">{{ $history->title }}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">{{ \Carbon\Carbon::parse($history->event_date)->format('d M Y') }} • Role: <span class="font-bold text-gray-700">{{ $history->jobdesk }}</span></p>
+                                </div>
+                                <div class="mt-3 sm:mt-0 flex items-center gap-3">
+                                    <span class="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">Completed</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div>
@@ -132,14 +154,20 @@
 
                                 <div class="flex flex-col gap-1 {{ $isFD ? 'mb-5' : '' }}">
                                     <p class="text-sm font-medium text-gray-300">Role: <span class="text-emerald-400 font-bold">{{ $event->jobdesk }}</span></p>
-                                    <p class="text-sm font-medium text-gray-300">Fee: <span class="text-white font-bold">Rp {{ number_format($event->fee, 0, ',', '.') }}</span></p>
                                 </div>
 
                                 @if($isFD)
-                                    <a href="{{ route('crew.rsvp.hub', $event->event_id) }}" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-400 text-gray-900 py-3 rounded-xl font-bold transition-all shadow-md">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                                        Enter Workspace
-                                    </a>
+                                    @if(\Carbon\Carbon::parse($event->event_date)->isToday())
+                                        <a href="{{ route('crew.rsvp.hub', $event->event_id) }}" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-400 text-gray-900 py-3 rounded-xl font-bold transition-all shadow-md">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                            Digital RSVP
+                                        </a>
+                                    @else
+                                        <div class="flex items-center justify-center gap-2 w-full bg-gray-800 text-gray-400 py-3 rounded-xl font-bold border border-gray-700 cursor-not-allowed select-none">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                            RSVP Opens on D-Day
+                                        </div>
+                                    @endif
                                 @endif
                             </div>
                         @empty
@@ -157,4 +185,30 @@
 
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmLogout() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Ready to Leave?',
+            text: 'Are you sure you want to logout from your account?',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, logout!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-xl',
+                confirmButton: 'rounded-lg px-6 py-2.5 font-bold',
+                cancelButton: 'rounded-lg px-6 py-2.5 font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logout-form').submit();
+            }
+        });
+    }
+</script>
 @endsection

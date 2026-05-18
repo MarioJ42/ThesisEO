@@ -17,8 +17,18 @@ class CrewController extends Controller
             ->join('events', 'event_crew.event_id', '=', 'events.id')
             ->where('event_crew.user_id', $user->id)
             ->where('event_crew.status', 'Verified')
-            ->select('event_crew.*', 'events.title', 'events.event_date', 'events.venue')
+            ->whereIn('events.status', ['planning', 'ongoing'])
+            ->select('event_crew.*', 'events.title', 'events.event_date', 'events.venue', 'events.status as event_status')
             ->orderBy('events.event_date', 'asc')
+            ->get();
+
+        $historyEvents = DB::table('event_crew')
+            ->join('events', 'event_crew.event_id', '=', 'events.id')
+            ->where('event_crew.user_id', $user->id)
+            ->where('event_crew.status', 'Verified')
+            ->where('events.status', 'completed')
+            ->select('event_crew.*', 'events.title', 'events.event_date', 'events.venue', 'events.status as event_status')
+            ->orderBy('events.event_date', 'desc')
             ->get();
 
         $pendingRequests = DB::table('event_crew')
@@ -39,7 +49,7 @@ class CrewController extends Controller
             ->orderBy('event_date', 'asc')
             ->get();
 
-        return view('crew.dashboard', compact('myEvents', 'pendingRequests', 'availableEvents'));
+        return view('crew.dashboard', compact('myEvents', 'pendingRequests', 'availableEvents', 'historyEvents'));
     }
 
     public function applyEvent(Request $request, $eventId)
