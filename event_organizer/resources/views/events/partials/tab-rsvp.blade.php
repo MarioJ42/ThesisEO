@@ -116,7 +116,17 @@
                                         class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">View</a>
 
                                     <button
-                                        @click="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->name) }}', '{{ addslashes($guest->phone_number) }}', {{ $guest->pax_invited }}, '{{ addslashes($guest->table_name) }}', '{{ $guest->status }}')"
+                                        @click="$dispatch('open-edit-guest', {
+                                            id: {{ $guest->id }},
+                                            name: '{{ addslashes($guest->name) }}',
+                                            phone_number: '{{ addslashes($guest->phone_number) }}',
+                                            pax_invited: {{ $guest->pax_invited }},
+                                            table_name: '{{ addslashes($guest->table_name) }}',
+                                            status: '{{ $guest->status }}',
+                                            pax_actual: {{ $guest->pax_actual ?? 0 }},
+                                            angpao_count: {{ $guest->angpao_count ?? 0 }},
+                                            angpao_type: '{{ $guest->angpao_type ?? 'fisik' }}'
+                                        })"
                                         class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Edit</button>
 
                                     <form
@@ -150,5 +160,4 @@
             </table>
         </div>
     </div>
-
 </div>

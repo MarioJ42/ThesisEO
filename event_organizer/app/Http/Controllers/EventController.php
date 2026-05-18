@@ -496,18 +496,46 @@ class EventController extends Controller
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
             'status' => 'required|in:pending,attending,not_attending,checked_in',
+            'pax_actual' => 'nullable|integer|min:0',
+            'angpao_count' => 'nullable|integer|min:0',
+            'angpao_type' => 'nullable|in:fisik,digital',
         ]);
 
-        DB::table('guests')->where('id', $guestId)->where('event_id', $event->id)->update([
-            'name' => $request->name,
-            'phone_number' => $request->phone_number,
-            'pax_invited' => $request->pax_invited,
-            'table_name' => $request->table_name,
-            'status' => $request->status,
-            'updated_at' => now(),
-        ]);
+        DB::beginTransaction();
+        try {
+            DB::table('guests')->where('id', $guestId)->where('event_id', $event->id)->update([
+                'name' => $request->name,
+                'phone_number' => $request->phone_number,
+                'pax_invited' => $request->pax_invited,
+                'table_name' => $request->table_name,
+                'status' => $request->status,
+                'pax_actual' => $request->pax_actual ?? 0,
+                'angpao_count' => $request->angpao_count ?? 0,
+                'angpao_type' => $request->angpao_type ?? 'fisik',
+                'updated_at' => now(),
+            ]);
 
-        return redirect()->back()->with('success', 'Guest details updated!')->with('active_tab', 'rsvp');
+            if ($request->filled('titipan_data')) {
+                $titipanArray = json_decode($request->titipan_data, true);
+
+                if (is_array($titipanArray) && count($titipanArray) > 0) {
+                    foreach ($titipanArray as $titipan) {
+                        DB::table('guests')->where('id', $titipan['id'])->update([
+                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
+                            'angpao_type' => $request->angpao_type ?? 'fisik',
+                            'angpao_titipan' => true,
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Guest details updated successfully!')->with('active_tab', 'rsvp');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update guest details: ' . $e->getMessage())->with('active_tab', 'rsvp');
+        }
     }
 
     public function destroyGuest(Event $event, $guestId)
