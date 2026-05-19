@@ -179,11 +179,13 @@
                                 </div>
                             </div>
 
+                            @if(!in_array($event->status, ['draft', 'canceled']))
                             <div class="mt-6 pl-2">
                                 <a href="{{ route('client.events.manage', $event->id) }}" class="block w-full py-2.5 bg-white border border-gray-200 text-gray-900 text-center rounded-lg text-sm font-semibold hover:border-gray-900 transition-colors">
                                     View Details
                                 </a>
                             </div>
+                            @endif
                         </div>
                     @endforeach
 

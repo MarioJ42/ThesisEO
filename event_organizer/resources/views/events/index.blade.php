@@ -134,7 +134,9 @@
                             <td class="px-6 py-4 text-sm text-center">
                                 <div class="flex justify-center gap-2">
                                     <button @click="openEditModal({{ $event->id }}, '{{ addslashes($event->title) }}', '{{ $event->pl_id }}', '{{ $event->package ? addslashes($event->package->name) : 'Custom' }}', '{{ \Carbon\Carbon::parse($event->event_date)->format('Y-m-d') }}', '{{ $event->status }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
+                                    @if(!in_array($event->status, ['draft', 'canceled']))
                                     <a href="{{ route($user->role . '.events.manage', $event->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Manage</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -268,19 +270,19 @@
                     <div class="pt-2 border-t border-gray-200">
                         <label class="block mb-2 text-sm font-medium text-gray-900">Event Status</label>
                         <select name="status" x-model="editForm.status" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                            <template x-if="editForm.status === 'draft'">
+                            <template x-if="!editForm.pl_id && editForm.status === 'draft'">
                                 <option value="draft">Draft (Waiting for PL)</option>
                             </template>
-                            <template x-if="editForm.status !== 'draft'">
+                            <template x-if="editForm.pl_id || editForm.status !== 'draft'">
                                 <option value="planning">Planning</option>
                             </template>
-                            <template x-if="editForm.status !== 'draft'">
+                            <template x-if="editForm.pl_id || editForm.status !== 'draft'">
                                 <option value="ongoing">Ongoing</option>
                             </template>
-                            <template x-if="editForm.status !== 'draft'">
+                            <template x-if="editForm.pl_id || editForm.status !== 'draft'">
                                 <option value="completed">Completed</option>
                             </template>
-                            <template x-if="editForm.status !== 'draft'">
+                            <template x-if="true">
                                 <option value="canceled">Canceled</option>
                             </template>
                         </select>
