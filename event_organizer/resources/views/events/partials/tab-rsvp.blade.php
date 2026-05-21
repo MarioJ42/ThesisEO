@@ -89,6 +89,7 @@
                         <th class="px-5 py-4 text-left text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Contact</th>
                         <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Pax</th>
                         <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Table</th>
+                        <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Side</th>
                         <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-5 py-4 text-center text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
@@ -101,6 +102,7 @@
                             <td class="px-5 py-4 text-sm text-gray-500">{{ $guest->phone_number ?? '-' }}</td>
                             <td class="px-5 py-4 text-sm text-center font-extrabold text-blue-600">{{ $guest->pax_invited }}</td>
                             <td class="px-5 py-4 text-sm text-center text-gray-600">{{ $guest->table_name ?? '-' }}</td>
+                            <td class="px-5 py-4 text-sm text-center text-gray-700 font-semibold">{{ $guest->side ?? 'General' }}</td>
                             <td class="px-5 py-4 text-sm text-center">
                                 <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border
                                                 @if ($guest->status === 'attending') bg-emerald-50 text-emerald-700 border-emerald-200
@@ -122,6 +124,7 @@
                                             phone_number: '{{ addslashes($guest->phone_number) }}',
                                             pax_invited: {{ $guest->pax_invited }},
                                             table_name: '{{ addslashes($guest->table_name) }}',
+                                            side: '{{ $guest->side ?? 'General' }}',
                                             status: '{{ $guest->status }}',
                                             pax_actual: {{ $guest->pax_actual ?? 0 }},
                                             angpao_count: {{ $guest->angpao_count ?? 0 }},
@@ -142,7 +145,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-12 text-center">
+                            <td colspan="7" class="px-5 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-gray-400">
                                     <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">

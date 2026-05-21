@@ -466,6 +466,7 @@ class EventController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
+            'side' => 'nullable|in:Groom,Bride,General',
         ]);
 
         $token = Str::random(10);
@@ -479,6 +480,7 @@ class EventController extends Controller
             'phone_number' => $request->phone_number,
             'pax_invited' => $request->pax_invited,
             'table_name' => $request->table_name,
+            'side' => $request->side ?? 'General',
             'status' => 'attending',
             'barcode_token' => $token,
             'created_at' => now(),
@@ -495,6 +497,7 @@ class EventController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
+            'side' => 'nullable|in:Groom,Bride,General',
             'status' => 'required|in:pending,attending,not_attending,checked_in',
             'pax_actual' => 'nullable|integer|min:0',
             'angpao_count' => 'nullable|integer|min:0',
@@ -508,6 +511,7 @@ class EventController extends Controller
                 'phone_number' => $request->phone_number,
                 'pax_invited' => $request->pax_invited,
                 'table_name' => $request->table_name,
+                'side' => $request->side ?? 'General',
                 'status' => $request->status,
                 'pax_actual' => $request->pax_actual ?? 0,
                 'angpao_count' => $request->angpao_count ?? 0,
@@ -718,5 +722,5 @@ class EventController extends Controller
             ->delete();
 
         return redirect()->back()->with('success', 'Jobdesk slot completely deleted!')->with('active_tab', 'crew');
-    }
+    }   
 }

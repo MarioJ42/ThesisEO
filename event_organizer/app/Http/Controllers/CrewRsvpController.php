@@ -103,6 +103,7 @@ class CrewRsvpController extends Controller
             'phone_number' => 'nullable|string|max:50',
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
+            'side' => 'nullable|in:Groom,Bride,General',
         ]);
 
         $token = Str::random(10);
@@ -116,6 +117,7 @@ class CrewRsvpController extends Controller
             'phone_number' => $request->phone_number,
             'pax_invited' => $request->pax_invited,
             'table_name' => $request->table_name,
+            'side' => $request->side ?? 'General',
             'status' => 'attending',
             'barcode_token' => $token,
             'created_at' => now(),

@@ -41,6 +41,15 @@
                                class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-lg font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none">
                     </div>
                 </div>
+
+                <div>
+                    <label class="block mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Guest Side</label>
+                    <select name="side" class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-lg font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none appearance-none">
+                        <option value="General">General</option>
+                        <option value="Groom">Groom Side</option>
+                        <option value="Bride">Bride Side</option>
+                    </select>
+                </div>
             </div>
 
             <div class="mt-8 pt-6 border-t border-gray-50">

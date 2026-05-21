@@ -32,7 +32,8 @@
                         <p class="text-sm font-semibold text-gray-700">{{ $guest->phone_number ?? '-' }}</p>
                         <p class="text-sm text-gray-600 mt-1">{{ $guest->pax_invited }} pax</p>
 
-                        <p class="text-[11px] font-bold text-pink-600 mt-4 tracking-wider uppercase">Table: {{ $guest->table_name ?? 'General' }}</p>
+                        <p class="text-[11px] font-bold text-pink-600 mt-4 tracking-wider uppercase">Table: {{ $guest->table_name ?? '-' }}</p>
+                        <p class="text-[11px] font-bold text-blue-600 mt-1 tracking-wider uppercase">Side: {{ $guest->side ?? 'General' }}</p>
 
                         @if($guest->status === 'checked_in')
                             <p class="text-[11px] font-bold text-emerald-600 mt-1 uppercase tracking-wider">Status: CHECKED_IN</p>

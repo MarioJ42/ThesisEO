@@ -87,13 +87,23 @@
                         <input type="text" name="table_name" placeholder="Optional" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
                     </div>
                 </div>
-                <div>
-                    <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
-                    <select name="status" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
-                        <option value="pending">Pending</option>
-                        <option value="attending">Attending</option>
-                        <option value="not_attending">Not Attending</option>
-                    </select>
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Side</label>
+                        <select name="side" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors appearance-none">
+                            <option value="General">General</option>
+                            <option value="Groom">Groom</option>
+                            <option value="Bride">Bride</option>
+                        </select>
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
+                        <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors appearance-none">
+                            <option value="pending">Pending</option>
+                            <option value="attending">Attending</option>
+                            <option value="not_attending">Not Attending</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="flex justify-end p-5 border-t border-gray-100 gap-3 bg-gray-50 rounded-b-xl">
@@ -140,8 +150,16 @@
                             <input type="number" name="pax_invited" x-model="form.pax_invited" min="1" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
                         </div>
                         <div>
+                            <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Side</label>
+                            <select name="side" x-model="form.side" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors appearance-none">
+                                <option value="General">General</option>
+                                <option value="Groom">Groom</option>
+                                <option value="Bride">Bride</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
                             <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
-                            <select name="status" x-model="form.status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors">
+                            <select name="status" x-model="form.status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors appearance-none">
                                 <option value="pending">Pending</option>
                                 <option value="attending">Attending</option>
                                 <option value="not_attending">Not Attending</option>
@@ -233,7 +251,7 @@
     function advancedEditGuestForm(allGuests) {
         return {
             isOpen: false,
-            form: { id: '', name: '', phone_number: '', pax_invited: 1, pax_actual: 0, table_name: '', status: 'attending', angpao_count: 0, angpao_type: 'fisik' },
+            form: { id: '', name: '', phone_number: '', pax_invited: 1, pax_actual: 0, table_name: '', side: 'General', status: 'attending', angpao_count: 0, angpao_type: 'fisik' },
             titipan: [],
             searchQuery: '',
             allGuests: allGuests,
