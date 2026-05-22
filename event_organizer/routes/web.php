@@ -201,7 +201,7 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('client.events.guests.destroy');
 
     Route::get('/events/{event}/billing', [PaymentController::class, 'index'])->name('client.events.billing');
-    Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');
+    Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.eresources/views/events/partials/tab-overview.blade.phpvents.pay');
     Route::put('/events/{event}/slots/{slot}/details', [EventController::class, 'updateSlotDetails'])->name('client.events.slots.details');
 });
 

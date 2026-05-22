@@ -89,6 +89,8 @@ class EventController extends Controller
                     'status' => 'unassigned',
                     'deal_price' => 0,
                     'meal_crew' => 0,
+                    'pic_name' => null,
+                    'pic_phone' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -299,6 +301,8 @@ class EventController extends Controller
             'status' => 'unassigned',
             'deal_price' => 0,
             'meal_crew' => 0,
+            'pic_name' => null,
+            'pic_phone' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -311,13 +315,13 @@ class EventController extends Controller
         if ($request->has('vendor_id')) {
             $request->validate(['vendor_id' => 'required|exists:vendors,id']);
 
-            $contactId = DB::table('vendor_contacts')
+            $contact = DB::table('vendor_contacts')
                 ->where('vendor_id', $request->vendor_id)
                 ->where('is_primary', true)
-                ->value('id');
+                ->first();
 
-            if (!$contactId) {
-                $contactId = DB::table('vendor_contacts')->where('vendor_id', $request->vendor_id)->value('id');
+            if (!$contact) {
+                $contact = DB::table('vendor_contacts')->where('vendor_id', $request->vendor_id)->first();
             }
 
             DB::table('event_vendor')
@@ -325,7 +329,9 @@ class EventController extends Controller
                 ->where('event_id', $event->id)
                 ->update([
                     'vendor_id' => $request->vendor_id,
-                    'vendor_contact_id' => $contactId,
+                    'vendor_contact_id' => $contact ? $contact->id : null,
+                    'pic_name' => $contact ? $contact->name : null,
+                    'pic_phone' => $contact ? $contact->phone : null,
                     'vendor_package_id' => null,
                     'deal_price' => 0,
                     'status' => 'reviewing',
@@ -367,6 +373,8 @@ class EventController extends Controller
                 'status' => 'unassigned',
                 'deal_price' => 0,
                 'meal_crew' => 0,
+                'pic_name' => null,
+                'pic_phone' => null,
                 'updated_at' => now(),
             ]);
 
@@ -390,15 +398,25 @@ class EventController extends Controller
             'vendor_contact_id' => 'nullable|exists:vendor_contacts,id'
         ]);
 
+        $updateData = [
+            'status' => $request->status,
+            'meal_crew' => $request->meal_crew ?? 0,
+            'vendor_contact_id' => $request->vendor_contact_id,
+            'updated_at' => now(),
+        ];
+
+        if ($request->filled('vendor_contact_id')) {
+            $contact = DB::table('vendor_contacts')->where('id', $request->vendor_contact_id)->first();
+            if ($contact) {
+                $updateData['pic_name'] = $contact->name;
+                $updateData['pic_phone'] = $contact->phone;
+            }
+        }
+
         DB::table('event_vendor')
             ->where('id', $slotId)
             ->where('event_id', $event->id)
-            ->update([
-                'status' => $request->status,
-                'meal_crew' => $request->meal_crew ?? 0,
-                'vendor_contact_id' => $request->vendor_contact_id,
-                'updated_at' => now(),
-            ]);
+            ->update($updateData);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => "Vendor's status updated"]);
@@ -442,9 +460,21 @@ class EventController extends Controller
 
         $package = DB::table('vendor_packages')->where('id', $request->package_id)->first();
 
+        $contact = DB::table('vendor_contacts')
+            ->where('vendor_id', $request->vendor_id)
+            ->where('is_primary', true)
+            ->first();
+
+        if (!$contact) {
+            $contact = DB::table('vendor_contacts')->where('vendor_id', $request->vendor_id)->first();
+        }
+
         $event->vendors()->attach($request->vendor_id, [
             'vendor_category_id' => $request->category_id,
             'vendor_package_id' => $request->package_id,
+            'vendor_contact_id' => $contact ? $contact->id : null,
+            'pic_name' => $contact ? $contact->name : null,
+            'pic_phone' => $contact ? $contact->phone : null,
             'session' => $request->session,
             'deal_price' => $package ? $package->price : 0,
             'is_included' => 0,

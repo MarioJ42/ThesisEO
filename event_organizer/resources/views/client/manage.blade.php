@@ -136,15 +136,6 @@
                     <span class="font-medium">{{ session('error') }}</span>
                 </div>
             @endif
-            @if ($errors->any())
-                <div class="mb-8 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
-                    <ul class="list-disc list-inside text-sm font-medium">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
             <div class="flex flex-col lg:flex-row gap-8 items-start" x-data="{ searchCategory: '' }">
 
@@ -253,17 +244,12 @@
                                                                 @endif
                                                             </div>
 
-                                                            {{-- Box Detail Operational PIC & Meal Crew dengan Prioritas Data Terupdate --}}
-                                                            @php
-                                                                $activePicName = $slot->pic_name ?: ($slot->contact_name ?? ($slot->vendorContact->name ?? 'Not assigned'));
-                                                                $activePicPhone = $slot->pic_phone ?: ($slot->contact_phone ?? ($slot->vendorContact->phone ?? ''));
-                                                            @endphp
                                                             <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                                 <div class="flex gap-8">
                                                                     <div>
                                                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">PIC Contact</p>
-                                                                        <p class="font-bold text-gray-900 text-sm">{{ $activePicName }}</p>
-                                                                        @if($activePicPhone) <p class="text-xs text-gray-500 mt-0.5">{{ $activePicPhone }}</p> @endif
+                                                                        <p class="font-bold text-gray-900 text-sm">{{ $slot->pic_name ?: 'Not assigned' }}</p>
+                                                                        @if($slot->pic_phone) <p class="text-xs text-gray-500 mt-0.5">{{ $slot->pic_phone }}</p> @endif
                                                                     </div>
                                                                     <div>
                                                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Meal Crew</p>
@@ -272,8 +258,8 @@
                                                                 </div>
                                                                 <button @click="$dispatch('open-details-modal', {
                                                                         slot_id: {{ $slot->id }},
-                                                                        pic_name: '{{ addslashes($activePicName === 'Not assigned' ? '' : $activePicName) }}',
-                                                                        pic_phone: '{{ addslashes($activePicPhone) }}',
+                                                                        pic_name: '{{ addslashes($slot->pic_name ?? '') }}',
+                                                                        pic_phone: '{{ addslashes($slot->pic_phone ?? '') }}',
                                                                         meal_crew: {{ $slot->meal_crew ?? 0 }}
                                                                     })" class="px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors shadow-sm whitespace-nowrap flex items-center gap-2">
                                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -355,7 +341,6 @@
         </div>
     </main>
 
-    {{-- MODAL PIC & MEAL CREW --}}
     <div x-data="{ isOpen: false, form: { slot_id: '', pic_name: '', pic_phone: '', meal_crew: 0 } }"
          @open-details-modal.window="form = $event.detail; isOpen = true;"
          x-show="isOpen"
