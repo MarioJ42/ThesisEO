@@ -722,5 +722,26 @@ class EventController extends Controller
             ->delete();
 
         return redirect()->back()->with('success', 'Jobdesk slot completely deleted!')->with('active_tab', 'crew');
-    }   
+    }
+
+    public function updateSlotDetails(Request $request, Event $event, $slotId)
+    {
+        $request->validate([
+            'pic_name' => 'nullable|string|max:255',
+            'pic_phone' => 'nullable|string|max:50',
+            'meal_crew' => 'nullable|integer|min:0'
+        ]);
+
+        DB::table('event_vendor')
+            ->where('id', $slotId)
+            ->where('event_id', $event->id)
+            ->update([
+                'pic_name' => $request->pic_name,
+                'pic_phone' => $request->pic_phone,
+                'meal_crew' => $request->meal_crew ?? 0,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', 'Operational details (PIC & Meal Crew) updated successfully!');
+    }
 }

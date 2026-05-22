@@ -202,6 +202,7 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
 
     Route::get('/events/{event}/billing', [PaymentController::class, 'index'])->name('client.events.billing');
     Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');
+    Route::put('/events/{event}/slots/{slot}/details', [EventController::class, 'updateSlotDetails'])->name('client.events.slots.details');
 });
 
 Route::middleware('auth')->group(function () {

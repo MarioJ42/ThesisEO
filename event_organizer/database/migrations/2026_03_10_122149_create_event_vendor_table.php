@@ -20,6 +20,8 @@ return new class extends Migration
             $table->boolean('is_included')->default(false);
             $table->decimal('deal_price', 15, 2)->default(0);
             $table->integer('meal_crew')->default(0);
+            $table->string('pic_name')->nullable();
+            $table->string('pic_phone')->nullable();
             $table->enum('status', ['unassigned', 'reviewing', 'verified', 'rejected'])->default('unassigned');
             $table->timestamps();
         });
