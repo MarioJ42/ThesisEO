@@ -15,13 +15,15 @@ class OwnerController extends Controller
     {
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $events = \App\Models\Event::all();
 
         $users = User::where('role', '!=', 'klien')
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%");
             })->paginate($perPage)->appends(request()->query());
 
-        return view('owner.users', compact('users'));
+        return view('owner.users', compact('users', 'user', 'events'));
     }
 
     public function storeUser(Request $request)
@@ -41,6 +43,7 @@ class OwnerController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_active' => true,
+            'must_change_password' => true,
         ]);
 
         return redirect()->route('owner.users')->with('success', 'User account successfully added!');
@@ -107,6 +110,7 @@ class OwnerController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'klien',
             'is_active' => true,
+            'must_change_password' => true,
         ]);
 
         return redirect()->route('owner.clients')->with('success', 'Client account successfully added!');

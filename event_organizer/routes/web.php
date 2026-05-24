@@ -208,6 +208,7 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/force-change-password', [\App\Http\Controllers\ProfileController::class, 'forceChangePassword'])->name('password.force_change')->middleware('auth');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
