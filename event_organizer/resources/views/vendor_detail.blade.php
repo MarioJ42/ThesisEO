@@ -9,6 +9,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -16,6 +17,26 @@
 
         [x-cloak] {
             display: none !important;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+        }
+        .fc .fc-button-primary {
+            background-color: #1f2937 !important;
+            border-color: #1f2937 !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #111827 !important;
+            border-color: #111827 !important;
+        }
+        .fc .fc-button-primary:disabled {
+            background-color: #9ca3af !important;
+            border-color: #9ca3af !important;
         }
     </style>
 </head>
@@ -202,6 +223,16 @@
                 @endif
             </div>
 
+            <div class="mb-16">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                    <h2 class="text-2xl font-bold text-gray-900">Jadwal Ketersediaan Vendor</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                    <div id="vendorCalendar" class="p-2"></div>
+                </div>
+            </div>
+
             <div>
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-1.5 h-6 bg-gray-900 rounded-full"></div>
@@ -304,6 +335,25 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('vendorCalendar');
+            if (calendarEl) {
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: ''
+                    },
+                    events: "{{ route('vendor.calendar.events', $vendor->id) }}",
+                    height: 'auto',
+                    locale: 'id'
+                });
+                calendar.render();
+            }
+        });
+    </script>
 </body>
 
 </html>

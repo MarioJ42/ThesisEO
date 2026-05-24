@@ -1,43 +1,74 @@
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
 <div x-show="activeTab === 'planning'" x-cloak>
     <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900">
             {{ $event->package ? $event->package->name : 'Custom Package' }}</h3>
     </div>
 
-    <div class="mb-8 bg-gray-50 border border-gray-200 rounded-lg p-5">
-        <h4 class="font-bold text-gray-800 mb-2">Add Custom Slot (Add-on)</h4>
-        <form action="{{ route($user->role . '.events.slots.custom', $event->id) }}" method="POST"
-            class="flex flex-col sm:flex-row gap-4 items-end">
-            @csrf
-            <div class="w-full sm:w-1/4">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Session</label>
-                <select name="session" required
-                    class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="morning">Morning Session</option>
-                    <option value="evening">Reception</option>
-                </select>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+            <h4 class="font-bold text-gray-800 mb-2">Add Custom Slot (Add-on)</h4>
+            <form action="{{ route($user->role . '.events.slots.custom', $event->id) }}" method="POST"
+                class="flex flex-col sm:flex-row gap-4 items-end">
+                @csrf
+                <div class="w-full sm:w-1/4">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Session</label>
+                    <select name="session" required
+                        class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="morning">Morning Session</option>
+                        <option value="evening">Reception</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-1/4">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Category</label>
+                    <select name="vendor_category_id" required
+                        class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="" disabled selected>Select Category</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="w-full sm:w-2/4">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Note</label>
+                    <input type="text" name="role_detail" placeholder="Optional"
+                        class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                </div>
+                <div>
+                    <button type="submit"
+                        class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-bold w-full sm:w-auto whitespace-nowrap">Add
+                        Slot</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-blue-50/50 border border-blue-200 rounded-lg p-5" x-data="{ checkVendorId: '' }">
+            <h4 class="font-bold text-blue-900 mb-2">Cek Ketersediaan Jadwal Vendor</h4>
+            <div class="flex flex-col sm:flex-row gap-4 items-end h-[calc(105px-1.5rem)]">
+                <div class="flex-grow w-full">
+                    <label class="block text-xs font-semibold text-blue-800 mb-1">Pilih Vendor Partner</label>
+                    <select x-model="checkVendorId" class="w-full border-gray-300 text-sm rounded-md p-2 bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled selected>Pilih salah satu vendor...</option>
+                        @foreach ($categories as $category)
+                            <optgroup label="{{ $category->name }}">
+                                @foreach ($category->vendors as $v)
+                                    <option value="{{ $v->id }}">{{ $v->name }}</option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <button type="button"
+                        @click="$dispatch('open-vendor-calendar', { id: checkVendorId })"
+                        :disabled="!checkVendorId"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-bold w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all h-[38px] flex items-center justify-center whitespace-nowrap">
+                        Lihat Kalender
+                    </button>
+                </div>
             </div>
-            <div class="w-full sm:w-1/4">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Category</label>
-                <select name="vendor_category_id" required
-                    class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="" disabled selected>Select Category</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="w-full sm:w-2/4">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Note</label>
-                <input type="text" name="role_detail" placeholder="Optional"
-                    class="w-full border-gray-300 text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <button type="submit"
-                    class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-bold w-full sm:w-auto whitespace-nowrap">Add
-                    Slot</button>
-            </div>
-        </form>
+        </div>
     </div>
 
     @foreach (['morning' => 'Morning Session', 'evening' => 'Reception'] as $sessionKey => $sessionTitle)
@@ -189,7 +220,7 @@
                                                                 : 0;
                                                     @endphp
                                                     <select name="vendor_package_id" required
-                                                        class="w-full border-gray-300 text-xs rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full">
+                                                        class="w-full border-gray-300 text-xs rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full bg-white">
                                                         <option value="" disabled selected>Select Package
                                                         </option>
                                                         @foreach ($packages as $pkg)
@@ -232,7 +263,7 @@
                                                     method="POST" class="flex gap-2 flex-grow h-full">
                                                     @csrf @method('PUT')
                                                     <select name="vendor_id" required
-                                                        class="w-full border-gray-300 text-sm rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full">
+                                                        class="w-full border-gray-300 text-sm rounded-md p-1.5 focus:ring-blue-500 focus:border-blue-500 h-full bg-white">
                                                         <option value="" disabled selected>Select Vendor
                                                         </option>
                                                         @foreach ($availableVendors as $v)
@@ -264,4 +295,50 @@
             </div>
         @endif
     @endforeach
+</div>
+
+<div x-data="{
+        isOpen: false,
+        vendorId: null,
+        calendar: null,
+        initCalendar() {
+            const calendarEl = document.getElementById('modalCalendar');
+            if (!calendarEl) return;
+
+            if (this.calendar) {
+                this.calendar.destroy();
+            }
+
+            this.calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+                height: 'auto',
+                locale: 'id',
+                events: `/vendor/${this.vendorId}/calendar-events`
+            });
+
+            setTimeout(() => {
+                this.calendar.render();
+            }, 150);
+        }
+     }"
+     @open-vendor-calendar.window="isOpen = true; vendorId = $event.detail.id; $nextTick(() => initCalendar())"
+     x-show="isOpen"
+     style="display: none;"
+     class="fixed inset-0 z-[150] flex items-center justify-center overflow-y-auto bg-gray-900/50 backdrop-blur-sm"
+     x-cloak>
+
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl mx-4 p-6 z-10 animate-fade-in" @click.outside="isOpen = false">
+        <button @click="isOpen = false" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Kalender Vendor</h3>
+
+        <div class="border-t border-gray-100 pt-4">
+            <div id="modalCalendar"></div>
+        </div>
+    </div>
 </div>

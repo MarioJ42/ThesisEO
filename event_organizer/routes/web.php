@@ -9,6 +9,7 @@ use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\PublicInvitationController;
 use App\Http\Controllers\CrewRsvpController;
 use App\Http\Controllers\CrewController;
+use App\Http\Controllers\VendorController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
@@ -56,23 +57,8 @@ Route::get('/vendor', function () {
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->name('vendor');
 
-Route::get('/vendor/{id}/detail', function ($id) {
-    if (Auth::check()) {
-        if (Auth::user()->role === 'owner') return redirect()->route('owner.dashboard');
-        if (Auth::user()->role === 'pl') return redirect()->route('pl.dashboard');
-        if (Auth::user()->role === 'crew_eo') return redirect()->route('crew.dashboard');
-    }
-
-    $vendor = \App\Models\Vendor::with(['categories', 'packages', 'portfolios'])->findOrFail($id);
-
-    $clientEvents = collect();
-    if (Auth::check() && Auth::user()->role === 'klien') {
-        $clientEvents = \App\Models\Event::where('client_id', Auth::id())
-            ->where('status', 'Planning')->get();
-    }
-
-    return view('vendor_detail', compact('vendor', 'clientEvents'));
-})->name('vendor.show');
+Route::get('/vendor/{id}/detail', [VendorController::class, 'show'])->name('vendor.show');
+Route::get('/vendor/{id}/calendar-events', [VendorController::class, 'getCalendarEvents'])->name('vendor.calendar.events');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::get('/dashboard', function () {
@@ -201,7 +187,7 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::delete('/events/{event}/guests/{guest}', [EventController::class, 'destroyGuest'])->name('client.events.guests.destroy');
 
     Route::get('/events/{event}/billing', [PaymentController::class, 'index'])->name('client.events.billing');
-    Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.eresources/views/events/partials/tab-overview.blade.phpvents.pay');
+    Route::post('/events/{event}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');
     Route::put('/events/{event}/slots/{slot}/details', [EventController::class, 'updateSlotDetails'])->name('client.events.slots.details');
 });
 
