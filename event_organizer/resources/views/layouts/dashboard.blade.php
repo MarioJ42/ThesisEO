@@ -88,7 +88,10 @@
     <main class="flex-1 flex flex-col overflow-hidden">
         <header class="h-16 bg-white shadow-sm flex items-center px-8 border-b border-gray-100">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Welcome, {{ Auth::user()->name }}
+                Welcome,
+                <a href="{{ route('profile.edit') }}" title="Edit Profile" class="hover:text-blue-600 hover:underline underline-offset-4 transition-all duration-200">
+                    {{ Auth::user()->name }}
+                </a>
             </h2>
         </header>
 

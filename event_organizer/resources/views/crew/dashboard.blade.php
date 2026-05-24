@@ -19,14 +19,16 @@
 
     <div class="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
-                {{ substr(Auth::user()->name, 0, 1) }}
-            </div>
+            {{-- Logo inisial huruf sudah dihapus di sini --}}
             <div>
                 <div class="mb-1.5 flex items-center h-6">
                     <img src="{{ asset('logo.png') }}" alt="Fenix EO Logo" class="h-full object-contain" onerror="this.outerHTML='<span class=\'text-xs font-bold text-gray-400 uppercase tracking-widest\'>FENIX EVENT ORGANIZER</span>'">
                 </div>
-                <h1 class="text-xl md:text-2xl font-bold text-gray-900">{{ Auth::user()->name }}</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-900">
+                    <a href="{{ route('profile.edit') }}" title="Edit Profile" class="hover:text-blue-600 hover:underline underline-offset-4 transition-all duration-200">
+                        {{ Auth::user()->name }}
+                    </a>
+                </h1>
             </div>
         </div>
         <form id="logout-form" method="POST" action="{{ route('logout') }}" class="m-0">
