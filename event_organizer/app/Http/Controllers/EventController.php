@@ -32,13 +32,21 @@ class EventController extends Controller
             return view('client.events', compact('events', 'packages', 'user'));
         }
 
-        $query = Event::with(['client', 'package', 'pl'])
-            ->when($search, function ($q, $search) {
-                return $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('pl', function ($subQ) use ($search) {
-                        $subQ->where('name', 'like', "%{$search}%");
+        $query = Event::with(['client', 'package', 'pl']);
+
+        if ($user->role === 'pl') {
+            $query->where('pl_id', $user->id)
+                ->where('status', '!=', 'draft');
+        }
+
+        $query->when($search, function ($q, $search) {
+            return $q->where(function ($subQuery) use ($search) {
+                $subQuery->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('pl', function ($plQuery) use ($search) {
+                        $plQuery->where('name', 'like', "%{$search}%");
                     });
-            })
+            });
+        })
             ->latest();
 
         $events = $query->paginate($perPage)->appends(request()->query());
