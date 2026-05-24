@@ -126,6 +126,7 @@
                                                 </form>
                                             @endif
 
+                                            {{-- Tombol Delete Slot HANYA muncul saat status Vacant --}}
                                             <form
                                                 action="{{ route($user->role . '.events.crew.delete', [$event->id, $slot->id]) }}"
                                                 method="POST" class="m-0">
@@ -156,15 +157,6 @@
                                                 <button type="submit"
                                                     class="text-orange-600 hover:text-orange-800 text-xs font-bold bg-orange-50 px-3 py-1.5 rounded-lg transition-colors"
                                                     title="Remove Crew from this slot">Remove Crew</button>
-                                            </form>
-
-                                            <form
-                                                action="{{ route($user->role . '.events.crew.delete', [$event->id, $slot->id]) }}"
-                                                method="POST" class="m-0">
-                                                @csrf @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)"
-                                                    class="text-red-600 hover:text-red-800 text-xs font-bold bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
-                                                    title="Completely Delete Slot">Delete Slot</button>
                                             </form>
                                         </div>
                                     </td>

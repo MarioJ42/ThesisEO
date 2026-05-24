@@ -722,13 +722,37 @@ class EventController extends Controller
 
     public function rejectCrew(Event $event, $slotId)
     {
+        $slot = DB::table('event_crew')->where('id', $slotId)->first();
+
+        if ($slot && $slot->user_id) {
+            $existsInPool = DB::table('event_crew')
+                ->where('event_id', $event->id)
+                ->where('user_id', $slot->user_id)
+                ->where('status', 'Requested')
+                ->exists();
+
+            if (!$existsInPool) {
+                DB::table('event_crew')->insert([
+                    'event_id' => $event->id,
+                    'user_id' => $slot->user_id,
+                    'jobdesk' => '-',
+                    'session' => '-',
+                    'status' => 'Requested',
+                    'fee' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        }
+
         DB::table('event_crew')->where('id', $slotId)->update([
             'user_id' => null,
             'fee' => 0,
             'status' => 'Vacant',
             'updated_at' => now()
         ]);
-        return redirect()->back()->with('error', 'Crew removed/rejected. Slot is vacant again.')->with('active_tab', 'crew');
+
+        return redirect()->back()->with('error', 'Crew removed from slot and returned to Applicant Pool.')->with('active_tab', 'crew');
     }
 
     public function addCustomCrewSlot(Request $request, Event $event)
