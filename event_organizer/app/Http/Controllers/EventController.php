@@ -59,15 +59,25 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        $role = Auth::user()->role;
+
+        if ($role === 'owner') {
+            $dateValidation = 'required|date|after_or_equal:today';
+        } elseif ($role === 'klien') {
+            $minClientDate = \Carbon\Carbon::today()->addDays(21)->format('Y-m-d');
+            $dateValidation = 'required|date|after_or_equal:' . $minClientDate;
+        } else {
+            $dateValidation = 'required|date|after:today';
+        }
+
         $request->validate([
             'client_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255|unique:events,title',
-            'event_date' => 'required|date|after:today',
+            'event_date' => $dateValidation,
             'package_id' => 'required',
         ]);
 
         $packageId = $request->package_id === 'custom' ? null : $request->package_id;
-        $role = Auth::user()->role;
         $status = ($role === 'owner' || $role === 'pl') ? 'planning' : 'draft';
         $plId = ($role === 'owner' || $role === 'pl') ? Auth::id() : null;
 
@@ -118,14 +128,27 @@ class EventController extends Controller
     {
         $request->validate([
             'pl_id' => 'nullable|exists:users,id',
-            'status' => 'required|in:draft,planning,ongoing,completed,canceled',
+            'status' => 'nullable|in:draft,planning,ongoing,completed,canceled',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        $event->pl_id = $request->pl_id;
-        $event->status = $request->status;
+        if ($request->has('pl_id')) {
+            $event->pl_id = $request->pl_id;
+        }
 
-        if ($event->pl_id && $event->status === 'draft') {
-            $event->status = 'planning';
+        if ($request->has('status')) {
+            $event->status = $request->status;
+            if ($event->pl_id && $event->status === 'draft') {
+                $event->status = 'planning';
+            }
+        }
+
+        if ($request->hasFile('cover_image')) {
+            if ($event->cover_image && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->cover_image)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($event->cover_image);
+            }
+            $path = $request->file('cover_image')->store('event_covers', 'public');
+            $event->cover_image = $path;
         }
 
         $event->save();

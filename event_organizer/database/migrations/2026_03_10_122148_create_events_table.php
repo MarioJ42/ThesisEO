@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->date('event_date');
             $table->string('venue')->nullable();
+            $table->string('cover_image')->nullable();
             $table->decimal('total_price', 15, 2)->nullable();
             $table->enum('status', ['draft', 'planning', 'ongoing', 'completed', 'canceled'])->default('draft');
             $table->timestamps();

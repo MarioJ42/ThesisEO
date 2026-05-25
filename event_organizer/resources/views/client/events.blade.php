@@ -241,7 +241,7 @@
 
                     <div>
                         <label class="block mb-1.5 text-sm font-bold text-gray-900">Event Date <span class="text-red-500">*</span></label>
-                        <input type="date" name="event_date" required min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
+                        <input type="date" name="event_date" required min="{{ \Carbon\Carbon::today()->addDays(21)->format('Y-m-d') }}" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
                     </div>
 
                     <div>

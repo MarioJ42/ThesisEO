@@ -205,7 +205,10 @@
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Event Date <span class="text-red-500">*</span></label>
-                        <input type="date" name="event_date" min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <input type="date" name="event_date"
+                            min="{{ Auth::user()->role === 'owner' ? \Carbon\Carbon::today()->format('Y-m-d') : \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
+                            required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900">Wedding Package <span class="text-red-500">*</span></label>

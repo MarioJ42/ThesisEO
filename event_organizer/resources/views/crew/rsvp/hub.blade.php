@@ -3,7 +3,7 @@
 @section('content')
     <div class="relative w-full h-screen overflow-hidden bg-gray-900" x-data="{ menuOpen: false }">
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-            style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop');">
+            style="background-image: url('{{ $event->cover_image ? asset('storage/' . $event->cover_image) : 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop' }}');">
         </div>
 
         <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
