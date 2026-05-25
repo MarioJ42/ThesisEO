@@ -14,7 +14,7 @@
         <h4 class="text-3xl font-bold text-blue-600 mt-3">{{ $guest->name }}</h4>
     </div>
 
-    <form action="{{ route('crew.rsvp.checkin.process', [$event->id, $guest->id]) }}" method="POST" class="space-y-6">
+    <form action="{{ route('crew.rsvp.checkin.process', [$event->id, $guest->id]) }}" method="POST" class="space-y-6" @submit="submitForm($event, {{ $event->id }}, {{ $guest->id }})">
         @csrf
         <div class="bg-white rounded-[2rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50">
 
@@ -134,6 +134,35 @@
 
             removeTitipan(index) {
                 this.titipan.splice(index, 1);
+            },
+
+            submitForm(event, eventId, guestId) {
+                event.preventDefault();
+                const checkinData = {
+                    guest_id: guestId,
+                    pax_actual: this.pax,
+                    angpao_count: this.gift,
+                    angpao_type: this.type,
+                    titipan_data: this.titipan,
+                    timestamp: new Date().toISOString()
+                };
+
+                if (navigator.onLine) {
+                    event.target.submit();
+                } else {
+                    const storageKey = 'offline_checkin_' + eventId;
+                    let offlineData = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+                    const existingIndex = offlineData.findIndex(d => d.guest_id === guestId);
+                    if(existingIndex >= 0) {
+                        offlineData[existingIndex] = checkinData;
+                    } else {
+                        offlineData.push(checkinData);
+                    }
+
+                    localStorage.setItem(storageKey, JSON.stringify(offlineData));
+                    window.location.href = `/crew/events/${eventId}/rsvp`;
+                }
             }
         }
     }

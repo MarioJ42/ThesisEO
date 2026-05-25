@@ -1,7 +1,7 @@
 @extends('layouts.guest_rsvp')
 
 @section('content')
-<div class="relative max-w-xl mx-auto p-8 min-h-screen flex flex-col justify-center">
+<div class="relative max-w-xl mx-auto p-8 min-h-screen flex flex-col justify-center" x-data="createGuestForm({{ $event->id }})">
 
     <a href="{{ route('crew.rsvp.hub', $event->id) }}" class="absolute top-8 right-8 text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors tracking-wider">
         &larr; Back to Hub
@@ -12,7 +12,7 @@
         <h3 class="text-5xl font-serif text-gray-900 tracking-tight">Add New Guest</h3>
     </div>
 
-    <form action="{{ route('crew.rsvp.guests.store', $event->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('crew.rsvp.guests.store', $event->id) }}" method="POST" class="space-y-6" @submit="submitForm($event)">
         @csrf
         <div class="bg-white rounded-[2rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50">
 
@@ -64,4 +64,33 @@
         </button>
     </form>
 </div>
+
+<script>
+    function createGuestForm(eventId) {
+        return {
+            submitForm(event) {
+                event.preventDefault();
+                if (navigator.onLine) {
+                    event.target.submit();
+                } else {
+                    const formData = new FormData(event.target);
+                    const newGuest = {
+                        name: formData.get('name'),
+                        phone_number: formData.get('phone_number'),
+                        pax_invited: formData.get('pax_invited'),
+                        table_name: formData.get('table_name'),
+                        side: formData.get('side'),
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const storageKey = 'offline_new_guests_' + eventId;
+                    let offlineData = JSON.parse(localStorage.getItem(storageKey)) || [];
+                    offlineData.push(newGuest);
+                    localStorage.setItem(storageKey, JSON.stringify(offlineData));
+                    window.location.href = `/crew/events/${eventId}/rsvp`;
+                }
+            }
+        }
+    }
+</script>
 @endsection

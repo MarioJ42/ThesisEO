@@ -204,4 +204,79 @@ class CrewRsvpController extends Controller
 
         return view('crew.rsvp.summary', compact('event', 'guest'));
     }
+    public function syncOfflineData(Request $request, Event $event)
+    {
+        $this->authorizeAccess($event);
+
+        $payload = json_decode($request->getContent(), true);
+        if (!is_array($payload)) {
+            return response()->json(['success' => false, 'message' => 'Invalid data format']);
+        }
+
+        $checkins = $payload['checkins'] ?? [];
+        $newGuests = $payload['new_guests'] ?? [];
+
+        if (empty($checkins) && empty($newGuests)) {
+            return response()->json(['success' => false, 'message' => 'No data to sync']);
+        }
+
+        DB::beginTransaction();
+        try {
+            $syncedNewGuests = 0;
+            foreach ($newGuests as $guest) {
+                $token = Str::random(10);
+                while (DB::table('guests')->where('barcode_token', $token)->exists()) {
+                    $token = Str::random(10);
+                }
+
+                DB::table('guests')->insert([
+                    'event_id' => $event->id,
+                    'name' => $guest['name'],
+                    'phone_number' => $guest['phone_number'],
+                    'pax_invited' => $guest['pax_invited'],
+                    'table_name' => $guest['table_name'],
+                    'side' => $guest['side'] ?? 'General',
+                    'status' => 'attending',
+                    'barcode_token' => $token,
+                    'created_at' => \Carbon\Carbon::parse($guest['timestamp'])->format('Y-m-d H:i:s'),
+                    'updated_at' => now(),
+                ]);
+                $syncedNewGuests++;
+            }
+
+            $syncedCheckins = 0;
+            foreach ($checkins as $data) {
+                DB::table('guests')->where('id', $data['guest_id'])->update([
+                    'status' => 'checked_in',
+                    'check_in_time' => \Carbon\Carbon::parse($data['timestamp'])->format('Y-m-d H:i:s'),
+                    'pax_actual' => $data['pax_actual'],
+                    'angpao_type' => $data['angpao_type'],
+                    'angpao_count' => $data['angpao_count'],
+                    'updated_at' => now(),
+                ]);
+
+                if (!empty($data['titipan_data'])) {
+                    foreach ($data['titipan_data'] as $titipan) {
+                        DB::table('guests')->where('id', $titipan['id'])->update([
+                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
+                            'angpao_type' => $data['angpao_type'],
+                            'angpao_titipan' => true,
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+                $syncedCheckins++;
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'synced_checkins' => $syncedCheckins,
+                'synced_new_guests' => $syncedNewGuests
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

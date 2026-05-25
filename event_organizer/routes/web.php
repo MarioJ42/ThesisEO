@@ -170,7 +170,8 @@ Route::middleware(['auth'])->prefix('crew')->group(function () {
         Route::get('/checkin/{token}', [CrewRsvpController::class, 'checkInForm'])->name('crew.rsvp.checkin.form');
         Route::post('/checkin/{guest}', [CrewRsvpController::class, 'processCheckIn'])->name('crew.rsvp.checkin.process');
         Route::get('/checkin/{guest}/summary', [CrewRsvpController::class, 'checkInSummary'])->name('crew.rsvp.checkin.summary');
-    });
+        Route::post('/sync', [CrewRsvpController::class, 'syncOfflineData'])->name('crew.rsvp.sync');
+        });
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
