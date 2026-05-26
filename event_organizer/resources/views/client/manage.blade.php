@@ -90,9 +90,11 @@
 
                     @php
                         $hasFenixGuestbook = $slots->contains(function ($slot) {
-                            return str_contains(strtolower(trim($slot->category_name)), 'guest book') &&
-                                   str_contains(strtolower(trim($slot->vendor_name)), 'fenix eo') &&
-                                   in_array($slot->status, ['verified', 'signed']);
+                            $catName = strtolower(trim($slot->category_name));
+                            $venName = strtolower(trim($slot->vendor_name));
+                            $isRsvp = str_contains($catName, 'guest book') || str_contains($catName, 'rsvp') || str_contains($catName, 'digital');
+                            $isFenix = str_contains($venName, 'fenix');
+                            return $isRsvp && $isFenix && in_array($slot->status, ['verified', 'signed']);
                         });
                     @endphp
 

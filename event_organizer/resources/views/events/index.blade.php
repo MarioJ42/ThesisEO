@@ -134,8 +134,12 @@
                             <td class="px-6 py-4 text-sm text-center">
                                 <div class="flex justify-center gap-2">
                                     <button @click="openEditModal({{ $event->id }}, '{{ addslashes($event->title) }}', '{{ $event->pl_id }}', '{{ $event->package ? addslashes($event->package->name) : 'Custom' }}', '{{ \Carbon\Carbon::parse($event->event_date)->format('Y-m-d') }}', '{{ $event->status }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors">Quick Edit</button>
+
                                     @if(!in_array($event->status, ['draft', 'canceled']))
                                     <a href="{{ route($user->role . '.events.manage', $event->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Manage</a>
+
+                                    {{-- TOMBOL ANALYTICS DITAMBAHKAN DI SINI --}}
+                                    <a href="{{ route($user->role . '.events.analytics', $event->id) }}" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Analytics</a>
                                     @endif
                                 </div>
                             </td>

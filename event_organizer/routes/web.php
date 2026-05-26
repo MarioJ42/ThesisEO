@@ -10,6 +10,7 @@ use App\Http\Controllers\PublicInvitationController;
 use App\Http\Controllers\CrewRsvpController;
 use App\Http\Controllers\CrewController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\AnalyticsController;
 use App\Models\EoPortfolio;
 use App\Models\WeddingPackage;
 use App\Models\VendorCategory;
@@ -61,12 +62,8 @@ Route::get('/vendor/{id}/detail', [VendorController::class, 'show'])->name('vend
 Route::get('/vendor/{id}/calendar-events', [VendorController::class, 'getCalendarEvents'])->name('vendor.calendar.events');
 
 Route::middleware(['auth'])->prefix('owner')->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'owner') {
-            return redirect('/');
-        }
-        return view('owner.dashboard');
-    })->name('owner.dashboard');
+    Route::get('/dashboard', [AnalyticsController::class, 'ownerDashboard'])->name('owner.dashboard');
+    Route::get('/events/{event}/analytics', [AnalyticsController::class, 'eventAnalytics'])->name('owner.events.analytics');
 
     Route::get('/users', [OwnerController::class, 'users'])->name('owner.users');
     Route::post('/users', [OwnerController::class, 'storeUser'])->name('owner.users.store');
@@ -126,12 +123,8 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'pl') {
-            return redirect('/');
-        }
-        return view('pl.dashboard');
-    })->name('pl.dashboard');
+    Route::get('/dashboard', [AnalyticsController::class, 'plDashboard'])->name('pl.dashboard');
+    Route::get('/events/{event}/analytics', [AnalyticsController::class, 'eventAnalytics'])->name('pl.events.analytics');
 
     Route::get('/events', [EventController::class, 'index'])->name('pl.events.index');
     Route::post('/events', [EventController::class, 'store'])->name('pl.events.store');
@@ -171,7 +164,7 @@ Route::middleware(['auth'])->prefix('crew')->group(function () {
         Route::post('/checkin/{guest}', [CrewRsvpController::class, 'processCheckIn'])->name('crew.rsvp.checkin.process');
         Route::get('/checkin/{guest}/summary', [CrewRsvpController::class, 'checkInSummary'])->name('crew.rsvp.checkin.summary');
         Route::post('/sync', [CrewRsvpController::class, 'syncOfflineData'])->name('crew.rsvp.sync');
-        });
+    });
 });
 
 Route::middleware(['auth'])->prefix('client')->group(function () {
@@ -191,7 +184,9 @@ Route::middleware(['auth'])->prefix('client')->group(function () {
     Route::post('/events/{evetab-overview.blade.phpnt}/pay', [PaymentController::class, 'pay'])->name('client.events.pay');
     Route::put('/events/{event}/slots/{slot}/details', [EventController::class, 'updateSlotDetails'])->name('client.events.slots.details');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('client.events.update');
-    });
+
+    Route::get('/events/{event}/analytics', [AnalyticsController::class, 'eventAnalytics'])->name('client.events.analytics');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
