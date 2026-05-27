@@ -343,6 +343,9 @@ class EventController extends Controller
 
     public function assignVendorToSlot(Request $request, Event $event, $slotId)
     {
+        $slot = DB::table('event_vendor')->where('id', $slotId)->where('event_id', $event->id)->first();
+        if (!$slot) return redirect()->back()->with('error', 'Invalid slot.');
+
         if ($request->has('vendor_id')) {
             $request->validate(['vendor_id' => 'required|exists:vendors,id']);
 
@@ -353,6 +356,25 @@ class EventController extends Controller
 
             if (!$contact) {
                 $contact = DB::table('vendor_contacts')->where('vendor_id', $request->vendor_id)->first();
+            }
+
+            if ($slot->vendor_category_id == 1) {
+                DB::table('event_vendor')
+                    ->where('id', $slotId)
+                    ->where('event_id', $event->id)
+                    ->update([
+                        'vendor_id' => $request->vendor_id,
+                        'vendor_contact_id' => $contact ? $contact->id : null,
+                        'pic_name' => $contact ? $contact->name : null,
+                        'pic_phone' => $contact ? $contact->phone : null,
+                        'vendor_package_id' => null,
+                        'deal_price' => 0,
+                        'net_price' => 0,
+                        'status' => 'verified',
+                        'updated_at' => now(),
+                    ]);
+
+                return redirect()->back()->with('success', 'Hotel venue selected successfully! No package selection required.');
             }
 
             DB::table('event_vendor')

@@ -571,6 +571,46 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 71,
+                'name' => 'Four Clover',
+                'address' => 'Surabaya',
+                'instagram' => 'fourclover.florist',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 72,
+                'name' => 'Retro Magis',
+                'address' => 'Surabaya',
+                'instagram' => '@retromagis',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 73,
+                'name' => 'Han Palace',
+                'address' => 'Surabaya',
+                'instagram' => '@hanpalace.surabaya',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 74,
+                'name' => 'Xiang Fu Hai',
+                'address' => 'Surabaya',
+                'instagram' => '@xiangfuhaicuisine',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 75,
+                'name' => 'Double Tree',
+                'address' => 'Surabaya',
+                'instagram' => '@doubletreebyhiltonsurabaya',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         $formattedVendors = [];
@@ -612,7 +652,7 @@ class VendorSeeder extends Seeder
             //New Royal
             ['vendor_id' => 4, 'category_id' => 22], //Venue
 
-            //Laviere Lounge (Morazen)
+            //Previere Lounge (Morazen)
             ['vendor_id' => 5, 'category_id' => 22], //Venue
 
             //Confera
@@ -884,6 +924,19 @@ class VendorSeeder extends Seeder
 
             //Nasi Campur Tambak Bayan
             ['vendor_id' => 70, 'category_id' => 21], //Guest Lunch
+
+            //Four Clover
+            ['vendor_id' => 71, 'category_id' => 14], //Hand Bouquet
+            ['vendor_id' => 71, 'category_id' => 15], //Corsage
+
+            //Han Palace
+            ['vendor_id' => 72, 'category_id' => 22], //Venue
+
+            //Xiang Fu Hai
+            ['vendor_id' => 73, 'category_id' => 22], //Venue
+
+            //Double Tree
+            ['vendor_id' => 74, 'category_id' => 22], //Venue
         ];
 
         foreach (array_chunk($categoryVendor, 50) as $chunk) {

@@ -14,7 +14,7 @@ class WeddingPackageSeeder extends Seeder
                 'id' => 1,
                 'name' => 'Holy Matrimony',
                 'base_price' => 30000000,
-                'eo_fee' => 5000000,
+                'eo_fee' => 5500000,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -22,7 +22,7 @@ class WeddingPackageSeeder extends Seeder
                 'id' => 2,
                 'name' => 'Half Day Wedding',
                 'base_price' => 54500000,
-                'eo_fee' => 8000000,
+                'eo_fee' => 9000000,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -38,7 +38,7 @@ class WeddingPackageSeeder extends Seeder
                 'id' => 4,
                 'name' => 'Dreamy Full Day Wedding',
                 'base_price' => 133500000,
-                'eo_fee' => 16000000,
+                'eo_fee' => 13500000,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
