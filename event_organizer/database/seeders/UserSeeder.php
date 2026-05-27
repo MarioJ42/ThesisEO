@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'Fenix',
-                'email' => 'f@f.com',
+                'email' => 'fenix@f.com',
                 'phone' => '+6281234567890',
                 'role' => 'owner',
                 'password' => Hash::make('12345'),
@@ -39,9 +39,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => 'Lilyana Levina',
-                'email' => 'l@l.com',
-                'phone' => '081234567890',
+                'name' => 'Januar Andika',
+                'email' => 'januarand5@gmail.com',
+                'phone' => '08137459112',
                 'role' => 'klien',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),

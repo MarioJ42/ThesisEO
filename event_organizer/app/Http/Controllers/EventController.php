@@ -377,6 +377,25 @@ class EventController extends Controller
                 return redirect()->back()->with('success', 'Hotel venue selected successfully! No package selection required.');
             }
 
+            if ($request->vendor_id == 1) {
+                DB::table('event_vendor')
+                    ->where('id', $slotId)
+                    ->where('event_id', $event->id)
+                    ->update([
+                        'vendor_id' => $request->vendor_id,
+                        'vendor_contact_id' => $contact ? $contact->id : null,
+                        'pic_name' => $contact ? $contact->name : null,
+                        'pic_phone' => $contact ? $contact->phone : null,
+                        'vendor_package_id' => null,
+                        'deal_price' => 0,
+                        'net_price' => 0,
+                        'status' => 'verified',
+                        'updated_at' => now(),
+                    ]);
+
+                return redirect()->back()->with('success', 'Fenix EO assigned! Please input the custom pricing in the Verification tab.');
+            }
+
             DB::table('event_vendor')
                 ->where('id', $slotId)
                 ->where('event_id', $event->id)

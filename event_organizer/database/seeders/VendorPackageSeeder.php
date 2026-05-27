@@ -191,6 +191,14 @@ class VendorPackageSeeder extends Seeder
             // Double Tree (75)
             ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'BUFFET 150 PAX (BALLROOM)', 'price' => 97500000],
             ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX (BALLROOM)', 'price' => 150000],
+
+            // Savore (76)
+            ['vendor_id' => 76, 'vendor_category_id' => 22, 'name' => 'BUFFET 150 PAX', 'price' => 83700000],
+            ['vendor_id' => 76, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 558000],
+
+            // 13. Lighting (Cat 3)
+            // Glow Effect (35)
+            ['vendor_id' => 62, 'vendor_category_id' => 24, 'name' => 'Standard Service', 'price' => 4000000],
         ];
 
         $formattedPackages = array_map(function ($pkg) {

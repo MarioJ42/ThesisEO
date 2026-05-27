@@ -611,6 +611,14 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 76,
+                'name' => 'Savore',
+                'address' => 'Jl. Mayjen HR. Muhammad No.31, Surabaya, Indonesia 60189',
+                'instagram' => '@vasahotel',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         $formattedVendors = [];
@@ -937,6 +945,9 @@ class VendorSeeder extends Seeder
 
             //Double Tree
             ['vendor_id' => 74, 'category_id' => 22], //Venue
+
+            //Savore
+            ['vendor_id' => 75, 'category_id' => 22], //Venue
         ];
 
         foreach (array_chunk($categoryVendor, 50) as $chunk) {
