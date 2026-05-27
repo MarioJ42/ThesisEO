@@ -44,7 +44,7 @@ class VendorPackageSeeder extends Seeder
 
             // Dave Galery (23)
             ['vendor_id' => 23, 'vendor_category_id' => 6, 'name' => 'Basic Service', 'price' => 5500000],
-            ['vendor_id' => 23, 'vendor_catzegory_id' => 5, 'name' => 'Basic Service', 'price' => 5500000],
+            ['vendor_id' => 23, 'vendor_category_id' => 5, 'name' => 'Basic Service', 'price' => 5500000],
             ['vendor_id' => 23, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 8750000],
             ['vendor_id' => 23, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 8750000],
 
@@ -136,6 +136,61 @@ class VendorPackageSeeder extends Seeder
             // 11. Hand Bouquet (Cat 14)
             // Four Clover (71)
             ['vendor_id' => 71, 'vendor_category_id' => 14, 'name' => 'Standard Service', 'price' => 1500000],
+
+            // 12. VENUE (Cat 22)
+            // Han Palace (73)
+            ['vendor_id' => 73, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 7 TABLE', 'price' => 20000000],
+            ['vendor_id' => 73, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 2700000],
+
+            // Zhang Palace (12)
+            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 15 TABLE', 'price' => 55500000],
+            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 3700000],
+            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 45 TABLE (BALLROOM)', 'price' => 191250000],
+            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE (BALLROOM)', 'price' => 4250000],
+
+            // Boncafe Raya Gubeng (2)
+            ['vendor_id' => 2, 'vendor_category_id' => 22, 'name' => 'SET MENU 70 PAX', 'price' => 15000000],
+            ['vendor_id' => 2, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 220000],
+
+            // The Socialite (11)
+            ['vendor_id' => 11, 'vendor_category_id' => 22, 'name' => 'INDIVIDUAL STYLE 100 PAX', 'price' => 41500000],
+            ['vendor_id' => 11, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 288000],
+
+            // New Royal (4)
+            ['vendor_id' => 4, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 10 TABLE', 'price' => 22880000],
+            ['vendor_id' => 4, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 2288000],
+
+            // Casa Milieu (10)
+            ['vendor_id' => 10, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 70 PAX by Moi Village', 'price' => 32250000],
+            ['vendor_id' => 10, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 1500000],
+
+            // The Cafe (Java Paragon) (3)
+            ['vendor_id' => 3, 'vendor_category_id' => 22, 'name' => 'AYCE/ SET MENU 70 PAX', 'price' => 21000000],
+            ['vendor_id' => 3, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 300000],
+
+            // Tamo Venue (7)
+            ['vendor_id' => 7, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 70 PAX by Moi Village', 'price' => 25000000],
+            ['vendor_id' => 7, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 1500000],
+
+            // Laviere Lounge (Morazen) / Previere Lounge (5)
+            ['vendor_id' => 5, 'vendor_category_id' => 22, 'name' => 'SET MENU 50 PAX', 'price' => 29900000],
+            ['vendor_id' => 5, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 5980000],
+
+            // Xiang Fu Hai (74)
+            ['vendor_id' => 74, 'vendor_category_id' => 22, 'name' => 'INDIVIDUAL STYLE 100 PAX', 'price' => 78588000],
+            ['vendor_id' => 74, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 785880],
+
+            // XO Palace (14)
+            ['vendor_id' => 14, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 25 TABLE', 'price' => 80000000],
+            ['vendor_id' => 14, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 3200000],
+
+            // Santika Premiere Ballroom (15)
+            ['vendor_id' => 15, 'vendor_category_id' => 22, 'name' => 'BUFFET 250 PAX', 'price' => 92500000],
+            ['vendor_id' => 15, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 370000],
+
+            // Double Tree (75)
+            ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'BUFFET 150 PAX (BALLROOM)', 'price' => 97500000],
+            ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX (BALLROOM)', 'price' => 150000],
         ];
 
         $formattedPackages = array_map(function ($pkg) {
