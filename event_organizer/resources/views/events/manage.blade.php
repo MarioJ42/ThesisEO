@@ -58,14 +58,23 @@
         $watch('activeTab', value => localStorage.setItem('manageEventTab', value))
     ">
 
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">{{ $event->title }}</h2>
                 <p class="text-sm text-gray-500 mt-1">Client: <span class="font-semibold text-gray-700">{{ $event->client->name }}</span> | Date: <span class="font-semibold text-gray-700">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }}</span></p>
             </div>
-            <a href="{{ route($user->role . '.events.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-semibold transition-colors">
-                Back to Events
-            </a>
+            <div class="flex items-center gap-3">
+                @if($hasFenixGuestbook)
+                    <a href="{{ route($user->role . '.events.analytics', $event->id) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Analytics
+                    </a>
+                @endif
+
+                <a href="{{ route($user->role . '.events.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-bold transition-colors">
+                    Back to Events
+                </a>
+            </div>
         </div>
 
         @if (session('success'))

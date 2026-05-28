@@ -98,6 +98,15 @@
                             if ($event->pl_id) {
                                 $rowCategory = ($event->pl_id === $user->id) ? 'mine' : 'pl';
                             }
+
+                            $hasFenixGuestbook = \Illuminate\Support\Facades\DB::table('event_vendor')
+                                ->join('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+                                ->join('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
+                                ->where('event_vendor.event_id', $event->id)
+                                ->where('vendor_categories.name', 'like', '%Guest Book%')
+                                ->where('vendors.name', 'like', '%Fenix EO%')
+                                ->whereIn('event_vendor.status', ['verified', 'signed'])
+                                ->exists();
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors"
@@ -137,8 +146,9 @@
 
                                     @if(!in_array($event->status, ['draft', 'canceled']))
                                     <a href="{{ route($user->role . '.events.manage', $event->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Manage</a>
+                                    @endif
 
-                                    {{-- TOMBOL ANALYTICS DITAMBAHKAN DI SINI --}}
+                                    @if($hasFenixGuestbook)
                                     <a href="{{ route($user->role . '.events.analytics', $event->id) }}" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Analytics</a>
                                     @endif
                                 </div>

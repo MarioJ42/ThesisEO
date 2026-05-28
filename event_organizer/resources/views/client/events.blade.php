@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fenix Event Organizer</title>
     <link rel="icon" href="/images/logo-fenix1.png" type="image/png">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -16,7 +14,6 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-
 <body class="bg-gray-50 text-gray-800 antialiased"
       x-data="{
           isCreateModalOpen: new URLSearchParams(location.search).has('plan_package'),
@@ -24,20 +21,17 @@
           selectedPackage: new URLSearchParams(location.search).get('plan_package') || ''
       }"
       x-init="if(isCreateModalOpen) { window.history.replaceState({}, document.title, window.location.pathname); }">
-
     <nav class="fixed w-full z-50 top-0 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='{{ route('home') }}'">
                     <img src="/images/logo-fenix2.png" alt="Fenix Logo" class="w-24 h-24 object-contain">
                 </div>
-
                 <div class="hidden md:flex space-x-8">
                     <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-900 font-medium text-sm transition-colors px-1 py-2">Home</a>
                     <a href="{{ route('vendor') }}" class="text-gray-500 hover:text-gray-900 font-medium text-sm transition-colors px-1 py-2">Vendor</a>
                     <a href="{{ route('client.events.index') }}" class="text-gray-900 border-b-2 border-gray-900 font-medium text-sm transition-colors px-1 py-2">My Events</a>
                 </div>
-
                 <div class="flex items-center gap-4">
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors focus:outline-none">
@@ -46,7 +40,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
-
                         <div x-show="open" x-transition.opacity.duration.200ms class="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 flex flex-col" x-cloak>
                             <a href="{{ route('profile.edit') }}" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors flex items-center gap-3">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -66,10 +59,8 @@
             </div>
         </div>
     </nav>
-
     <main class="pt-32 pb-24 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 tracking-tight">My Events</h1>
@@ -80,14 +71,12 @@
                     Plan New Event
                 </button>
             </div>
-
             @if(session('success'))
             <div class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-xl flex items-center gap-3">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <span class="font-medium">{{ session('success') }}</span>
             </div>
             @endif
-
             @if ($errors->any())
             <div class="mb-8 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
                 <ul class="list-disc list-inside text-sm">
@@ -97,7 +86,6 @@
                 </ul>
             </div>
             @endif
-
             @php
                 $counts = [
                     'all' => $events->count(),
@@ -108,7 +96,6 @@
                     'canceled' => $events->where('status', 'canceled')->count(),
                 ];
             @endphp
-
             @if($counts['all'] > 0)
                 <div class="mb-8 border-b border-gray-200">
                     <nav class="flex space-x-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
@@ -124,9 +111,18 @@
                         @endforeach
                     </nav>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($events as $event)
+                        @php
+                            $hasFenixGuestbook = \Illuminate\Support\Facades\DB::table('event_vendor')
+                                ->join('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+                                ->join('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
+                                ->where('event_vendor.event_id', $event->id)
+                                ->where('vendor_categories.name', 'like', '%Guest Book%')
+                                ->where('vendors.name', 'like', '%Fenix EO%')
+                                ->whereIn('event_vendor.status', ['verified', 'signed'])
+                                ->exists();
+                        @endphp
                         <div x-show="activeTab === 'all' || activeTab === '{{ $event->status }}'" x-transition.opacity.duration.300ms class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full relative overflow-hidden" x-cloak>
                             <div class="absolute top-0 left-0 w-1 h-full
                                 @if($event->status == 'draft') bg-gray-300
@@ -136,7 +132,6 @@
                                 @elseif($event->status == 'canceled') bg-red-500
                                 @endif">
                             </div>
-
                             <div class="flex justify-between items-start mb-4 pl-2">
                                 <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full
                                     @if($event->status == 'draft') bg-gray-100 text-gray-600
@@ -151,13 +146,11 @@
                                     {{ \Carbon\Carbon::parse($event->created_at)->diffForHumans() }}
                                 </div>
                             </div>
-
                             <h3 class="text-xl font-bold text-gray-900 mb-1 pl-2">{{ $event->title }}</h3>
                             <p class="text-sm text-gray-500 mb-6 pl-2 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 {{ \Carbon\Carbon::parse($event->event_date)->format('l, d F Y') }}
                             </p>
-
                             <div class="mt-auto space-y-3 pl-2 bg-gray-50 p-4 rounded-xl">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Package Selected</p>
@@ -178,20 +171,20 @@
                                     </div>
                                 </div>
                             </div>
-
                             @if(!in_array($event->status, ['draft', 'canceled']))
                             <div class="mt-6 pl-2 flex flex-col gap-2">
                                 <a href="{{ route('client.events.manage', $event->id) }}" class="block w-full py-2.5 bg-white border border-gray-200 text-gray-900 text-center rounded-lg text-sm font-semibold hover:border-gray-900 transition-colors">
                                     View Details
                                 </a>
+                                @if($hasFenixGuestbook)
                                 <a href="{{ route('client.events.analytics', $event->id) }}" class="block w-full py-2.5 bg-gray-900 text-white text-center rounded-lg text-sm font-semibold hover:bg-black transition-colors shadow-sm">
                                     View RSVP Analytics
                                 </a>
+                                @endif
                             </div>
                             @endif
                         </div>
                     @endforeach
-
                     @foreach(['draft', 'planning', 'ongoing', 'completed', 'canceled'] as $status)
                         @if($counts[$status] === 0)
                             <div x-show="activeTab === '{{ $status }}'" class="col-span-full py-16 flex flex-col items-center justify-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200" x-cloak>
@@ -200,11 +193,9 @@
                         @endif
                     @endforeach
                 </div>
-
                 <div class="mt-8">
                     {{ $events->links() }}
                 </div>
-
             @else
                 <div class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-2xl border border-dashed border-gray-300">
                     <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
@@ -219,7 +210,6 @@
             @endif
         </div>
     </main>
-
     <div x-show="isCreateModalOpen" x-transition.opacity class="fixed inset-0 flex items-center justify-center p-4" style="z-index: 999; background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px);" x-cloak>
         <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl" @click.away="isCreateModalOpen = false">
             <div class="flex justify-between items-center p-6 border-b border-gray-100">
@@ -231,22 +221,18 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
             <form action="{{ route('client.events.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="client_id" value="{{ Auth::id() }}">
-
                 <div class="p-6 space-y-5">
                     <div>
                         <label class="block mb-1.5 text-sm font-bold text-gray-900">Event Title <span class="text-red-500">*</span></label>
                         <input type="text" name="title" required placeholder="Wedding of Groom & Bride" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
                     </div>
-
                     <div>
                         <label class="block mb-1.5 text-sm font-bold text-gray-900">Event Date <span class="text-red-500">*</span></label>
                         <input type="date" name="event_date" required min="{{ \Carbon\Carbon::today()->addDays(21)->format('Y-m-d') }}" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
                     </div>
-
                     <div>
                         <label class="block mb-1.5 text-sm font-bold text-gray-900">Select Package <span class="text-red-500">*</span></label>
                         <select name="package_id" required x-model="selectedPackage" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-3 transition-colors">
@@ -259,7 +245,6 @@
                         <p class="text-[11px] text-gray-500 mt-2 leading-relaxed">By selecting a package, we will automatically set up standard vendor slots for you. You can customize them later.</p>
                     </div>
                 </div>
-
                 <div class="flex justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
                     <button type="button" @click="isCreateModalOpen = false" class="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
                     <button type="submit" class="px-5 py-2.5 text-sm font-bold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors shadow-md">Create Event</button>
@@ -267,8 +252,7 @@
             </form>
         </div>
     </div>
-
-@auth
+    @auth
         @if(Auth::user()->must_change_password)
             <div class="fixed inset-0 flex items-center justify-center p-4" style="z-index: 99999; background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);">
                 <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
@@ -277,7 +261,6 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Security Update</h3>
                     <p class="text-sm text-gray-500 mb-6">For your account's security, please change the default password provided by the administrator.</p>
-
                     <form action="{{ route('password.force_change') }}" method="POST" class="text-left space-y-4">
                         @csrf
                         <div>
@@ -302,6 +285,5 @@
             </style>
         @endif
     @endauth
-
 </body>
 </html>

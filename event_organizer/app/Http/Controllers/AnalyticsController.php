@@ -134,6 +134,19 @@ class AnalyticsController extends Controller
         if ($role === 'klien' && $event->client_id !== Auth::id()) abort(403);
         if ($role === 'pl' && $event->pl_id !== Auth::id()) abort(403);
 
+        $hasFenixGuestbook = DB::table('event_vendor')
+            ->leftJoin('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+            ->leftJoin('vendors', 'event_vendor.vendor_id', '=', 'vendors.id')
+            ->where('event_vendor.event_id', $event->id)
+            ->where('vendor_categories.name', 'like', '%Guest Book%')
+            ->where('vendors.name', 'like', '%Fenix EO%')
+            ->whereIn('event_vendor.status', ['verified', 'signed'])
+            ->exists();
+
+        if (!$hasFenixGuestbook) {
+            return redirect()->route($role . '.events.manage', $event->id)->with('error', 'Analytics feature requires Fenix EO Digital Guestbook to be verified first.');
+        }
+
         $guests = DB::table('guests')->where('event_id', $event->id)->get();
 
         $totalInvited = $guests->count();
