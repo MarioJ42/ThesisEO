@@ -13,39 +13,77 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'Fenix',
-                'email' => 'fenix@f.com',
-                'phone' => '+6281234567890',
+                'email' => 'fenixorganizer@gmail.com',
+                'phone' => '+6285855788100',
                 'role' => 'owner',
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'name' => 'Mario',
-                'email' => 'm@m.com',
-                'phone' => '+6281234567890',
-                'role' => 'pl',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'name' => 'Jessica Christy',
-                'email' => 'j@j.com',
-                'phone' => '081234567890',
-                'role' => 'klien',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'name' => 'Januar Andika',
-                'email' => 'januarand5@gmail.com',
-                'phone' => '08137459112',
-                'role' => 'klien',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
+                [
+                    'name' => 'Jessica Christy',
+                    'email' => 'jessicachristy@gmail.com',
+                    'phone' => '081298453210',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Januar Andika',
+                    'email' => 'januarand5@gmail.com',
+                    'phone' => '081347829913',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Syea Pascha',
+                    'email' => 'syeapascha@gmail.com',
+                    'phone' => '082155637284',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Febriani Ruth',
+                    'email' => 'febrianiruth@gmail.com',
+                    'phone' => '085789123456',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Rika Alicia',
+                    'email' => 'rikaaliciah@gmail.com',
+                    'phone' => '087823456190',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Victor Antonius',
+                    'email' => 'victorantonius@gmail.com',
+                    'phone' => '081190876543',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
+                [
+                    'name' => 'Dennis Bastian',
+                    'email' => 'dennisbastian@gmail.com',
+                    'phone' => '089634567821',
+                    'role' => 'klien',
+                    'password' => Hash::make('12345'),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ],
             ],
             [
                 'name' => 'Kezia',
