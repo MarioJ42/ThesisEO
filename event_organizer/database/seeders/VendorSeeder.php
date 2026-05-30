@@ -619,6 +619,14 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 77,
+                'name' => 'Vasa Hotel',
+                'address' => 'Jl. Mayjen HR. Muhammad No.31, Surabaya, Indonesia 60189',
+                'instagram' => '@vasahotel',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         $formattedVendors = [];
@@ -937,17 +945,24 @@ class VendorSeeder extends Seeder
             ['vendor_id' => 71, 'category_id' => 14], //Hand Bouquet
             ['vendor_id' => 71, 'category_id' => 15], //Corsage
 
-            //Han Palace
-            ['vendor_id' => 72, 'category_id' => 22], //Venue
+            //Retro Magis
+            ['vendor_id' => 72, 'category_id' => 6], //Photographer
+            ['vendor_id' => 72, 'category_id' => 5], //Videographer
 
-            //Xiang Fu Hai
+            //Han Palace
             ['vendor_id' => 73, 'category_id' => 22], //Venue
 
-            //Double Tree
+            //Xiang Fu Hai
             ['vendor_id' => 74, 'category_id' => 22], //Venue
 
-            //Savore
+            //Double Tree
             ['vendor_id' => 75, 'category_id' => 22], //Venue
+
+            //Savore
+            ['vendor_id' => 76, 'category_id' => 22], //Venue
+
+            //Vasa Hotel
+            ['vendor_id' => 77, 'category_id' => 1], //Venue
         ];
 
         foreach (array_chunk($categoryVendor, 50) as $chunk) {

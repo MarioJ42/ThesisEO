@@ -9,9 +9,10 @@ class EventSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. EVENT PERTAMA: YOSHUA & JESSICA
         $eventId = DB::table('events')->insertGetId([
-            'client_id' => 3,
-            'pl_id' => 2,
+            'client_id' => 2,
+            'pl_id' => 1,
             'package_id' => 3,
             'title' => 'Wedding of Yoshua & Jessica',
             'event_date' => '2026-05-28',
@@ -36,7 +37,7 @@ class EventSeeder extends Seeder
             ['category' => 'Videographer', 'vendor_id' => 18, 'pic_name' => 'Vera', 'pic_phone' => '+6281319090868', 'session' => 'evening'],
             ['category' => 'Church', 'vendor_id' => 60, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'morning'],
             ['category' => 'Church Decoration', 'vendor_id' => 60, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'morning'],
-            ['category' => 'Baloon & Dove', 'vendor_id' => 1, 'pic_name' => 'Michael H', 'pic_phone' => '+6285855788100', 'session' => 'morning'],
+            ['category' => 'Baloon & Dove', 'vendor_id' => 1, 'pic_name' => 'Michael', 'pic_phone' => '+6285855788100', 'session' => 'morning'],
             ['category' => 'Venue', 'vendor_id' => 14, 'pic_name' => 'Shierly', 'pic_phone' => '+628179329180', 'session' => 'evening'],
             ['category' => 'Pyramid Fountain & Toast', 'vendor_id' => 14, 'pic_name' => 'Shierly', 'pic_phone' => '+628179329180', 'session' => 'evening'],
             ['category' => 'Venue Decoration', 'vendor_id' => 31, 'pic_name' => 'Intan', 'pic_phone' => '+6282257592928', 'session' => 'evening'],
@@ -44,7 +45,7 @@ class EventSeeder extends Seeder
             ['category' => 'Lighting', 'vendor_id' => 62, 'pic_name' => 'Eric', 'pic_phone' => '+628123237445', 'session' => 'evening'],
             ['category' => 'Effect', 'vendor_id' => 62, 'pic_name' => 'Eric', 'pic_phone' => '+628123237445', 'session' => 'evening'],
             ['category' => 'Sound', 'vendor_id' => 14, 'pic_name' => 'Shierly', 'pic_phone' => '+628179329180', 'session' => 'evening'],
-            ['category' => 'Genset', 'vendor_id' => 1, 'pic_name' => 'Michael H', 'pic_phone' => '+6285855788100', 'session' => 'evening'],
+            ['category' => 'Genset', 'vendor_id' => 1, 'pic_name' => 'Michael', 'pic_phone' => '+6285855788100', 'session' => 'evening'],
             ['category' => 'LCD', 'vendor_id' => 14, 'pic_name' => 'Shierly', 'pic_phone' => '+628179329180', 'session' => 'evening'],
             ['category' => 'Band', 'vendor_id' => 63, 'pic_name' => 'Fandy', 'pic_phone' => '+6281703090482', 'session' => 'evening'],
             ['category' => 'MC', 'vendor_id' => 47, 'pic_name' => 'David', 'pic_phone' => '+628175188144', 'session' => 'evening'],
@@ -62,7 +63,7 @@ class EventSeeder extends Seeder
             ['category' => 'LED', 'vendor_id' => 14, 'pic_name' => 'Shierly', 'pic_phone' => '+628179329180', 'session' => 'evening'],
             ['category' => 'Hair Styling', 'vendor_id' => 37, 'pic_name' => 'Lina', 'pic_phone' => '+6281233548993', 'session' => 'morning'],
             ['category' => 'Guest Lunch', 'vendor_id' => 70, 'pic_name' => 'Admin', 'pic_phone' => '+6281331713577', 'session' => 'morning'],
-            ['category' => 'Misua & Angco Tea', 'vendor_id' => 1, 'pic_name' => 'Michael H', 'pic_phone' => '+6285855788100', 'session' => 'morning'],
+            ['category' => 'Misua & Angco Tea', 'vendor_id' => 1, 'pic_name' => 'Michael', 'pic_phone' => '+6285855788100', 'session' => 'morning'],
         ];
 
         $categories = DB::table('vendor_categories')->pluck('id', 'name')->toArray();
@@ -139,5 +140,74 @@ class EventSeeder extends Seeder
         }
 
         DB::table('event_vendor')->insert($slots);
+
+        // 2. EVENT KEDUA: JANUAR & RISKA (Half Day Wedding - 150 Pax)
+        $eventId2 = DB::table('events')->insertGetId([
+            'client_id' => 3,
+            'pl_id' => 1,
+            'package_id' => 2,
+            'title' => 'Wedding of Januar & Riska',
+            'event_date' => '2026-10-15',
+            'status' => 'planning',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $januarAssignments = [
+            ['category' => 'Venue Decoration', 'vendor_id' => 31, 'pic_name' => 'Intan', 'pic_phone' => '+6282257592928', 'session' => 'evening', 'deal_price' => 12500000],
+            ['category' => 'Photographer', 'vendor_id' => 18, 'pic_name' => 'Vera', 'pic_phone' => '+6281319090868', 'session' => 'morning', 'deal_price' => 8000000],
+            ['category' => 'Videographer', 'vendor_id' => 18, 'pic_name' => 'Vera', 'pic_phone' => '+6281319090868', 'session' => 'morning', 'deal_price' => 8000000],
+            ['category' => 'Gown', 'vendor_id' => 34, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'morning', 'deal_price' => 13000000],
+            ['category' => 'Suit', 'vendor_id' => 41, 'pic_name' => 'Admin', 'pic_phone' => '+6289668065240', 'session' => 'morning', 'deal_price' => 6300000],
+            ['category' => 'Wedding Cake', 'vendor_id' => 52, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'evening', 'deal_price' => 2500000],
+            ['category' => 'Lighting', 'vendor_id' => 62, 'pic_name' => 'Eric', 'pic_phone' => '+628123237445', 'session' => 'evening', 'deal_price' => 2750000],
+            ['category' => 'Hotel', 'vendor_id' => 77, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'morning', 'deal_price' => 13000000],
+            ['category' => 'Venue', 'vendor_id' => 76, 'pic_name' => 'Admin', 'pic_phone' => '-', 'session' => 'evening', 'deal_price' => 83700000],
+        ];
+
+        $slotsJanuar = [];
+
+        foreach ($januarAssignments as $data) {
+            if (isset($categories[$data['category']])) {
+                $categoryId = $categories[$data['category']];
+
+                $existingContact = DB::table('vendor_contacts')
+                    ->where('vendor_id', $data['vendor_id'])
+                    ->where('name', $data['pic_name'])
+                    ->first();
+
+                if ($existingContact) {
+                    $contactId = $existingContact->id;
+                } else {
+                    $contactId = DB::table('vendor_contacts')->insertGetId([
+                        'vendor_id' => $data['vendor_id'],
+                        'name' => $data['pic_name'],
+                        'phone' => $data['pic_phone'],
+                        'is_primary' => true,
+                        'is_active' => true,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                $slotsJanuar[] = [
+                    'event_id' => $eventId2,
+                    'vendor_category_id' => $categoryId,
+                    'vendor_id' => $data['vendor_id'],
+                    'vendor_contact_id' => $contactId,
+                    'vendor_package_id' => null,
+                    'session' => $data['session'],
+                    'role_detail' => '-',
+                    'is_included' => false,
+                    'status' => 'signed',
+                    'deal_price' => $data['deal_price'],
+                    'meal_crew' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        DB::table('event_vendor')->insert($slotsJanuar);
     }
 }
