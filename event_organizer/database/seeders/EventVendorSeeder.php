@@ -9,6 +9,10 @@ class EventVendorSeeder extends Seeder
 {
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('event_vendor')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $events = DB::table('events')->get();
 
         foreach ($events as $event) {
@@ -38,10 +42,8 @@ class EventVendorSeeder extends Seeder
                 ->inRandomOrder()->value('vendor_id')
                 ?? DB::table('category_vendor')->where('category_id', 30)->inRandomOrder()->value('vendor_id');
 
-
             $templates = DB::table('package_templates')->where('package_id', $templatePackageId)->get();
             $eventVendors = [];
-
             $chargedVendors = [];
 
             foreach ($templates as $template) {
@@ -55,13 +57,13 @@ class EventVendorSeeder extends Seeder
                 $picPhone = null;
 
                 $isIncluded = $event->package_id ? $template->is_included : false;
-                $shouldAssign = false;
 
+                $shouldAssign = false;
                 if (in_array($event->status, ['completed', 'ongoing'])) {
                     $shouldAssign = true;
                     $status = 'verified';
                 } elseif ($event->status === 'planning') {
-                    $shouldAssign = (rand(1, 10) <= 7);
+                    $shouldAssign = (rand(1, 10) <= 8);
                     $status = $shouldAssign ? 'verified' : 'reviewing';
                 }
 
@@ -79,7 +81,6 @@ class EventVendorSeeder extends Seeder
                     } elseif (in_array($catId, [4, 12])) {
                         $vendorId = $suitVendorId;
                     } else {
-
                         $vendorPivot = DB::table('package_vendor_pivot')
                             ->where('package_id', $templatePackageId)
                             ->where('vendor_category_id', $catId)
@@ -103,30 +104,31 @@ class EventVendorSeeder extends Seeder
                             $picPhone = $contact->phone;
                         }
 
-                        if (!in_array($vendorId, $chargedVendors)) {
-                            $vPackage = DB::table('vendor_packages')
-                                ->where('vendor_id', $vendorId)
-                                ->where('vendor_category_id', $catId)
-                                ->inRandomOrder()
-                                ->first();
+                        $vPackage = DB::table('vendor_packages')
+                            ->where('vendor_id', $vendorId)
+                            ->where('vendor_category_id', $catId)
+                            ->inRandomOrder()
+                            ->first();
 
-                            if (!$vPackage) {
-                                $vPackage = DB::table('vendor_packages')->where('vendor_id', $vendorId)->inRandomOrder()->first();
-                            }
+                        if (!$vPackage) {
+                            $vPackage = DB::table('vendor_packages')->where('vendor_id', $vendorId)->inRandomOrder()->first();
+                        }
 
-                            if ($vPackage) {
-                                $vendorPkgId = $vPackage->id;
-                                $netPrice = $vPackage->price;
+                        if ($vPackage) {
+                            $vendorPkgId = $vPackage->id;
+
+                            if (!in_array($vendorId, $chargedVendors)) {
+                                $publishPrice = $vPackage->price;
+
+                                $netPrice = $publishPrice - 100000;
+
+                                $dealPrice = $isIncluded ? 0 : $publishPrice;
+
+                                $chargedVendors[] = $vendorId;
                             } else {
-                                $netPrice = rand(15, 50) * 100000;
+                                $netPrice = 0;
+                                $dealPrice = 0;
                             }
-
-                            $dealPrice = $isIncluded ? 0 : round($netPrice * 1.15);
-
-                            $chargedVendors[] = $vendorId;
-                        } else {
-                            $netPrice = 0;
-                            $dealPrice = 0;
                         }
                     } else {
                         $status = 'unassigned';

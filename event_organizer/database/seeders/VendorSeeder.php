@@ -627,6 +627,14 @@ class VendorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'id' => 78,
+                'name' => 'Lancar',
+                'address' => 'Surabaya',
+                'instagram' => '@lancarproduction',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ];
 
         $formattedVendors = [];
@@ -963,6 +971,9 @@ class VendorSeeder extends Seeder
 
             //Vasa Hotel
             ['vendor_id' => 77, 'category_id' => 1], //Venue
+
+            //Lancar
+            ['vendor_id' => 78, 'category_id' => 23], //Venue
         ];
 
         foreach (array_chunk($categoryVendor, 50) as $chunk) {
