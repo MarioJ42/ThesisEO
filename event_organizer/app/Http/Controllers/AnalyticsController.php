@@ -28,8 +28,8 @@ class AnalyticsController extends Controller
 
         $eventsInPeriod = Event::whereBetween('event_date', [$startDate, $endDate])
             ->whereIn('status', ['ongoing', 'completed'])
-            ->with(['package', 'slots' => function ($q) {
-                $q->whereIn('status', ['verified', 'signed']);
+            ->with(['package', 'vendors' => function ($q) {
+                $q->whereIn('event_vendor.status', ['verified', 'signed']);
             }])
             ->get();
 
@@ -41,7 +41,7 @@ class AnalyticsController extends Controller
             $additionalSellingPrice = 0;
             $eventVendorCost = 0;
 
-            foreach ($event->slots as $slot) {
+            foreach ($event->vendors as $slot) {
                 $dealPrice = $slot->deal_price > 0 ? $slot->deal_price : 0;
                 $netCost = $dealPrice * 0.8;
                 $eventVendorCost += $netCost;

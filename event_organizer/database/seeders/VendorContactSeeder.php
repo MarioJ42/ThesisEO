@@ -9,56 +9,164 @@ class VendorContactSeeder extends Seeder
 {
     public function run(): void
     {
-        $contacts = [
-            //Bie Hin Tailor
-            ['id' => 1, 'vendor_id' => 41, 'name' => 'Admin', 'phone' => '+6289668065240', 'created_at' => now(), 'updated_at' => now()],
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('vendor_contacts')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-            //House of Lea
-            ['id' => 2, 'vendor_id' => 37, 'name' => 'Lina', 'phone' => '+6281233548993', 'created_at' => now(), 'updated_at' => now()],
+        $vendors = DB::table('vendors')->get();
 
-            //Novotel Samator East Surabaya
-            ['id' => 3, 'vendor_id' => 58, 'name' => 'Riska', 'phone' => '+6281907978313', 'created_at' => now(), 'updated_at' => now()],
+        $modernNames = [
+            'Alexander',
+            'Austin',
+            'Brandon',
+            'Bryan',
+            'Calvin',
+            'Christian',
+            'Christopher',
+            'Daniel',
+            'Darren',
+            'David',
+            'Dennis',
+            'Edward',
+            'Edwin',
+            'Eric',
+            'Felix',
+            'Gabriel',
+            'Glenn',
+            'Ivan',
+            'Jason',
+            'Jeffrey',
+            'Jonathan',
+            'Joshua',
+            'Justin',
+            'Kevin',
+            'Leon',
+            'Marcel',
+            'Matthew',
+            'Michael',
+            'Nathan',
+            'Nicholas',
+            'Raymond',
+            'Richard',
+            'Ronald',
+            'Samuel',
+            'Steven',
+            'Thomas',
+            'Victor',
+            'Vincent',
+            'William',
+            'Winston',
 
-            //Butterfly Decoration
-            ['id' => 4, 'vendor_id' => 31, 'name' => 'Intan', 'phone' => '+6282257592928', 'created_at' => now(), 'updated_at' => now()],
-
-            //Possa Wedding
-            ['id' => 5, 'vendor_id' => 18, 'name' => 'Vera', 'phone' => '+6281319090868', 'created_at' => now(), 'updated_at' => now()],
-
-            //XO Palace Ballroom
-            ['id' => 6, 'vendor_id' => 14, 'name' => 'Shierly', 'phone' => '+62 8179329180', 'created_at' => now(), 'updated_at' => now()],
-
-            //Evergreen Cake
-            ['id' => 7, 'vendor_id' => 61, 'name' => 'Jois', 'phone' => '+6281938231378', 'created_at' => now(), 'updated_at' => now()],
-
-            //Glow Effect
-            ['id' => 8, 'vendor_id' => 62, 'name' => 'Eric', 'phone' => '+628123237445', 'created_at' => now(), 'updated_at' => now()],
-
-            //Manifest
-            ['id' => 9, 'vendor_id' => 63, 'name' => 'Fandy', 'phone' => '+6281703090482', 'created_at' => now(), 'updated_at' => now()],
-
-            //Ann Pagar Ayu
-            ['id' => 10, 'vendor_id' => 64, 'name' => 'Michelle', 'phone' => '+6281818148209', 'created_at' => now(), 'updated_at' => now()],
-
-            //Clarity Production
-            ['id' => 11, 'vendor_id' => 54, 'name' => 'Sisca', 'phone' => '+6287819557195', 'created_at' => now(), 'updated_at' => now()],
-
-            //Stefany Hyperstage Visual
-            ['id' => 12, 'vendor_id' => 69, 'name' => 'Stefany', 'phone' => '+6287887374306', 'created_at' => now(), 'updated_at' => now()],
-
-            //Depot Bu Tin
-            ['id' => 13, 'vendor_id' => 17, 'name' => 'Admin', 'phone' => '+6282213337790', 'created_at' => now(), 'updated_at' => now()],
-
-            //Nasi Campur Tambak Bayan
-            ['id' => 14, 'vendor_id' => 70, 'name' => 'Admin', 'phone' => '+6281331713577', 'created_at' => now(), 'updated_at' => now()],
-
-            //David Funata
-            ['id' => 15, 'vendor_id' => 47, 'name' => 'David', 'phone' => '+628175188144', 'created_at' => now(), 'updated_at' => now()],
-
-            //Fenix EO
-            ['id' => 16, 'vendor_id' => 1, 'name' => 'Michael', 'phone' => '+6285855788100', 'created_at' => now(), 'updated_at' => now()],
+            'Alicia',
+            'Amanda',
+            'Angelina',
+            'Audrey',
+            'Aurelia',
+            'Bella',
+            'Carissa',
+            'Caroline',
+            'Celine',
+            'Chelsea',
+            'Cindy',
+            'Clarissa',
+            'Cynthia',
+            'Erica',
+            'Evelyn',
+            'Felicia',
+            'Fiona',
+            'Gabriella',
+            'Giselle',
+            'Grace',
+            'Irene',
+            'Jane',
+            'Jessica',
+            'Jocelyn',
+            'Karen',
+            'Kelly',
+            'Lauren',
+            'Liv',
+            'Marissa',
+            'Melissa',
+            'Michelle',
+            'Nadine',
+            'Natasha',
+            'Olivia',
+            'Patricia',
+            'Priscilla',
+            'Rachel',
+            'Regina',
+            'Sharon',
+            'Sherly',
+            'Stella',
+            'Stephanie',
+            'Sylvia',
+            'Tania',
+            'Valerie',
+            'Vania',
+            'Vera',
+            'Veronica',
+            'Victoria',
+            'Vivian'
         ];
 
-        DB::table('vendor_contacts')->insert($contacts);
+
+        $prefixes = ['+62812', '+62813', '+62821', '+62822', '+62818', '+62819', '+62878', '+62895', '+62896', '+62811'];
+
+        $contacts = [];
+
+
+        $specificContacts = [
+            1  => 'Michael',   // Fenix EO
+            14 => 'Shierly',   // XO Palace
+            18 => 'Vera',      // Possa Wedding
+            31 => 'Intan',     // Butterfly Decoration
+            37 => 'Lina',      // House of Lea
+            41 => 'Richard',   // Bie Hin Tailor (diubah dari "Admin" menjadi lebih modern)
+            42 => 'Michael',   // MC Michael Christian
+            43 => 'Juan',      // MC Juan Filbert
+            47 => 'David',     // MC David Funata
+            54 => 'Sisca',     // Clarity Production
+            61 => 'Jois',      // Evergreen Cake
+            62 => 'Eric',      // Glow Effect
+            63 => 'Fandy',     // Manifest Band
+            64 => 'Michelle',  // Ann Pagar Ayu
+            69 => 'Stefany',   // Stefany Hyperstage
+            71 => 'Celine',    // Four Clover
+        ];
+
+        foreach ($vendors as $vendor) {
+            $name = $specificContacts[$vendor->id] ?? $modernNames[array_rand($modernNames)];
+
+            $prefix = $prefixes[array_rand($prefixes)];
+            $suffix = rand(1000000, 99999999);
+            $phone = $prefix . $suffix;
+
+            $contacts[] = [
+                'vendor_id'  => $vendor->id,
+                'name'       => $name,
+                'phone'      => $phone,
+                'is_primary' => true,
+                'is_active'  => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+
+            if (rand(1, 100) <= 15) {
+                $contacts[] = [
+                    'vendor_id'  => $vendor->id,
+                    'name'       => $modernNames[array_rand($modernNames)],
+                    'phone'      => $prefixes[array_rand($prefixes)] . rand(1000000, 99999999),
+                    'is_primary' => false,
+                    'is_active'  => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        foreach (array_chunk($contacts, 100) as $chunk) {
+            DB::table('vendor_contacts')->insert($chunk);
+        }
     }
 }

@@ -13,201 +13,91 @@ class VendorPackageSeeder extends Seeder
         DB::table('vendor_packages')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        $vendorPackages = [
-            // 1. FOTOGRAFI (Cat 6) & VIDEOGRAFI (Cat 5)
-            // Note: Harga paket bundling di-split 50:50
-            // Diverso Photography (28)
-            ['vendor_id' => 28, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 3500000],
-            ['vendor_id' => 28, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 3500000],
+        $categoryVendors = DB::table('category_vendor')->get();
 
-            // Muel Photography (27)
-            ['vendor_id' => 27, 'vendor_category_id' => 6, 'name' => 'Basic Service', 'price' => 3500000],
-            ['vendor_id' => 27, 'vendor_category_id' => 5, 'name' => 'Basic Service', 'price' => 3500000],
-            ['vendor_id' => 27, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 5500000],
-            ['vendor_id' => 27, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 5500000],
-
-            // Daily Photoworks (26)
-            ['vendor_id' => 26, 'vendor_category_id' => 6, 'name' => 'Basic Service', 'price' => 3500000],
-            ['vendor_id' => 26, 'vendor_category_id' => 5, 'name' => 'Basic Service', 'price' => 3500000],
-            ['vendor_id' => 26, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 5500000],
-            ['vendor_id' => 26, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 5500000],
-
-            // Possa Photography (18)
-            ['vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Basic Service', 'price' => 5500000],
-            ['vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Basic Service', 'price' => 5500000],
-            ['vendor_id' => 18, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 8750000],
-            ['vendor_id' => 18, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 8750000],
-
-            // Retro Magis (72)
-            ['vendor_id' => 72, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 8750000],
-            ['vendor_id' => 72, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 8750000],
-
-            // Dave Galery (23)
-            ['vendor_id' => 23, 'vendor_category_id' => 6, 'name' => 'Basic Service', 'price' => 5500000],
-            ['vendor_id' => 23, 'vendor_category_id' => 5, 'name' => 'Basic Service', 'price' => 5500000],
-            ['vendor_id' => 23, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 8750000],
-            ['vendor_id' => 23, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 8750000],
-
-            // PJ (25)
-            ['vendor_id' => 25, 'vendor_category_id' => 6, 'name' => 'Standard Service', 'price' => 8750000],
-            ['vendor_id' => 25, 'vendor_category_id' => 5, 'name' => 'Standard Service', 'price' => 8750000],
-
-
-            // 2. BRIDAL / GOWN (Cat 3)
-            // JD Bridal (35)
-            ['vendor_id' => 35, 'vendor_category_id' => 3, 'name' => 'Basic Service', 'price' => 13000000],
-            ['vendor_id' => 35, 'vendor_category_id' => 3, 'name' => 'Standard Service', 'price' => 18000000],
-
-            // Grace Wang Bridal (34)
-            ['vendor_id' => 34, 'vendor_category_id' => 3, 'name' => 'Basic Service', 'price' => 13000000],
-            ['vendor_id' => 34, 'vendor_category_id' => 3, 'name' => 'Standard Service', 'price' => 18000000],
-            ['vendor_id' => 34, 'vendor_category_id' => 3, 'name' => 'Premium Service', 'price' => 25000000],
-
-            // House of Lea (37)
-            ['vendor_id' => 37, 'vendor_category_id' => 3, 'name' => 'Standard Service', 'price' => 22000000],
-
-            // Ovan Putri (38)
-            ['vendor_id' => 38, 'vendor_category_id' => 3, 'name' => 'Standard Service', 'price' => 22000000],
-
-            // 3. SUITS / JAS (Cat 4)
-            // Sanjin Suits (40)
-            ['vendor_id' => 40, 'vendor_category_id' => 4, 'name' => 'Standard Service', 'price' => 450000],
-
-            // Bie Hin Tailor (41)
-            ['vendor_id' => 41, 'vendor_category_id' => 4, 'name' => 'Standard Service', 'price' => 900000],
-            ['vendor_id' => 41, 'vendor_category_id' => 4, 'name' => 'Premium Service', 'price' => 3500000],
-
-            // 4. MASTER OF CEREMONY (Cat 28)
-            // Michael Christian (42)
-            ['vendor_id' => 42, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 2500000],
-            ['vendor_id' => 42, 'vendor_category_id' => 28, 'name' => 'Premium Service', 'price' => 7000000],
-
-            // Juan Filbert (43)
-            ['vendor_id' => 43, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 2500000],
-            ['vendor_id' => 43, 'vendor_category_id' => 28, 'name' => 'Premium Service', 'price' => 7000000],
-
-            // Charly Hong (45)
-            ['vendor_id' => 45, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 2500000],
-            ['vendor_id' => 45, 'vendor_category_id' => 28, 'name' => 'Premium Service', 'price' => 7000000],
-
-            // David Funata (47)
-            ['vendor_id' => 47, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 2500000],
-            ['vendor_id' => 47, 'vendor_category_id' => 28, 'name' => 'Premium Service', 'price' => 7000000],
-
-            // Fransiskus Nduti (44)
-            ['vendor_id' => 44, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 2500000],
-            ['vendor_id' => 44, 'vendor_category_id' => 28, 'name' => 'Premium Service', 'price' => 7000000],
-
-            //Piniela (48)
-            ['vendor_id' => 48, 'vendor_category_id' => 28, 'name' => 'Standard Service', 'price' => 7000000],
-
-            // 5. DECORATION (Cat 30)
-            // Elora Decoration (33)
-            ['vendor_id' => 33, 'vendor_category_id' => 30, 'name' => 'Standard Service', 'price' => 6000000],
-
-            // Butterfly Decoration (31)
-            ['vendor_id' => 31, 'vendor_category_id' => 30, 'name' => 'Standard Service', 'price' => 6000000],
-            ['vendor_id' => 31, 'vendor_category_id' => 30, 'name' => 'Premium Service', 'price' => 45000000],
-
-            // Best Decoration (29)
-            ['vendor_id' => 29, 'vendor_category_id' => 30, 'name' => 'Standard Service', 'price' => 45000000],
-
-            // 6. WEDDING CAKE (Cat 32)
-            // Groovy Cake (52)
-            ['vendor_id' => 52, 'vendor_category_id' => 32, 'name' => 'Standard Service', 'price' => 3000000],
-
-            //BAND / ENTERTAINMENT (Cat 33)
-            // Freshtunes (49)
-            ['vendor_id' => 49, 'vendor_category_id' => 33, 'name' => 'Standard Service', 'price' => 3500000],
-            ['vendor_id' => 49, 'vendor_category_id' => 33, 'name' => 'Premium Service', 'price' => 6000000],
-
-            // 8. PHOTOBOOTH (Cat 42)
-            // Clarity Production (54)
-            ['vendor_id' => 54, 'vendor_category_id' => 42, 'name' => 'Standard Service', 'price' => 3750000],
-
-            // 9. USHERETTES (Cat 37)
-            // Athalia (56)
-            ['vendor_id' => 56, 'vendor_category_id' => 37, 'name' => 'Standard Service', 'price' => 1500000],
-
-            // 10. DIGITAL GUEST BOOK / RSVP (Cat 40)
-            // Fenix EO (1)
-            ['vendor_id' => 1, 'vendor_category_id' => 40, 'name' => 'Standard Service', 'price' => 2000000],
-
-            // 11. Hand Bouquet (Cat 14)
-            // Four Clover (71)
-            ['vendor_id' => 71, 'vendor_category_id' => 14, 'name' => 'Standard Service', 'price' => 1500000],
-
-            // 12. VENUE (Cat 22)
-            // Han Palace (73)
-            ['vendor_id' => 73, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 7 TABLE', 'price' => 20000000],
-            ['vendor_id' => 73, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 2700000],
-
-            // Zhang Palace (12)
-            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 15 TABLE', 'price' => 55500000],
-            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 3700000],
-            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 45 TABLE (BALLROOM)', 'price' => 191250000],
-            ['vendor_id' => 12, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE (BALLROOM)', 'price' => 4250000],
-
-            // Boncafe Raya Gubeng (2)
-            ['vendor_id' => 2, 'vendor_category_id' => 22, 'name' => 'SET MENU 70 PAX', 'price' => 15000000],
-            ['vendor_id' => 2, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 220000],
-
-            // The Socialite (11)
-            ['vendor_id' => 11, 'vendor_category_id' => 22, 'name' => 'INDIVIDUAL STYLE 100 PAX', 'price' => 41500000],
-            ['vendor_id' => 11, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 288000],
-
-            // New Royal (4)
-            ['vendor_id' => 4, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 10 TABLE', 'price' => 22880000],
-            ['vendor_id' => 4, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 2288000],
-
-            // Casa Milieu (10)
-            ['vendor_id' => 10, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 70 PAX by Moi Village', 'price' => 32250000],
-            ['vendor_id' => 10, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 1500000],
-
-            // The Cafe (Java Paragon) (3)
-            ['vendor_id' => 3, 'vendor_category_id' => 22, 'name' => 'AYCE/ SET MENU 70 PAX', 'price' => 21000000],
-            ['vendor_id' => 3, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 300000],
-
-            // Tamo Venue (7)
-            ['vendor_id' => 7, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 70 PAX by Moi Village', 'price' => 25000000],
-            ['vendor_id' => 7, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 1500000],
-
-            // Laviere Lounge (Morazen) / Previere Lounge (5)
-            ['vendor_id' => 5, 'vendor_category_id' => 22, 'name' => 'SET MENU 50 PAX', 'price' => 29900000],
-            ['vendor_id' => 5, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 5980000],
-
-            // Xiang Fu Hai (74)
-            ['vendor_id' => 74, 'vendor_category_id' => 22, 'name' => 'INDIVIDUAL STYLE 100 PAX', 'price' => 78588000],
-            ['vendor_id' => 74, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 785880],
-
-            // XO Palace (14)
-            ['vendor_id' => 14, 'vendor_category_id' => 22, 'name' => 'FAMILY STYLE 25 TABLE', 'price' => 80000000],
-            ['vendor_id' => 14, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 TABLE', 'price' => 3200000],
-
-            // Santika Premiere Ballroom (15)
-            ['vendor_id' => 15, 'vendor_category_id' => 22, 'name' => 'BUFFET 250 PAX', 'price' => 92500000],
-            ['vendor_id' => 15, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 370000],
-
-            // Double Tree (75)
-            ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'BUFFET 150 PAX (BALLROOM)', 'price' => 97500000],
-            ['vendor_id' => 75, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX (BALLROOM)', 'price' => 150000],
-
-            // Savore (76)
-            ['vendor_id' => 76, 'vendor_category_id' => 22, 'name' => 'BUFFET 150 PAX', 'price' => 83700000],
-            ['vendor_id' => 76, 'vendor_category_id' => 22, 'name' => 'ADDITIONAL 1 PAX', 'price' => 558000],
-
-            // 13. Lighting (Cat 3)
-            // Glow Effect (35)
-            ['vendor_id' => 62, 'vendor_category_id' => 24, 'name' => 'Standard Service', 'price' => 4000000],
+        $basePrices = [
+            1 => ['basic' => 8000000, 'standard' => 13000000],  // Hotel
+            2 => ['basic' => 3000000, 'standard' => 6000000],   // MUA
+            3 => ['basic' => 8000000, 'standard' => 15000000],  // Gown
+            4 => ['basic' => 900000, 'standard' => 2500000],    // Suit
+            5 => ['basic' => 3500000, 'standard' => 5500000],   // Videographer
+            6 => ['basic' => 3500000, 'standard' => 5500000],   // Photographer
+            7 => ['basic' => 500000, 'standard' => 1000000],    // Keepsake
+            9 => ['basic' => 1000000, 'standard' => 2000000],   // Hair Styling
+            10 => ['basic' => 500000, 'standard' => 1500000],   // Headpiece
+            11 => ['basic' => 500000, 'standard' => 1500000],   // Robe & Veil
+            12 => ['basic' => 150000, 'standard' => 300000],    // Tie
+            13 => ['basic' => 1500000, 'standard' => 3000000],  // Room Decoration
+            14 => ['basic' => 850000, 'standard' => 1500000],   // Hand Bouquet
+            15 => ['basic' => 150000, 'standard' => 300000],    // Corsage
+            16 => ['basic' => 300000, 'standard' => 700000],    // Ring Box
+            18 => ['basic' => 1500000, 'standard' => 2500000],  // Wedding Car
+            19 => ['basic' => 2000000, 'standard' => 4000000],  // Church
+            20 => ['basic' => 750000, 'standard' => 1500000],   // Meal Crew (Lump sum)
+            21 => ['basic' => 2500000, 'standard' => 5000000],  // Guest Lunch (Lump sum)
+            22 => ['basic' => 35000000, 'standard' => 75000000], // Venue
+            23 => ['basic' => 2500000, 'standard' => 5000000],  // Sound
+            24 => ['basic' => 1500000, 'standard' => 3500000],  // Lighting
+            25 => ['basic' => 1500000, 'standard' => 3000000],  // Genset
+            26 => ['basic' => 4000000, 'standard' => 8000000],  // LED
+            27 => ['basic' => 1000000, 'standard' => 2000000],  // LCD
+            28 => ['basic' => 1500000, 'standard' => 2500000],  // MC
+            29 => ['basic' => 1000000, 'standard' => 2000000],  // Animation
+            30 => ['basic' => 6000000, 'standard' => 12500000], // Venue Decoration
+            31 => ['basic' => 3500000, 'standard' => 6000000],  // Church Decoration
+            32 => ['basic' => 1500000, 'standard' => 3000000],  // Wedding Cake
+            33 => ['basic' => 2500000, 'standard' => 4500000],  // Band
+            37 => ['basic' => 1000000, 'standard' => 1500000],  // Usherettes
+            38 => ['basic' => 1000000, 'standard' => 2000000],  // Effect
+            39 => ['basic' => 1000000, 'standard' => 2000000],  // Invitation
+            40 => ['basic' => 1000000, 'standard' => 2000000],  // Digital Guest Book
+            41 => ['basic' => 2000000, 'standard' => 5000000],  // Souvenir
+            42 => ['basic' => 2000000, 'standard' => 3500000],  // Photobooth
+            43 => ['basic' => 500000, 'standard' => 1000000],   // Baloon & Dove
+            44 => ['basic' => 300000, 'standard' => 600000],    // Flower Shower
+            45 => ['basic' => 500000, 'standard' => 1000000],   // Misua & Angco Tea
+            46 => ['basic' => 1000000, 'standard' => 2000000],  // Pyramid Fountain & Toast
         ];
 
-        $formattedPackages = array_map(function ($pkg) {
-            $pkg['created_at'] = now();
-            $pkg['updated_at'] = now();
-            return $pkg;
-        }, $vendorPackages);
+        $vendorPackages = [];
 
-        foreach (array_chunk($formattedPackages, 50) as $chunk) {
+        foreach ($categoryVendors as $cv) {
+            $catId = $cv->category_id;
+            $vendorId = $cv->vendor_id;
+
+            $basicBase = $basePrices[$catId]['basic'] ?? 1000000;
+            $stdBase = $basePrices[$catId]['standard'] ?? 2500000;
+
+            $basicNet = round(($basicBase * (1 + rand(-5, 10) / 100)) / 50000) * 50000;
+            $stdNet = round(($stdBase * (1 + rand(-5, 10) / 100)) / 50000) * 50000;
+
+            $basicSell = round($basicNet * 1.15);
+            $stdSell = round($stdNet * 1.15);
+
+            $vendorPackages[] = [
+                'vendor_id' => $vendorId,
+                'vendor_category_id' => $catId,
+                'name' => 'Basic Service',
+                'price' => $basicSell,
+                'net_price' => $basicNet,
+                'details' => 'Standard equipment and minimum personnel coverage for your event.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            $vendorPackages[] = [
+                'vendor_id' => $vendorId,
+                'vendor_category_id' => $catId,
+                'name' => 'Standard Service',
+                'price' => $stdSell,
+                'net_price' => $stdNet,
+                'details' => 'Premium equipment, additional hours, and extra personnel coverage.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        foreach (array_chunk($vendorPackages, 200) as $chunk) {
             DB::table('vendor_packages')->insert($chunk);
         }
     }
