@@ -28,9 +28,7 @@ class AnalyticsController extends Controller
 
         $eventsInPeriod = Event::whereBetween('event_date', [$startDate, $endDate])
             ->whereIn('status', ['ongoing', 'completed'])
-            ->with(['package', 'vendors' => function ($q) {
-                $q->whereIn('event_vendor.status', ['verified', 'signed']);
-            }])
+            ->with(['package', 'vendors'])
             ->get();
 
         foreach ($eventsInPeriod as $event) {
@@ -41,14 +39,53 @@ class AnalyticsController extends Controller
             $additionalSellingPrice = 0;
             $eventVendorCost = 0;
 
+            $baseCosts = [];
+            if ($event->package_id) {
+                $allowedVendors = DB::table('package_vendor_pivot')
+                    ->where('package_id', $event->package_id)
+                    ->get()
+                    ->groupBy('vendor_category_id');
+
+                $templateCategories = DB::table('package_templates')
+                    ->where('package_id', $event->package_id)
+                    ->where('is_included', true)
+                    ->pluck('vendor_category_id')
+                    ->toArray();
+
+                foreach ($templateCategories as $catId) {
+                    $allowedIds = collect($allowedVendors[$catId] ?? [])->pluck('vendor_id');
+                    $minPrice = DB::table('vendor_packages')
+                        ->whereIn('vendor_id', $allowedIds)
+                        ->where('vendor_category_id', $catId)
+                        ->min('price');
+                    $baseCosts[$catId] = $minPrice ?? 0;
+                }
+            }
+
+            $vendorPackageIds = [];
             foreach ($event->vendors as $slot) {
-                $dealPrice = $slot->pivot->deal_price ?? 0;
-                $netCost = $slot->pivot->net_price ?? 0;
+                if ($slot->pivot->vendor_package_id) {
+                    $vendorPackageIds[] = $slot->pivot->vendor_package_id;
+                }
+            }
+            $packages = DB::table('vendor_packages')->whereIn('id', $vendorPackageIds)->get()->keyBy('id');
 
-                $eventVendorCost += $netCost;
+            foreach ($event->vendors as $slot) {
+                $pkg = isset($packages[$slot->pivot->vendor_package_id]) ? $packages[$slot->pivot->vendor_package_id] : null;
 
-                if (!$slot->pivot->is_included) {
-                    $additionalSellingPrice += $dealPrice;
+                $dPrice = $slot->pivot->deal_price > 0 ? $slot->pivot->deal_price : ($pkg->price ?? 0);
+                $nPrice = $slot->pivot->net_price > 0 ? $slot->pivot->net_price : ($pkg->net_price ?? 0);
+
+                $eventVendorCost += $nPrice;
+
+                if ($slot->pivot->is_included) {
+                    $baseAllowance = $baseCosts[$slot->pivot->vendor_category_id] ?? 0;
+                    if ($dPrice > $baseAllowance) {
+                        $upgradeFee = $dPrice - $baseAllowance;
+                        $additionalSellingPrice += $upgradeFee;
+                    }
+                } else {
+                    $additionalSellingPrice += $dPrice;
                 }
             }
 
@@ -63,9 +100,13 @@ class AnalyticsController extends Controller
         $expenditures = DB::table('event_vendor')
             ->join('events', 'event_vendor.event_id', '=', 'events.id')
             ->join('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
+            ->leftJoin('vendor_packages', 'event_vendor.vendor_package_id', '=', 'vendor_packages.id')
             ->whereBetween('events.event_date', [$startDate, $endDate])
-            ->whereIn('event_vendor.status', ['verified', 'signed'])
-            ->select('vendor_categories.name as category', DB::raw('SUM(event_vendor.net_price) as total_spent'))
+            ->whereIn('events.status', ['ongoing', 'completed'])
+            ->select(
+                'vendor_categories.name as category',
+                DB::raw('SUM(CASE WHEN event_vendor.net_price > 0 THEN event_vendor.net_price ELSE COALESCE(vendor_packages.net_price, 0) END) as total_spent')
+            )
             ->groupBy('vendor_categories.name')
             ->orderByDesc('total_spent')
             ->get();

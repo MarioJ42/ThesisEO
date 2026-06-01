@@ -160,10 +160,15 @@
                         <div class="col-span-2">
                             <label class="block mb-1.5 text-xs font-bold text-gray-700 uppercase tracking-wider">Status</label>
                             <select name="status" x-model="form.status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-colors appearance-none">
-                                <option value="pending">Pending</option>
-                                <option value="attending">Attending</option>
-                                <option value="not_attending">Not Attending</option>
-                                <option value="checked_in">Checked In</option>
+                                @if($event->status === 'completed')
+                                    <option value="checked_in">Checked In</option>
+                                    <option value="not_attending">Not Attending</option>
+                                @else
+                                    <option value="pending">Pending</option>
+                                    <option value="attending">Attending</option>
+                                    <option value="not_attending">Not Attending</option>
+                                    <option value="checked_in">Checked In</option>
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -259,7 +264,13 @@
 
             initForm(detail) {
                 this.form = detail;
-                this.titipan = [];
+
+                if (detail.existing_titipans && detail.existing_titipans.length > 0) {
+                    this.titipan = detail.existing_titipans;
+                } else {
+                    this.titipan = [];
+                }
+
                 this.searchQuery = '';
                 this.showSearch = false;
                 this.isOpen = true;

@@ -148,9 +148,6 @@
                                     <a href="{{ route($user->role . '.events.manage', $event->id) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Manage</a>
                                     @endif
 
-                                    @if($hasFenixGuestbook)
-                                    <a href="{{ route($user->role . '.events.analytics', $event->id) }}" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-block">Analytics</a>
-                                    @endif
                                 </div>
                             </td>
                         </tr>

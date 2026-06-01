@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             EventVendorSeeder::class,
             EoPortfolioSeeder::class,
+            EventCrewSeeder::class,
+            GuestSeeder::class,
         ]);
     }
 }

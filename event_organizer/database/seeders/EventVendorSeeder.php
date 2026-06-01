@@ -142,5 +142,24 @@ class EventVendorSeeder extends Seeder
 
             DB::table('event_vendor')->insert($eventVendors);
         }
+
+        DB::table('event_vendor')->insert([
+            'event_id'           => 1,
+            'vendor_category_id' => 40,
+            'vendor_id'          => 1,
+            'vendor_contact_id'  => 1,
+            'vendor_package_id'  => null,
+            'session'            => 'evening',
+            'role_detail'        => 'Digital QR Check-in System',
+            'is_included'        => 0,
+            'deal_price'         => 1500000,
+            'net_price'          => 0,
+            'meal_crew'          => 2,
+            'pic_name'           => 'Michael',
+            'pic_phone'          => '+6285855788100',
+            'status'             => 'verified',
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
     }
 }

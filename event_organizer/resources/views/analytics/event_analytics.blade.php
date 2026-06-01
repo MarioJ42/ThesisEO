@@ -15,6 +15,12 @@
             <h1 class="text-3xl font-black text-gray-900 mt-2">Event Analytics</h1>
             <p class="text-sm text-gray-500 mt-1">Real-time metrics for <b>{{ $event->title }}</b></p>
         </div>
+        <div>
+            @php $routePrefix = ($role === 'klien') ? 'client' : $role; @endphp
+            <a href="{{ route($routePrefix . '.events.manage', $event->id) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-sm inline-flex items-center gap-2">
+                &larr; Back to Manage Event
+            </a>
+        </div>
     </div>
 
     @if(in_array($role, ['owner', 'pl']))

@@ -117,6 +117,9 @@
                                     <a href="{{ route('invitation.show', $guest->barcode_token) }}" target="_blank"
                                         class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">View</a>
 
+                                    @php
+                                        $guestTitipans = DB::table('guests')->where('titipan_by', $guest->id)->select('id', 'name', 'angpao_count as qty')->get();
+                                    @endphp
                                     <button
                                         @click="$dispatch('open-edit-guest', {
                                             id: {{ $guest->id }},
@@ -128,7 +131,8 @@
                                             status: '{{ $guest->status }}',
                                             pax_actual: {{ $guest->pax_actual ?? 0 }},
                                             angpao_count: {{ $guest->angpao_count ?? 0 }},
-                                            angpao_type: '{{ $guest->angpao_type ?? 'fisik' }}'
+                                            angpao_type: '{{ $guest->angpao_type ?? 'fisik' }}',
+                                            existing_titipans: {{ json_encode($guestTitipans) }}
                                         })"
                                         class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Edit</button>
 

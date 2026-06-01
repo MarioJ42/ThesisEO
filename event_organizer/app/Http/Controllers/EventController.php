@@ -627,9 +627,11 @@ class EventController extends Controller
                 if (is_array($titipanArray) && count($titipanArray) > 0) {
                     foreach ($titipanArray as $titipan) {
                         DB::table('guests')->where('id', $titipan['id'])->update([
+                            'status' => 'not_attending',
                             'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
                             'angpao_type' => $request->angpao_type ?? 'fisik',
                             'angpao_titipan' => true,
+                            'titipan_by' => $guestId,
                             'updated_at' => now(),
                         ]);
                     }

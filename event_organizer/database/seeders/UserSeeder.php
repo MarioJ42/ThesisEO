@@ -10,6 +10,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('users')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $users = [
             [
                 'name' => 'Fenix',
@@ -82,26 +86,42 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345'),
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            [
-                'name' => 'Kezia',
-                'email' => 'k@k.com',
-                'phone' => '081234567890',
-                'role' => 'crew_eo',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'name' => 'Clarin',
-                'email' => 'c@c.com',
-                'phone' => '081234567890',
-                'role' => 'crew_eo',
-                'password' => Hash::make('12345'),
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
+            ]
         ];
+
+        $crewNames = [
+            'Hanvy',
+            'Lucy',
+            'Henry',
+            'Eugenia',
+            'Raphael',
+            'Aprillia',
+            'Celine',
+            'Alvin',
+            'Louisa',
+            'Kezia',
+            'Mario',
+            'Edwin',
+            'Marchi',
+            'Nathasia',
+            'Casey',
+            'Jennifer',
+            'Christina'
+        ];
+
+        $prefixes = ['0812', '0813', '0821', '0857', '0878', '0896'];
+
+        foreach ($crewNames as $name) {
+            $users[] = [
+                'name' => $name,
+                'email' => strtolower($name) . '.crew@gmail.com',
+                'phone' => $prefixes[array_rand($prefixes)] . rand(10000000, 99999999),
+                'role' => 'crew_eo',
+                'password' => Hash::make('12345'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
 
         DB::table('users')->insert($users);
     }

@@ -22,8 +22,9 @@ return new class extends Migration
             $table->integer('angpao_count')->nullable();
             $table->enum('angpao_type', ['fisik', 'digital'])->nullable();
             $table->boolean('angpao_titipan')->default(false);
-            $table->string('side', 50)->nullable();
+            $table->foreignId('titipan_by')->nullable()->constrained('guests')->onDelete('set null');
 
+            $table->string('side', 50)->nullable();
             $table->timestamps();
         });
     }
