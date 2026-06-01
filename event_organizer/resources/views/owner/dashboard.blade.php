@@ -69,12 +69,56 @@
             <div id="chart-finance" class="w-full h-80"></div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col h-full">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">3. Vendor Costs Breakdown</h3>
-                <p class="text-xs text-gray-500">Where the operational money goes.</p>
+                <h3 class="text-lg font-bold text-gray-800">3. Upcoming Events</h3>
+                <p class="text-xs text-gray-500">Top 5 nearest event timelines & countdowns.</p>
             </div>
-            <div id="chart-expenditure" class="w-full h-80 flex justify-center items-center"></div>
+
+            <div class="flex-grow flex flex-col justify-center">
+                @php
+                    $upcomingEvents = \App\Models\Event::where('event_date', '>=', \Carbon\Carbon::today())
+                        ->whereIn('status', ['planning', 'ongoing', 'draft'])
+                        ->orderBy('event_date', 'asc')
+                        ->limit(5)
+                        ->get();
+                @endphp
+
+                @if($upcomingEvents->count() > 0)
+                    <ul class="divide-y divide-gray-100 flex flex-col">
+                        @foreach($upcomingEvents as $evt)
+                            @php
+                                $daysLeft = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($evt->event_date), false);
+                            @endphp
+                            <li class="py-3 first:pt-0 last:pb-0 flex justify-between items-center group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors
+                                        {{ $daysLeft == 0 ? 'bg-emerald-100 text-emerald-600' : ($daysLeft <= 7 ? 'bg-orange-50 text-orange-500' : 'bg-blue-50 text-blue-600') }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-900 line-clamp-1">{{ $evt->title }}</h4>
+                                        <p class="text-xs font-medium text-gray-500">{{ \Carbon\Carbon::parse($evt->event_date)->format('d M Y') }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 ml-2">
+                                    @if($daysLeft === 0)
+                                        <span class="inline-block px-2.5 py-1 bg-emerald-500 text-white rounded-md text-[10px] font-black tracking-wider animate-pulse">TODAY</span>
+                                    @else
+                                        <span class="text-lg font-black {{ $daysLeft <= 7 ? 'text-orange-500' : 'text-blue-600' }}">{{ $daysLeft }}</span>
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase block -mt-1">Days</span>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="flex flex-col items-center justify-center text-center text-gray-400 py-8">
+                        <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <p class="text-sm font-medium">No upcoming events scheduled.</p>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -114,10 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const grossData = rawMonthly.map(item => item.gross);
     const netData = rawMonthly.map(item => item.net);
 
-    const rawExpenditures = @json($expenditures);
-    const expLabels = rawExpenditures.map(item => item.category);
-    const expData = rawExpenditures.map(item => parseFloat(item.total_spent));
-
     const rawStatus = @json($eventStatuses);
     const statusLabels = Object.keys(rawStatus).map(s => s.charAt(0).toUpperCase() + s.slice(1));
     const statusData = Object.values(rawStatus);
@@ -139,17 +179,6 @@ document.addEventListener('DOMContentLoaded', function () {
         stroke: { curve: 'smooth', width: 3 },
         xaxis: { categories: months, axisBorder: { show: false }, axisTicks: { show: false } },
         yaxis: { labels: { formatter: (value) => "Rp " + (value / 1000000).toFixed(1) + "M" } },
-        tooltip: { y: { formatter: (value) => "Rp " + value.toLocaleString('id-ID') } }
-    }).render();
-
-    new ApexCharts(document.querySelector("#chart-expenditure"), {
-        series: expData.length > 0 ? expData : [1],
-        labels: expLabels.length > 0 ? expLabels : ['No Data'],
-        chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
-        colors: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'],
-        plotOptions: { pie: { donut: { size: '70%' } } },
-        dataLabels: { enabled: false },
-        legend: { position: 'bottom' },
         tooltip: { y: { formatter: (value) => "Rp " + value.toLocaleString('id-ID') } }
     }).render();
 

@@ -42,21 +42,18 @@ class AnalyticsController extends Controller
             $eventVendorCost = 0;
 
             foreach ($event->vendors as $slot) {
-                $dealPrice = $slot->deal_price > 0 ? $slot->deal_price : 0;
-                $netCost = $dealPrice * 0.8;
+                $dealPrice = $slot->pivot->deal_price ?? 0;
+                $netCost = $slot->pivot->net_price ?? 0;
+
                 $eventVendorCost += $netCost;
 
-                if ($event->package && $slot->is_included) {
-                    $baseAllowance = 0;
-                    if ($dealPrice > $baseAllowance) {
-                        $additionalSellingPrice += ($dealPrice - $baseAllowance);
-                    }
-                } else {
+                if (!$slot->pivot->is_included) {
                     $additionalSellingPrice += $dealPrice;
                 }
             }
 
             $sellingPrice = $basePackagePrice + $additionalSellingPrice;
+
             $monthlyFinances[$monthKey]['gross'] += $sellingPrice;
             $monthlyFinances[$monthKey]['net'] += ($sellingPrice - $eventVendorCost);
         }
@@ -68,7 +65,7 @@ class AnalyticsController extends Controller
             ->join('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')
             ->whereBetween('events.event_date', [$startDate, $endDate])
             ->whereIn('event_vendor.status', ['verified', 'signed'])
-            ->select('vendor_categories.name as category', DB::raw('SUM(event_vendor.deal_price) as total_spent'))
+            ->select('vendor_categories.name as category', DB::raw('SUM(event_vendor.net_price) as total_spent'))
             ->groupBy('vendor_categories.name')
             ->orderByDesc('total_spent')
             ->get();

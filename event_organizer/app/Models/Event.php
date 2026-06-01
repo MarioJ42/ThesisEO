@@ -33,7 +33,7 @@ class Event extends Model
     public function vendors()
     {
         return $this->belongsToMany(Vendor::class, 'event_vendor')
-            ->withPivot('vendor_contact_id', 'vendor_package_id', 'deal_price', 'status', 'is_included', 'vendor_category_id')
+            ->withPivot('vendor_contact_id', 'vendor_package_id', 'deal_price', 'net_price', 'status', 'is_included', 'vendor_category_id')
             ->withTimestamps();
     }
 

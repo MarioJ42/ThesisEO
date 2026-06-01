@@ -9,37 +9,25 @@ class EventVendorSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('event_vendor')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
         $events = DB::table('events')->get();
 
         foreach ($events as $event) {
             $templatePackageId = $event->package_id ?: 3;
 
             $bridalVendorId = DB::table('package_vendor_pivot')
-                ->where('package_id', $templatePackageId)
-                ->where('vendor_category_id', 3)
-                ->inRandomOrder()->value('vendor_id')
+                ->where('package_id', $templatePackageId)->where('vendor_category_id', 3)->inRandomOrder()->value('vendor_id')
                 ?? DB::table('category_vendor')->where('category_id', 3)->inRandomOrder()->value('vendor_id');
 
             $docVendorId = DB::table('package_vendor_pivot')
-                ->where('package_id', $templatePackageId)
-                ->where('vendor_category_id', 6)
-                ->inRandomOrder()->value('vendor_id')
+                ->where('package_id', $templatePackageId)->where('vendor_category_id', 6)->inRandomOrder()->value('vendor_id')
                 ?? DB::table('category_vendor')->where('category_id', 6)->inRandomOrder()->value('vendor_id');
 
             $suitVendorId = DB::table('package_vendor_pivot')
-                ->where('package_id', $templatePackageId)
-                ->where('vendor_category_id', 4)
-                ->inRandomOrder()->value('vendor_id')
+                ->where('package_id', $templatePackageId)->where('vendor_category_id', 4)->inRandomOrder()->value('vendor_id')
                 ?? DB::table('category_vendor')->where('category_id', 4)->inRandomOrder()->value('vendor_id');
 
             $decorVendorId = DB::table('package_vendor_pivot')
-                ->where('package_id', $templatePackageId)
-                ->where('vendor_category_id', 30)
-                ->inRandomOrder()->value('vendor_id')
+                ->where('package_id', $templatePackageId)->where('vendor_category_id', 30)->inRandomOrder()->value('vendor_id')
                 ?? DB::table('category_vendor')->where('category_id', 30)->inRandomOrder()->value('vendor_id');
 
             $templates = DB::table('package_templates')->where('package_id', $templatePackageId)->get();
@@ -63,7 +51,7 @@ class EventVendorSeeder extends Seeder
                     $shouldAssign = true;
                     $status = 'verified';
                 } elseif ($event->status === 'planning') {
-                    $shouldAssign = (rand(1, 10) <= 8);
+                    $shouldAssign = (rand(1, 10) <= 7);
                     $status = $shouldAssign ? 'verified' : 'reviewing';
                 }
 
@@ -80,19 +68,18 @@ class EventVendorSeeder extends Seeder
                         $vendorId = $docVendorId;
                     } elseif (in_array($catId, [4, 12])) {
                         $vendorId = $suitVendorId;
+                    } elseif ($catId == 23) {
+                        $vendorId = 78;
+                    } elseif (in_array($catId, [20, 21])) {
+                        $kateringVendors = [17, 70];
+                        $vendorId = $kateringVendors[array_rand($kateringVendors)];
                     } else {
                         $vendorPivot = DB::table('package_vendor_pivot')
                             ->where('package_id', $templatePackageId)
                             ->where('vendor_category_id', $catId)
-                            ->inRandomOrder()
-                            ->first();
+                            ->inRandomOrder()->first()
+                            ?? DB::table('category_vendor')->where('category_id', $catId)->inRandomOrder()->first();
 
-                        if (!$vendorPivot) {
-                            $vendorPivot = DB::table('category_vendor')
-                                ->where('category_id', $catId)
-                                ->inRandomOrder()
-                                ->first();
-                        }
                         $vendorId = $vendorPivot ? $vendorPivot->vendor_id : null;
                     }
 
@@ -107,28 +94,26 @@ class EventVendorSeeder extends Seeder
                         $vPackage = DB::table('vendor_packages')
                             ->where('vendor_id', $vendorId)
                             ->where('vendor_category_id', $catId)
-                            ->inRandomOrder()
-                            ->first();
-
-                        if (!$vPackage) {
-                            $vPackage = DB::table('vendor_packages')->where('vendor_id', $vendorId)->inRandomOrder()->first();
-                        }
+                            ->inRandomOrder()->first()
+                            ?? DB::table('vendor_packages')->where('vendor_id', $vendorId)->inRandomOrder()->first();
 
                         if ($vPackage) {
                             $vendorPkgId = $vPackage->id;
+                            $publishPrice = $vPackage->price;
+                        } else {
+                            $publishPrice = rand(15, 50) * 100000;
+                        }
 
-                            if (!in_array($vendorId, $chargedVendors)) {
-                                $publishPrice = $vPackage->price;
+                        if (!in_array($vendorId, $chargedVendors) || !$isIncluded) {
+                            $netPrice = max(0, $publishPrice - 100000);
+                            $dealPrice = $isIncluded ? 0 : $publishPrice;
 
-                                $netPrice = $publishPrice - 100000;
-
-                                $dealPrice = $isIncluded ? 0 : $publishPrice;
-
+                            if ($isIncluded) {
                                 $chargedVendors[] = $vendorId;
-                            } else {
-                                $netPrice = 0;
-                                $dealPrice = 0;
                             }
+                        } else {
+                            $netPrice = 0;
+                            $dealPrice = 0;
                         }
                     } else {
                         $status = 'unassigned';

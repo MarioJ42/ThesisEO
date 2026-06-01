@@ -132,6 +132,7 @@ class VendorContactSeeder extends Seeder
             64 => 'Michelle',  // Ann Pagar Ayu
             69 => 'Stefany',   // Stefany Hyperstage
             71 => 'Celine',    // Four Clover
+            78 => 'William', // Lancar Sound
         ];
 
         foreach ($vendors as $vendor) {
