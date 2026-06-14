@@ -163,7 +163,7 @@ class EventController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        if ($user->role === 'klien' && $event->client_id !== $user->id) {
+        if ($user->role === 'klien' && (int)$event->client_id !== (int)$user->id) {
             abort(403, 'Unauthorized action.');
         }
 
