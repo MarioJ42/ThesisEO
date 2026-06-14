@@ -168,9 +168,8 @@ class AnalyticsController extends Controller
     public function eventAnalytics(Event $event)
     {
         $role = Auth::user()->role;
-
-        if ($role === 'klien' && $event->client_id !== Auth::id()) abort(403);
-        if ($role === 'pl' && $event->pl_id !== Auth::id()) abort(403);
+        if ($role === 'klien' && (int)$event->client_id !== (int)Auth::id()) abort(403);
+        if ($role === 'pl' && (int)$event->pl_id !== (int)Auth::id()) abort(403);
 
         $hasFenixGuestbook = DB::table('event_vendor')
             ->leftJoin('vendor_categories', 'event_vendor.vendor_category_id', '=', 'vendor_categories.id')

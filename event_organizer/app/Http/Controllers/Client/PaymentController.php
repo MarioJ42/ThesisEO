@@ -105,7 +105,7 @@ class PaymentController extends Controller
 
     public function index(Event $event)
     {
-        if ($event->client_id !== Auth::id()) {
+        if ((int)$event->client_id !== (int)Auth::id()) {
             abort(403);
         }
 
@@ -121,7 +121,7 @@ class PaymentController extends Controller
 
     public function pay(Request $request, Event $event)
     {
-        if ($event->client_id !== Auth::id()) {
+        if ((int)$event->client_id !== (int)Auth::id()) {
             abort(403);
         }
 
