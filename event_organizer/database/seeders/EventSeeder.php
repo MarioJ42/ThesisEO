@@ -21,7 +21,7 @@ class EventSeeder extends Seeder
                 'pl_id'       => 1,
                 'package_id'  => 3,
                 'title'       => 'Wedding of Yoshua & Jessica',
-                'event_date'  => '2026-05-16',
+                'event_date'  => '2026-06-02',
                 'venue'       => 'DoubleTree by Hilton Surabaya',
                 'cover_image' => 'event_covers/yoshua_jessica.jpg',
                 'total_price' => 166500000.00,

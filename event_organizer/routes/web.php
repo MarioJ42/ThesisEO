@@ -199,4 +199,13 @@ Route::post('/midtrans/callback', [PaymentController::class, 'callback'])->name(
 Route::get('/invitation/{token}', [PublicInvitationController::class, 'show'])->name('invitation.show');
 Route::post('/invitation/{token}/rsvp', [PublicInvitationController::class, 'rsvp'])->name('invitation.rsvp');
 
+// Route::get('/buat-symlink', function () {
+//     $targetFolder = storage_path('app/public');
+//     $linkFolder = $_SERVER['DOCUMENT_ROOT'] . '/storage';
+
+//     \Illuminate\Support\Facades\Artisan::call('storage:link');
+
+//     return 'Symlink proses selesai. Silakan cek website Anda.';
+// });
+
 require __DIR__ . '/auth.php';
