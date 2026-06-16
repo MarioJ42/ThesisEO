@@ -83,6 +83,25 @@ class EventVendorSeeder extends Seeder
                         $vendorId = $vendorPivot ? $vendorPivot->vendor_id : null;
                     }
 
+                    if ($event->id == 1) {
+                        if ($catId == 22) {
+                            $vendorId = 75;
+                        } elseif ($catId == 1) {
+                            $vendorId = 58;
+                        } elseif ($catId == 6) {
+                            $vendorId = 24;
+                        }
+                    }
+
+                    if ($vendorId && $catId == 22) {
+                        $vendorName = DB::table('vendors')->where('id', $vendorId)->value('name');
+                        if ($vendorName) {
+                            DB::table('events')->where('id', $event->id)->update([
+                                'venue' => $vendorName
+                            ]);
+                        }
+                    }
+
                     if ($vendorId) {
                         $contact = DB::table('vendor_contacts')->where('vendor_id', $vendorId)->first();
                         if ($contact) {
@@ -143,12 +162,17 @@ class EventVendorSeeder extends Seeder
             DB::table('event_vendor')->insert($eventVendors);
         }
 
+        $guestBookPackageId = DB::table('vendor_packages')
+            ->where('vendor_id', 1)
+            ->where('vendor_category_id', 40)
+            ->value('id');
+
         DB::table('event_vendor')->insert([
             'event_id'           => 1,
             'vendor_category_id' => 40,
             'vendor_id'          => 1,
             'vendor_contact_id'  => 1,
-            'vendor_package_id'  => null,
+            'vendor_package_id'  => $guestBookPackageId,
             'session'            => 'evening',
             'role_detail'        => 'Digital QR Check-in System',
             'is_included'        => 0,
