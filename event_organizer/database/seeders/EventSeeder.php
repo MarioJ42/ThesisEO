@@ -15,7 +15,7 @@ class EventSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $events = [
-            // 1. Klien: Jessica Christy (ID: 2) | Status: Completed
+            // 1. Klien: Jessica Christy
             [
                 'client_id'   => 2,
                 'pl_id'       => 1,
@@ -30,13 +30,13 @@ class EventSeeder extends Seeder
                 'updated_at'  => Carbon::parse('2026-05-16')->subDays(1),
             ],
 
-            // 2. Klien: Januar Andika (ID: 3) | Status: Planning
+            // 2. Klien: Januar Andika
             [
                 'client_id'   => 3,
                 'pl_id'       => 1,
                 'package_id'  => 2,
                 'title'       => 'Wedding of Januar & Riska',
-                'event_date'  => '2026-06-21',
+                'event_date'  => '2026-06-27',
                 'venue'       => 'Santika Premiere Ballroom',
                 'cover_image' => 'event_covers/januar_riska.jpg',
                 'total_price' => 147000000.00,
@@ -45,13 +45,13 @@ class EventSeeder extends Seeder
                 'updated_at'  => Carbon::now(),
             ],
 
-            // 3. Klien: Syea Pascha (ID: 4) | Status: Planning
+            // 3. Klien: Syea Pascha
             [
                 'client_id'   => 4,
                 'pl_id'       => 1,
                 'package_id'  => 4,
                 'title'       => 'Wedding of Daniel & Syea',
-                'event_date'  => '2026-06-27',
+                'event_date'  => '2026-06-28',
                 'venue'       => 'Zhang Palace',
                 'cover_image' => 'event_covers/daniel_syea.jpg',
                 'total_price' => 191250000.00,
@@ -60,7 +60,7 @@ class EventSeeder extends Seeder
                 'updated_at'  => Carbon::now(),
             ],
 
-            // 4. Klien: Febriani Ruth (ID: 5) | Status: Planning
+            // 4. Klien: Febriani Ruth
             [
                 'client_id'   => 5,
                 'pl_id'       => 1,
@@ -75,13 +75,13 @@ class EventSeeder extends Seeder
                 'updated_at'  => Carbon::now(),
             ],
 
-            // 5. Klien: Dennis Bastian (ID: 8) | Status: Planning
+            // 5. Klien: Dennis Bastian
             [
                 'client_id'   => 8,
                 'pl_id'       => 1,
                 'package_id'  => 3,
                 'title'       => 'Wedding of Edward & Anne',
-                'event_date'  => '2026-07-05',
+                'event_date'  => '2026-07-11',
                 'venue'       => 'XO Palace',
                 'cover_image' => 'event_covers/edward_anne.jpg',
                 'total_price' => 149000000.00,
@@ -90,7 +90,7 @@ class EventSeeder extends Seeder
                 'updated_at'  => Carbon::now(),
             ],
 
-            // 6. Klien: Rika Alicia (ID: 6) | Status: Draft
+            // 6. Klien: Rika Alicia
             [
                 'client_id'   => 6,
                 'pl_id'       => null,

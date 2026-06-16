@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             EoPortfolioSeeder::class,
             EventCrewSeeder::class,
             GuestSeeder::class,
+            PaymentSeeder::class,
         ]);
     }
 }

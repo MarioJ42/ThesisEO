@@ -33,7 +33,8 @@ class GuestSeeder extends Seeder
         shuffle($namePool);
 
         $prefixes = ['0812', '0813', '0821', '0822', '0857', '0818', '0819', '0878', '0896'];
-        $sides = ['Groom', 'Bride', 'General'];
+
+        $sides = ['Groom', 'Bride'];
 
         $totalExpected = 0;
         $totalActual = 0;
@@ -82,9 +83,12 @@ class GuestSeeder extends Seeder
         $totalExpected += 2;
         $paxInTable20 = 3;
 
+        $targetMissing = rand(2, 5);
+        $currentMissing = 2;
+
         while ($paxInTable20 < 10) {
             $paxInvited = rand(1, min(4, 10 - $paxInTable20));
-            $guests[] = $this->generateRandomGuest($eventId, $eventDate, '20', $paxInvited, $namePool, $prefixes, $sides, $totalActual);
+            $guests[] = $this->generateRandomGuest($eventId, $eventDate, '20', $paxInvited, $namePool, $prefixes, $sides, $totalActual, $currentMissing, $targetMissing);
             $totalExpected += $paxInvited;
             $paxInTable20 += $paxInvited;
         }
@@ -93,7 +97,7 @@ class GuestSeeder extends Seeder
             $paxInTable = 0;
             while ($paxInTable < 10) {
                 $paxInvited = rand(1, min(4, 10 - $paxInTable));
-                $guests[] = $this->generateRandomGuest($eventId, $eventDate, (string)$table, $paxInvited, $namePool, $prefixes, $sides, $totalActual);
+                $guests[] = $this->generateRandomGuest($eventId, $eventDate, (string)$table, $paxInvited, $namePool, $prefixes, $sides, $totalActual, $currentMissing, $targetMissing);
                 $totalExpected += $paxInvited;
                 $paxInTable += $paxInvited;
             }
@@ -104,7 +108,7 @@ class GuestSeeder extends Seeder
         }
     }
 
-    private function generateRandomGuest($eventId, $eventDate, $table, $paxInvited, &$namePool, $prefixes, $sides, &$totalActual)
+    private function generateRandomGuest($eventId, $eventDate, $table, $paxInvited, &$namePool, $prefixes, $sides, &$totalActual, &$currentMissing, $targetMissing)
     {
         if (empty($namePool)) {
             $firstName = 'Guest';
@@ -123,21 +127,35 @@ class GuestSeeder extends Seeder
             $name = 'Kel. ' . $firstName . ' ' . $lastName;
         }
 
-        $isCheckedIn = (rand(1, 100) <= 90);
-        $paxActual = 0;
-        $checkInTime = null;
-        $angpaoCount = 0;
+        $status = 'checked_in';
+        $paxActual = $paxInvited;
 
-        if ($isCheckedIn) {
-            $status = 'checked_in';
-            $paxActual = (rand(1, 100) <= 5 && $paxInvited > 1) ? $paxInvited - 1 : $paxInvited;
-            $totalActual += $paxActual;
+        if ($currentMissing < $targetMissing) {
+            if ($paxInvited == 1) {
+                if (rand(1, 100) <= 15) {
+                    $status = 'not_attending';
+                    $paxActual = 0;
+                    $currentMissing += 1;
+                }
+            } else {
+                if (rand(1, 100) <= 25) {
+                    $paxActual = $paxInvited - 1;
+                    $currentMissing += 1;
+                }
+            }
+        }
 
+        if ($status === 'checked_in') {
             $checkInTime = clone $eventDate;
             $checkInTime->addMinutes(rand(-45, 60));
             $angpaoCount = rand(1, 2);
+            $angpaoType = (rand(1, 10) <= 7) ? 'fisik' : 'digital';
+
+            $totalActual += $paxActual;
         } else {
-            $status = 'not_attending';
+            $checkInTime = null;
+            $angpaoCount = 0;
+            $angpaoType = null;
         }
 
         return [
@@ -151,7 +169,7 @@ class GuestSeeder extends Seeder
             'check_in_time' => $checkInTime,
             'pax_actual'    => $paxActual,
             'angpao_count'  => $angpaoCount,
-            'angpao_type'   => $isCheckedIn ? (rand(1, 10) <= 7 ? 'fisik' : 'digital') : null,
+            'angpao_type'   => $angpaoType,
             'angpao_titipan' => 0,
             'titipan_by'    => null,
             'side'          => $sides[array_rand($sides)],
