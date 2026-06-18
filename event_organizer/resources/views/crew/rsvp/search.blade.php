@@ -30,7 +30,18 @@
                     <div>
                         <h3 class="font-bold text-lg text-gray-900 mb-1">{{ $guest->name }}</h3>
                         <p class="text-sm font-semibold text-gray-700">{{ $guest->phone_number ?? '-' }}</p>
-                        <p class="text-sm text-gray-600 mt-1">{{ $guest->pax_invited }} pax</p>
+
+                        @php
+                            $isConfirmed = in_array($guest->status, ['attending', 'checked_in']);
+                            $displayPax = ($isConfirmed && $guest->pax_actual > 0) ? $guest->pax_actual : $guest->pax_invited;
+                        @endphp
+
+                        <p class="text-sm text-gray-600 mt-1">
+                            <span class="font-bold text-gray-900">{{ $displayPax }}</span> pax
+                            @if($isConfirmed)
+                                <span class="text-[10px] text-gray-400 ml-1">(Invited: {{ $guest->pax_invited }})</span>
+                            @endif
+                        </p>
 
                         <p class="text-[11px] font-bold text-pink-600 mt-4 tracking-wider uppercase">Table: {{ $guest->table_name ?? '-' }}</p>
                         <p class="text-[11px] font-bold text-blue-600 mt-1 tracking-wider uppercase">Side: {{ $guest->side ?? 'General' }}</p>

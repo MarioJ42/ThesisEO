@@ -1,8 +1,15 @@
 @extends('layouts.guest_rsvp')
 
 @section('content')
+
+@php
+    $defaultPax = (in_array($guest->status, ['attending', 'checked_in']) && $guest->pax_actual > 0)
+                  ? $guest->pax_actual
+                  : $guest->pax_invited;
+@endphp
+
 <div class="relative max-w-xl mx-auto p-8 min-h-screen flex flex-col justify-center"
-     x-data="checkinForm(@js($guest->pax_invited), @js($allGuests))">
+     x-data="checkinForm(@js($defaultPax), @js($allGuests))">
 
     <a href="{{ route('crew.rsvp.search', $event->id) }}" class="absolute top-8 right-8 text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors tracking-wider">
         &larr; Back
