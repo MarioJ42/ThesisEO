@@ -569,6 +569,7 @@ class EventController extends Controller
             'pax_invited' => 'required|integer|min:1',
             'table_name' => 'nullable|string|max:50',
             'side' => 'nullable|in:Groom,Bride,General',
+            'status' => 'nullable|in:pending,attending,not_attending,checked_in',
         ]);
 
         $token = Str::random(10);
@@ -583,13 +584,13 @@ class EventController extends Controller
             'pax_invited' => $request->pax_invited,
             'table_name' => $request->table_name,
             'side' => $request->side ?? 'General',
-            'status' => 'attending',
+            'status' => $request->status ?? 'pending',
             'barcode_token' => $token,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Guest added successfully as Attending!')->with('active_tab', 'rsvp');
+        return redirect()->back()->with('success', 'Guest added successfully!')->with('active_tab', 'rsvp');
     }
 
     public function updateGuest(Request $request, Event $event, $guestId)
