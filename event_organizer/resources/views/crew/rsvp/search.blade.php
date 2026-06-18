@@ -19,7 +19,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-20">
         @foreach($guests as $guest)
-            <a href="{{ route('crew.rsvp.checkin.form', [$event->id, $guest->barcode_token ?? $guest->id]) }}"
+            <a href="{{ route('crew.rsvp.checkin.form', $event->id) }}?guest_id={{ $guest->id }}"
                x-show="search === '' || '{{ strtolower(addslashes($guest->name . ' ' . $guest->phone_number)) }}'.includes(search.toLowerCase())"
                class="block bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all cursor-pointer">
 

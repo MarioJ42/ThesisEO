@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fenix-rsvp-cache-v2';
+const CACHE_NAME = 'fenix-rsvp-cache-v3';
 
 const STATIC_ASSETS = [
     '/images/logo-fenix1.png',
@@ -37,6 +37,11 @@ self.addEventListener('fetch', (event) => {
                     const responseToCache = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, responseToCache);
+
+                        const urlWithoutQuery = event.request.url.split('?')[0];
+                        if (event.request.url !== urlWithoutQuery) {
+                            cache.put(urlWithoutQuery, networkResponse.clone());
+                        }
                     });
                 }
                 return networkResponse;
