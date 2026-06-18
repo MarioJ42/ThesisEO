@@ -350,9 +350,11 @@
                                 onClose: function() { window.location.reload(); }
                             });
                         } else {
-                            alert(data.error || 'Failed to get payment token');
+                            console.error("Midtrans Error Response:", data);
+                            alert("Error: " + (data.message || data.error || "Gagal mendapatkan token. Cek console Inspect Element!"));
                         }
                     } catch (error) {
+                        console.error("Fetch Error:", error);
                         alert('Connection error. Please try again.');
                     } finally {
                         this.isLoading = false;

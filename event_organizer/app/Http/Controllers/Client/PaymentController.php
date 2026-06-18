@@ -16,9 +16,15 @@ class PaymentController extends Controller
     public function __construct()
     {
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        Config::$isProduction = env('MIDTRANS_IS_PRODUCTION');
-        Config::$isSanitized = env('MIDTRANS_IS_SANITIZED');
-        Config::$is3ds = env('MIDTRANS_IS_3DS');
+        Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+        Config::$isSanitized = env('MIDTRANS_IS_SANITIZED', true);
+        Config::$is3ds = env('MIDTRANS_IS_3DS', true);
+
+        Config::$curlOptions = [
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_HTTPHEADER => [],
+        ];
     }
 
     private function getBillingDetails(Event $event)
@@ -122,7 +128,7 @@ class PaymentController extends Controller
     public function pay(Request $request, Event $event)
     {
         if ((int)$event->client_id !== (int)Auth::id()) {
-            abort(403);
+            return response()->json(['error' => 'Unauthorized action.'], 403);
         }
 
         $request->validate([
@@ -130,7 +136,7 @@ class PaymentController extends Controller
             'amount' => 'required|numeric|min:1',
         ]);
 
-        $amount = $request->amount;
+        $amount = (int) round($request->amount);
         $pendingPayment = $event->payments()->where('status', 'pending')->first();
 
         if ($pendingPayment && $pendingPayment->midtrans_snap_token) {
@@ -138,6 +144,8 @@ class PaymentController extends Controller
         }
 
         $orderId = 'PAY-' . $event->id . '-' . time();
+
+        $itemName = substr('Pay ' . strtoupper(str_replace('_', ' ', $request->payment_type)) . ' - ' . $event->title, 0, 50);
 
         $params = [
             'transaction_details' => [
@@ -153,7 +161,7 @@ class PaymentController extends Controller
                     'id' => $request->payment_type,
                     'price' => $amount,
                     'quantity' => 1,
-                    'name' => 'Payment ' . strtoupper(str_replace('_', ' ', $request->payment_type)) . ' - ' . $event->title
+                    'name' => $itemName
                 ]
             ],
             'callbacks' => [
@@ -177,7 +185,7 @@ class PaymentController extends Controller
 
             return response()->json(['snap_token' => $snapToken]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Midtrans Error: ' . $e->getMessage()], 500);
         }
     }
 
