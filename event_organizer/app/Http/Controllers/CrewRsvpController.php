@@ -144,7 +144,12 @@ class CrewRsvpController extends Controller
             ->select('id', 'name', 'phone_number')
             ->get();
 
-        return view('crew.rsvp.checkin_form', compact('event', 'guest', 'allGuests'));
+        $existingTitipan = DB::table('guests')
+            ->where('titipan_by', $guest->id)
+            ->select('id', 'name', 'phone_number', 'angpao_count as qty')
+            ->get();
+
+        return view('crew.rsvp.checkin_form', compact('event', 'guest', 'allGuests', 'existingTitipan'));
     }
 
     public function processCheckIn(Request $request, Event $event, $guestId)
@@ -168,15 +173,23 @@ class CrewRsvpController extends Controller
                 'updated_at' => now(),
             ]);
 
+            DB::table('guests')->where('titipan_by', $guestId)->update([
+                'angpao_count' => 0,
+                'angpao_titipan' => false,
+                'titipan_by' => null,
+            ]);
+
             if ($request->filled('titipan_data')) {
                 $titipanArray = json_decode($request->titipan_data, true);
 
                 if (is_array($titipanArray) && count($titipanArray) > 0) {
                     foreach ($titipanArray as $titipan) {
                         DB::table('guests')->where('id', $titipan['id'])->update([
-                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
+                            'status' => 'not_attending',
+                            'angpao_count' => intval($titipan['qty']),
                             'angpao_type' => $request->angpao_type,
                             'angpao_titipan' => true,
+                            'titipan_by' => $guestId,
                             'updated_at' => now(),
                         ]);
                     }
@@ -204,6 +217,7 @@ class CrewRsvpController extends Controller
 
         return view('crew.rsvp.summary', compact('event', 'guest'));
     }
+
     public function syncOfflineData(Request $request, Event $event)
     {
         $this->authorizeAccess($event);
@@ -255,12 +269,20 @@ class CrewRsvpController extends Controller
                     'updated_at' => now(),
                 ]);
 
+                DB::table('guests')->where('titipan_by', $data['guest_id'])->update([
+                    'angpao_count' => 0,
+                    'angpao_titipan' => false,
+                    'titipan_by' => null,
+                ]);
+
                 if (!empty($data['titipan_data'])) {
                     foreach ($data['titipan_data'] as $titipan) {
                         DB::table('guests')->where('id', $titipan['id'])->update([
-                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
+                            'status' => 'not_attending',
+                            'angpao_count' => intval($titipan['qty']),
                             'angpao_type' => $data['angpao_type'],
                             'angpao_titipan' => true,
+                            'titipan_by' => $data['guest_id'],
                             'updated_at' => now(),
                         ]);
                     }

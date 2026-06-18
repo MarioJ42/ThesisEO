@@ -6,10 +6,12 @@
     $defaultPax = (in_array($guest->status, ['attending', 'checked_in']) && $guest->pax_actual > 0)
                   ? $guest->pax_actual
                   : $guest->pax_invited;
+    $defaultGift = $guest->status === 'checked_in' ? $guest->angpao_count : 1;
+    $defaultType = $guest->angpao_type ?? 'fisik';
 @endphp
 
 <div class="relative max-w-xl mx-auto p-8 min-h-screen flex flex-col justify-center"
-     x-data="checkinForm(@js($defaultPax), @js($allGuests))">
+     x-data="checkinForm(@js($defaultPax), @js($defaultGift), @js($defaultType), @js($allGuests), @js($existingTitipan))">
 
     <a href="{{ route('crew.rsvp.search', $event->id) }}" class="absolute top-8 right-8 text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors tracking-wider">
         &larr; Back
@@ -63,7 +65,10 @@
                 <div class="space-y-3 mb-4">
                     <template x-for="(t, index) in titipan" :key="index">
                         <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <span class="font-bold text-sm text-gray-800" x-text="t.name"></span>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-sm text-gray-800" x-text="t.name"></span>
+                                <span class="text-[11px] font-medium text-gray-500 mt-0.5" x-text="t.phone_number || 'No Phone'"></span>
+                            </div>
                             <div class="flex items-center gap-3">
                                 <span class="text-xs text-gray-400 font-bold mr-2">GIFT:</span>
                                 <button type="button" @click="if(t.qty > 1) t.qty--" class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-500">-</button>
@@ -113,15 +118,15 @@
 </div>
 
 <script>
-    function checkinForm(initialPax, allGuestsList) {
+    function checkinForm(initialPax, initialGift, initialType, allGuestsList, existingTitipanList) {
         return {
             pax: initialPax,
-            gift: 1,
-            type: 'fisik',
+            gift: initialGift,
+            type: initialType,
             showSearch: false,
             searchQuery: '',
             allGuests: allGuestsList,
-            titipan: [],
+            titipan: existingTitipanList || [],
 
             get filteredGuests() {
                 if (this.searchQuery === '') return [];
@@ -133,7 +138,7 @@
 
             addTitipan(guest) {
                 if (!this.titipan.find(t => t.id === guest.id)) {
-                    this.titipan.push({ id: guest.id, name: guest.name, qty: 1 });
+                    this.titipan.push({ id: guest.id, name: guest.name, phone_number: guest.phone_number, qty: 1 });
                 }
                 this.searchQuery = '';
                 this.showSearch = false;
@@ -174,4 +179,4 @@
         }
     }
 </script>
-@endsection
+@endsection 
