@@ -212,7 +212,8 @@
                     }
 
                     localStorage.setItem(storageKey, JSON.stringify(offlineData));
-                    window.location.href = `/crew/events/${eventId}/rsvp`;
+
+                    window.location.href = `/crew/events/${eventId}/rsvp/summary?guest_id=${this.activeGuest.id}`;
                 }
             }
         }

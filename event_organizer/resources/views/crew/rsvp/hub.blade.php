@@ -85,7 +85,8 @@
                             '{{ route("crew.rsvp.scan", $event->id) }}',
                             '{{ route("crew.rsvp.search", $event->id) }}',
                             '{{ route("crew.rsvp.guests.create", $event->id) }}',
-                            '{{ route("crew.rsvp.checkin.form", $event->id) }}'
+                            '{{ route("crew.rsvp.checkin.form", $event->id) }}',
+                            '{{ route("crew.rsvp.checkin.summary", $event->id) }}'
                         ];
                         urls.forEach(url => fetch(url).catch(() => {}));
                     }

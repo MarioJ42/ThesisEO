@@ -173,25 +173,22 @@ class CrewRsvpController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('crew.rsvp.checkin.summary', [$event->id, $guestId])
-                ->with('success_checkin', 'Guest successfully checked in!');
+
+            return redirect()->route('crew.rsvp.checkin.summary', $event->id)
+                ->with(['success_checkin' => 'Guest successfully checked in!', 'guest_id' => $guestId]);
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to check-in guest: ' . $e->getMessage()]);
         }
     }
 
-    public function checkInSummary(Event $event, $guestId)
+    public function checkInSummary(Event $event)
     {
         $this->authorizeAccess($event);
 
-        $guest = DB::table('guests')->where('id', $guestId)->first();
+        $allGuests = DB::table('guests')->where('event_id', $event->id)->get();
 
-        if (!$guest) {
-            abort(404, 'Guest not found.');
-        }
-
-        return view('crew.rsvp.summary', compact('event', 'guest'));
+        return view('crew.rsvp.summary', compact('event', 'allGuests'));
     }
 
     public function syncOfflineData(Request $request, Event $event)
