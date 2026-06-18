@@ -70,16 +70,19 @@
         return {
             submitForm(event) {
                 event.preventDefault();
+                const formData = new FormData(event.target);
+
                 if (navigator.onLine) {
                     event.target.submit();
                 } else {
-                    const formData = new FormData(event.target);
                     const newGuest = {
+                        id: 'offline_' + Date.now(), // Berikan ID Sementara
                         name: formData.get('name'),
                         phone_number: formData.get('phone_number'),
-                        pax_invited: formData.get('pax_invited'),
+                        pax_invited: parseInt(formData.get('pax_invited')),
                         table_name: formData.get('table_name'),
                         side: formData.get('side'),
+                        status: 'pending',
                         timestamp: new Date().toISOString()
                     };
 
@@ -87,7 +90,9 @@
                     let offlineData = JSON.parse(localStorage.getItem(storageKey)) || [];
                     offlineData.push(newGuest);
                     localStorage.setItem(storageKey, JSON.stringify(offlineData));
-                    window.location.href = `/crew/events/${eventId}/rsvp`;
+
+                    // Lanjutkan ke form Check-in dengan melempar ID sementara
+                    window.location.href = `{{ route('crew.rsvp.checkin.form', $event->id) }}?guest_id=${newGuest.id}`;
                 }
             }
         }

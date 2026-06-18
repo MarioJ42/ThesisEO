@@ -28,7 +28,7 @@
 <script>
     function onScanSuccess(decodedText) {
         html5QrcodeScanner.clear();
-        window.location.href = `{{ url('/crew/events/'.$event->id.'/rsvp/checkin') }}/${decodedText}`;
+        window.location.href = `{{ route('crew.rsvp.checkin.form', $event->id) }}?token=${decodedText}`;
     }
 
     let config = {
@@ -39,13 +39,12 @@
     };
 
     let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", config, /* verbose= */ false
+        "reader", config, false
     );
     html5QrcodeScanner.render(onScanSuccess);
 </script>
 
 <style>
-    /* CSS tambahan untuk merapikan tombol bawaan library */
     #reader__dashboard_section_csr button {
         background-color: #2563eb !important;
         color: white !important;

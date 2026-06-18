@@ -160,7 +160,7 @@ Route::middleware(['auth'])->prefix('crew')->group(function () {
         Route::get('/search', [CrewRsvpController::class, 'search'])->name('crew.rsvp.search');
         Route::get('/guests/create', [CrewRsvpController::class, 'createGuest'])->name('crew.rsvp.guests.create');
         Route::post('/guests/store', [CrewRsvpController::class, 'storeGuest'])->name('crew.rsvp.guests.store');
-        Route::get('/checkin/{token}', [CrewRsvpController::class, 'checkInForm'])->name('crew.rsvp.checkin.form');
+        Route::get('/checkin-form', [CrewRsvpController::class, 'checkInForm'])->name('crew.rsvp.checkin.form');
         Route::post('/checkin/{guest}', [CrewRsvpController::class, 'processCheckIn'])->name('crew.rsvp.checkin.process');
         Route::get('/checkin/{guest}/summary', [CrewRsvpController::class, 'checkInSummary'])->name('crew.rsvp.checkin.summary');
         Route::post('/sync', [CrewRsvpController::class, 'syncOfflineData'])->name('crew.rsvp.sync');

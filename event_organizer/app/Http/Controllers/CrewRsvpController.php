@@ -124,32 +124,15 @@ class CrewRsvpController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('crew.rsvp.checkin.form', [$event->id, $token])
+        return redirect()->route('crew.rsvp.checkin.form', ['event' => $event->id, 'token' => $token])
             ->with('success', 'Guest added! Please complete the check-in.');
     }
 
-    public function checkInForm(Event $event, $token)
+    public function checkInForm(Event $event)
     {
         $this->authorizeAccess($event);
-
-        $guest = DB::table('guests')->where('barcode_token', $token)->first();
-
-        if (!$guest) {
-            abort(404, 'Guest QR Code not found in the database.');
-        }
-
-        $allGuests = DB::table('guests')
-            ->where('event_id', $event->id)
-            ->where('id', '!=', $guest->id)
-            ->select('id', 'name', 'phone_number')
-            ->get();
-
-        $existingTitipan = DB::table('guests')
-            ->where('titipan_by', $guest->id)
-            ->select('id', 'name', 'phone_number', 'angpao_count as qty')
-            ->get();
-
-        return view('crew.rsvp.checkin_form', compact('event', 'guest', 'allGuests', 'existingTitipan'));
+        $allGuests = DB::table('guests')->where('event_id', $event->id)->get();
+        return view('crew.rsvp.checkin_form', compact('event', 'allGuests'));
     }
 
     public function processCheckIn(Request $request, Event $event, $guestId)
@@ -173,20 +156,13 @@ class CrewRsvpController extends Controller
                 'updated_at' => now(),
             ]);
 
-            DB::table('guests')->where('titipan_by', $guestId)->update([
-                'angpao_count' => 0,
-                'angpao_titipan' => false,
-                'titipan_by' => null,
-            ]);
-
             if ($request->filled('titipan_data')) {
                 $titipanArray = json_decode($request->titipan_data, true);
 
                 if (is_array($titipanArray) && count($titipanArray) > 0) {
                     foreach ($titipanArray as $titipan) {
                         DB::table('guests')->where('id', $titipan['id'])->update([
-                            'status' => 'not_attending',
-                            'angpao_count' => intval($titipan['qty']),
+                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
                             'angpao_type' => $request->angpao_type,
                             'angpao_titipan' => true,
                             'titipan_by' => $guestId,
@@ -237,13 +213,15 @@ class CrewRsvpController extends Controller
         DB::beginTransaction();
         try {
             $syncedNewGuests = 0;
+            $idMapping = [];
+
             foreach ($newGuests as $guest) {
                 $token = Str::random(10);
                 while (DB::table('guests')->where('barcode_token', $token)->exists()) {
                     $token = Str::random(10);
                 }
 
-                DB::table('guests')->insert([
+                $realId = DB::table('guests')->insertGetId([
                     'event_id' => $event->id,
                     'name' => $guest['name'],
                     'phone_number' => $guest['phone_number'],
@@ -255,12 +233,20 @@ class CrewRsvpController extends Controller
                     'created_at' => \Carbon\Carbon::parse($guest['timestamp'])->format('Y-m-d H:i:s'),
                     'updated_at' => now(),
                 ]);
+
+                $idMapping[$guest['id']] = $realId;
                 $syncedNewGuests++;
             }
 
             $syncedCheckins = 0;
             foreach ($checkins as $data) {
-                DB::table('guests')->where('id', $data['guest_id'])->update([
+                $targetGuestId = $data['guest_id'];
+
+                if (isset($idMapping[$targetGuestId])) {
+                    $targetGuestId = $idMapping[$targetGuestId];
+                }
+
+                DB::table('guests')->where('id', $targetGuestId)->update([
                     'status' => 'checked_in',
                     'check_in_time' => \Carbon\Carbon::parse($data['timestamp'])->format('Y-m-d H:i:s'),
                     'pax_actual' => $data['pax_actual'],
@@ -269,20 +255,17 @@ class CrewRsvpController extends Controller
                     'updated_at' => now(),
                 ]);
 
-                DB::table('guests')->where('titipan_by', $data['guest_id'])->update([
-                    'angpao_count' => 0,
-                    'angpao_titipan' => false,
-                    'titipan_by' => null,
-                ]);
-
                 if (!empty($data['titipan_data'])) {
                     foreach ($data['titipan_data'] as $titipan) {
-                        DB::table('guests')->where('id', $titipan['id'])->update([
-                            'status' => 'not_attending',
-                            'angpao_count' => intval($titipan['qty']),
+                        $titipanId = $titipan['id'];
+                        if (isset($idMapping[$titipanId])) {
+                            $titipanId = $idMapping[$titipanId];
+                        }
+                        DB::table('guests')->where('id', $titipanId)->update([
+                            'angpao_count' => DB::raw("COALESCE(angpao_count, 0) + " . intval($titipan['qty'])),
                             'angpao_type' => $data['angpao_type'],
                             'angpao_titipan' => true,
-                            'titipan_by' => $data['guest_id'],
+                            'titipan_by' => $targetGuestId,
                             'updated_at' => now(),
                         ]);
                     }

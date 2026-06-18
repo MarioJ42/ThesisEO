@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fenix-rsvp-cache-v1';
+const CACHE_NAME = 'fenix-rsvp-cache-v2';
 
 const STATIC_ASSETS = [
     '/images/logo-fenix1.png',
@@ -28,7 +28,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
-
     if (event.request.url.startsWith('chrome-extension') || event.request.url.includes('/api/')) return;
 
     event.respondWith(
@@ -43,7 +42,7 @@ self.addEventListener('fetch', (event) => {
                 return networkResponse;
             })
             .catch(() => {
-                return caches.match(event.request).then((cachedResponse) => {
+                return caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
                     if (cachedResponse) {
                         return cachedResponse;
                     }
