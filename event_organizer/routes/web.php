@@ -120,6 +120,11 @@ Route::middleware(['auth'])->prefix('owner')->group(function () {
     Route::put('/event-packages/{package}/price', [OwnerController::class, 'updatePackagePrice'])->name('owner.wedding_packages.price.update');
     Route::post('/events/{event}/crew/add-custom-job', [EventController::class, 'addCustomCrewSlot'])->name('owner.events.crew.add_custom_job');
     Route::delete('/events/{event}/crew/{slot}/delete', [EventController::class, 'deleteCrewSlot'])->name('owner.events.crew.delete');
+
+    Route::get('/portfolios', [\App\Http\Controllers\EoPortfolioController::class, 'index'])->name('owner.portfolios.index');
+    Route::post('/portfolios', [\App\Http\Controllers\EoPortfolioController::class, 'store'])->name('owner.portfolios.store');
+    Route::put('/portfolios/{portfolio}', [\App\Http\Controllers\EoPortfolioController::class, 'update'])->name('owner.portfolios.update');
+    Route::delete('/portfolios/{portfolio}', [\App\Http\Controllers\EoPortfolioController::class, 'destroy'])->name('owner.portfolios.destroy');
 });
 
 Route::middleware(['auth'])->prefix('pl')->group(function () {
