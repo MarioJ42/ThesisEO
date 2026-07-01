@@ -199,6 +199,21 @@ class AnalyticsController extends Controller
         $giftDigital = $guests->where('angpao_type', 'digital')->sum('angpao_count');
         $totalTitipan = $guests->where('angpao_titipan', 1)->count();
 
+        $checkedInGuests = $guests->where('status', 'checked_in')
+            ->whereNotNull('check_in_time')
+            ->sortBy(function ($guest) {
+                return strtotime($guest->check_in_time);
+            })->values();
+
+        $averageCheckinTime = 0;
+
+        if ($checkedInGuests->count() > 1) {
+            $firstCheckIn = \Carbon\Carbon::parse($checkedInGuests->first()->check_in_time);
+            $lastCheckIn = \Carbon\Carbon::parse($checkedInGuests->last()->check_in_time);
+            $totalSeconds = abs($lastCheckIn->diffInSeconds($firstCheckIn));
+            $averageCheckinTime = round($totalSeconds / ($checkedInGuests->count() - 1));
+        }
+
         if ($role === 'klien') {
             return view('client.analytics', compact(
                 'event',
@@ -212,7 +227,8 @@ class AnalyticsController extends Controller
                 'paxActual',
                 'giftFisik',
                 'giftDigital',
-                'totalTitipan'
+                'totalTitipan',
+                'averageCheckinTime'
             ));
         }
 
@@ -246,7 +262,8 @@ class AnalyticsController extends Controller
             'giftDigital',
             'totalTitipan',
             'vendorAllocations',
-            'trafficData'
+            'trafficData',
+            'averageCheckinTime'
         ));
     }
 }

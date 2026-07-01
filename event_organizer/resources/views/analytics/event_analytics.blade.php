@@ -93,10 +93,10 @@
 
         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">10. Gift Category Overview</h3>
-                <p class="text-xs text-gray-500">Physical vs digital gift proportions.</p>
+                <h3 class="text-lg font-bold text-gray-800">10. Check-in Speed Efficiency</h3>
+                <p class="text-xs text-gray-500">Average processing time per guest arrival.</p>
             </div>
-            <div id="chart-gifts" class="w-full h-64 flex justify-center items-center"></div>
+            <div id="chart-speed" class="w-full h-64 flex justify-center items-center"></div>
         </div>
     </div>
 </div>
@@ -140,12 +140,36 @@ document.addEventListener('DOMContentLoaded', function () {
         legend: { show: false }
     }).render();
 
-    new ApexCharts(document.querySelector("#chart-gifts"), {
-        series: [@json($giftFisik), @json($giftDigital)],
-        labels: ['Physical Gift', 'Digital Envelope'],
-        chart: { type: 'pie', height: 280, fontFamily: 'inherit' },
-        colors: ['#6366f1', '#10b981'],
-        legend: { position: 'bottom' }
+    let avgSpeed = @json($averageCheckinTime);
+    let speedText = avgSpeed > 0 ? avgSpeed + " Sec/Guest" : "No Data";
+    let speedColor = avgSpeed === 0 ? '#cbd5e1' : (avgSpeed <= 30 ? '#10b981' : (avgSpeed <= 60 ? '#f59e0b' : '#ef4444'));
+    let speedPercentage = avgSpeed === 0 ? 0 : (avgSpeed <= 60 ? Math.round((avgSpeed / 60) * 100) : 100);
+
+    new ApexCharts(document.querySelector("#chart-speed"), {
+        series: [speedPercentage],
+        chart: { type: 'radialBar', height: 280, fontFamily: 'inherit' },
+        plotOptions: {
+            radialBar: {
+                startAngle: -135,
+                endAngle: 135,
+                hollow: { size: '60%' },
+                track: { background: '#f1f5f9', strokeWidth: '100%' },
+                dataLabels: {
+                    name: { show: true, fontSize: '12px', color: '#64748b', offsetY: 20 },
+                    value: {
+                        show: true,
+                        fontSize: '22px',
+                        fontWeight: '900',
+                        offsetY: -10,
+                        color: speedColor,
+                        formatter: function (val) { return speedText; }
+                    }
+                }
+            }
+        },
+        fill: { colors: [speedColor] },
+        stroke: { lineCap: "round" },
+        labels: ['Avg. Speed']
     }).render();
 
 });
