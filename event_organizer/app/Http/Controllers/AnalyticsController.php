@@ -205,13 +205,29 @@ class AnalyticsController extends Controller
                 return strtotime($guest->check_in_time);
             })->values();
 
-        $averageCheckinTime = 0;
+        $totalSeconds = 0;
+        $guestCount = $checkedInGuests->count();
 
-        if ($checkedInGuests->count() > 1) {
-            $firstCheckIn = \Carbon\Carbon::parse($checkedInGuests->first()->check_in_time);
-            $lastCheckIn = \Carbon\Carbon::parse($checkedInGuests->last()->check_in_time);
-            $totalSeconds = abs($lastCheckIn->diffInSeconds($firstCheckIn));
-            $averageCheckinTime = round($totalSeconds / ($checkedInGuests->count() - 1));
+        if ($guestCount > 0) {
+            $capSeconds = 60;
+            $totalSeconds += $capSeconds;
+
+            for ($i = 1; $i < $guestCount; $i++) {
+                $prev = \Carbon\Carbon::parse($checkedInGuests[$i - 1]->check_in_time);
+                $curr = \Carbon\Carbon::parse($checkedInGuests[$i]->check_in_time);
+
+                $diff = abs($curr->diffInSeconds($prev));
+
+                if ($diff <= 60) {
+                    $totalSeconds += $diff;
+                } else {
+                    $totalSeconds += $capSeconds;
+                }
+            }
+
+            $averageCheckinTime = round($totalSeconds / $guestCount);
+        } else {
+            $averageCheckinTime = 0;
         }
 
         if ($role === 'klien') {
